@@ -4,7 +4,7 @@ import { ArrowRight, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Project } from "../../types";
+import { Project } from "../../../types";
 import { ProjectDetailsDialog } from "./project-details-dialog";
 import { ApplyProjectDialog } from "./apply-project-dialog";
 

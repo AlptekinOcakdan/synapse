@@ -11,9 +11,9 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import {ProjectCard} from "../components/project-card";
-import {ProjectsFilterBar} from "../components/projects-filter-bar";
-import {AdvancedSearchPanel} from "../components/advanced-search-panel";
+import {ProjectCard} from "../components/dashboard/project-card";
+import {ProjectsFilterBar} from "../components/dashboard/projects-filter-bar";
+import {AdvancedSearchPanel} from "../components/dashboard/advanced-search-panel";
 import {MOCK_PROJECTS} from "../../types";
 
 export const DashboardView = () => {

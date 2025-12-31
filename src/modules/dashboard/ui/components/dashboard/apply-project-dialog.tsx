@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
-import { Project } from "../../types";
+import { Project } from "../../../types";
 import {LayoutProps} from "@/lib/utils";
 
 interface ApplyProjectDialogProps extends LayoutProps{

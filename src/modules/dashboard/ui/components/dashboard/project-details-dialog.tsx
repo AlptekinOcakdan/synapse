@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Trophy, User, Target, Layers, Briefcase, GraduationCap } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Project, DEPARTMENTS } from "../../types";
+import { Project, DEPARTMENTS } from "../../../types";
 import {LayoutProps} from "@/lib/utils";
 
 interface ProjectDetailsDialogProps extends LayoutProps{
@@ -102,7 +102,7 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                             </h4>
 
                             <div className="grid gap-3">
-                                {project.positions.map((pos, index) => (
+                                {project.positions.map((pos) => (
                                     <div key={pos.id} className="border rounded-md p-3 hover:bg-muted/20 transition-colors">
                                         <div className="flex items-center gap-2 mb-2">
                                             <GraduationCap className="w-4 h-4 text-primary" />

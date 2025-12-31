@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { DEPARTMENTS } from "../../types";
+import { DEPARTMENTS } from "../../../types";
 
 interface AdvancedSearchPanelProps {
     isOpen: boolean;

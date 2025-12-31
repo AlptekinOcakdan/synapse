@@ -4,9 +4,10 @@ export interface Competition {
 }
 
 export interface Experience {
-    institution: string; // Kurum Adı
-    duration: string;    // Süre (Örn: 6 Ay, 2022-2023)
-    description: string; // Yaptığı işin özeti
+    institution: string;
+    duration: string;
+    description: string;
+    order: number;
 }
 
 export interface SignUpFormData {

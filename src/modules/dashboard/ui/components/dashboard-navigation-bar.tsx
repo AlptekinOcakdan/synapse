@@ -52,7 +52,7 @@ export const DashboardNavigationBar = () => {
                 <div className="flex w-full items-center justify-between gap-4">
 
                     {/* --- SOL TARAFTA LOGO --- */}
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                         <SynapseLogo />
                     </div>
 

@@ -1,11 +1,13 @@
 // types.ts
 
+import {Competition, Experience} from "@/modules/auth/types";
+
 export interface Department {
     value: string;
     label: string;
 }
 
-// Yeni: Pozisyon/Rol Arayüzü
+// Pozisyon/Rol Arayüzü
 export interface ProjectPosition {
     id: string;
     department: string; // Department.value ile eşleşecek
@@ -18,11 +20,27 @@ export interface Project {
     title: string;
     owner: string;
     summary: string;
-    participantsNeeded: number; // positions.length'e eşit olabilir veya sanal bir alan
+    participantsNeeded: number;
     platform: string;
     competition: string;
     date: string;
-    positions: ProjectPosition[]; // YENİ ALAN
+    positions: ProjectPosition[];
+}
+
+export interface UserProfile {
+    id: number;
+    name: string;
+    title: string;
+    department: string;
+    avatar: string;
+    skills: string[];
+    projectCount: number;
+    top3Count: number;
+    isAvailable?: boolean;
+    // --- YENİ ALANLAR ---
+    bio?: string;
+    experiences?: Experience[];
+    competitions?: Competition[];
 }
 
 // --- SABİTLER ---
@@ -34,7 +52,160 @@ export const DEPARTMENTS: Department[] = [
     {value: "makine-muh", label: "Makine Mühendisliği"},
 ];
 
-// --- GÜNCELLENMİŞ MOCK VERİLER ---
+export const MOCK_PROFILES: UserProfile[] = [
+    {
+        id: 1,
+        name: "Alptekin Ocakdan",
+        title: "Full Stack Geliştirici",
+        department: "bilgisayar-muh",
+        avatar: "",
+        skills: ["React", "Next.js", "Node.js", "PostgreSQL", "Docker", "TypeScript"],
+        projectCount: 12,
+        top3Count: 4,
+        isAvailable: true,
+        bio: "Yazılım geliştirmeye olan tutkum, karmaşık problemleri çözme isteğimle birleşiyor. Özellikle modern web teknolojileri ve ölçeklenebilir sistem mimarileri üzerine çalışmaktan keyif alıyorum.",
+        experiences: [
+            {
+                institution: "Aselsan",
+                duration: "3 Ay (Yaz Stajı)",
+                description: "Savunma sanayi projelerinde C++ ile gömülü yazılım geliştirme süreçlerine katkıda bulundum.",
+                order: 2
+            },
+            {
+                institution: "Sakarya Teknokent",
+                duration: "1 Yıl",
+                description: "Start-up ortamında Full Stack geliştirici olarak görev aldım. React ve Node.js kullanarak çeşitli web uygulamaları geliştirdim.",
+                order: 1
+            }
+        ],
+        competitions: [
+            { name: "Teknofest 2023 - Eğitim Teknolojileri", rank: "Finalist" },
+            { name: "Tübitak 2209-A", rank: "Kabul" }
+        ]
+    },
+    {
+        id: 2,
+        name: "Zeynep Kaya",
+        title: "Veri Bilimcisi",
+        department: "yazilim-muh",
+        avatar: "", // Gerçekçi olması için boş bıraktım, UI'da baş harfler çıkacak
+        skills: ["Python", "TensorFlow", "Pandas", "Veri Analizi", "Makine Öğrenmesi"],
+        projectCount: 8,
+        top3Count: 3,
+        isAvailable: false,
+        bio: "Veri bilimi alanında derinlemesine bilgi sahibi olup, büyük veri setlerinden anlamlı içgörüler çıkarma konusunda uzmanım. Makine öğrenimi modelleri geliştirme ve uygulama konusunda deneyimliyim.",
+        experiences: [
+            {
+                institution: "Turkcell Teknoloji",
+                duration: "6 Ay (Uzun Dönem Staj)",
+                description: "Müşteri verileri üzerinde makine öğrenimi modelleri geliştirme ve churn analizi optimizasyonu.",
+                order: 2
+            },
+            {
+                institution: "Getir",
+                duration: "2 Yıl",
+                description: "Veri analisti olarak tedarik zinciri optimizasyonu için veri odaklı çözümler ürettim.",
+                order: 1
+            }
+        ],
+        competitions: [
+            { name: "Datathon Türkiye 2023", rank: "İlk 10%" },
+            { name: "Teknofest Yapay Zeka Yarışması", rank: "2.lik Ödülü" }
+        ]
+    },
+    {
+        id: 3,
+        name: "Mehmet Demir",
+        title: "Blokzincir Geliştiricisi",
+        department: "endustri-muh",
+        avatar: "",
+        skills: ["Solidity", "Rust", "Akıllı Sözleşmeler", "Web3.js"],
+        projectCount: 5,
+        top3Count: 1,
+        isAvailable: true,
+        bio: "Blokzincir teknolojileri ve akıllı sözleşmeler konusunda uzmanım. Merkeziyetsiz uygulamalar (dApp) geliştirme ve blokzincir tabanlı finansal çözümler üretme konusunda deneyim sahibiyim.",
+        experiences: [
+            {
+                institution: "BtcTurk",
+                duration: "1 Yıl",
+                description: "Kripto varlık işlem platformunda backend süreçlerine destek ve akıllı sözleşme denetimi.",
+                order: 1
+            },
+            {
+                institution: "Avalanche Türkiye Topluluğu",
+                duration: "8 Ay",
+                description: "Topluluk projelerinde açık kaynak dApp geliştirme süreçlerinde aktif rol aldım.",
+                order: 2
+            }
+        ],
+        competitions: [
+            { name: "Solana İstanbul Hackathon", rank: "Finalist" },
+            { name: "ETHGünü Hackathonu", rank: "3.lük Ödülü" }
+        ]
+    },
+    {
+        id: 4,
+        name: "Ayşe Yılmaz",
+        title: "Gömülü Sistemler Mühendisi",
+        department: "elektrik-elektronik",
+        avatar: "",
+        skills: ["C", "C++", "Altium Designer", "STM32", "RTOS"],
+        projectCount: 15,
+        top3Count: 5,
+        isAvailable: true,
+        bio: "Gömülü sistemler ve mikrodenetleyiciler konusunda derinlemesine bilgi sahibiyim. Donanım ve yazılım entegrasyonu üzerine çalışmaktan ve otonom sistemler geliştirmekten keyif alıyorum.",
+        experiences: [
+            {
+                institution: "STM Savunma Teknolojileri",
+                duration: "1 Yıl",
+                description: "Otonom drone sistemleri için gömülü yazılım geliştirme ve sensör füzyonu çalışmaları.",
+                order: 1
+            },
+            {
+                institution: "Baykar Teknoloji",
+                duration: "2 Yıl",
+                description: "Aviyonik sistemler üzerine Ar-Ge mühendisi olarak görev aldım.",
+                order: 2
+            }
+        ],
+        competitions: [
+            { name: "Teknofest Savaşan İHA", rank: "1.lik Ödülü" },
+            { name: "TÜBİTAK 2242 Proje Yarışması", rank: "İlk 5" }
+        ]
+    },
+    {
+        id: 5,
+        name: "Caner Erkin",
+        title: "Mekanik Tasarım Mühendisi",
+        department: "makine-muh",
+        avatar: "",
+        skills: ["SolidWorks", "Ansys", "AutoCAD", "Termodinamik"],
+        projectCount: 7,
+        top3Count: 0,
+        isAvailable: false,
+        bio: "Mekanik tasarım ve analiz konularında uzmanım. Yenilikçi mühendislik çözümleri geliştirme, 3D modelleme ve yapısal analiz konularında deneyim sahibiyim.",
+        experiences: [
+            {
+                institution: "TUSAŞ (TAI)",
+                duration: "2 Yıl",
+                description: "Havacılık yapısal parçalarının mekanik tasarımı ve sonlu elemanlar analizi (FEA).",
+                order: 1
+            },
+            {
+                institution: "Ford Otosan",
+                duration: "1 Yıl",
+                description: "Motor parçalarının termal analizleri ve üretim süreçlerinin iyileştirilmesi.",
+                order: 2
+            }
+        ],
+        competitions: [
+            { name: "Teknofest Robotaksi Binek Otonom", rank: "2.lik Ödülü" },
+            { name: "FNSS MİLDEN Tasarım Yarışması", rank: "Mansiyon Ödülü" }
+        ]
+    },
+];
+
+// --- MOCK PROJELER ---
 export const MOCK_PROJECTS: Project[] = [
     {
         id: 1,
