@@ -21,9 +21,10 @@ import {
     ExternalLink,
     Award
 } from "lucide-react";
-import {UserProfile, DEPARTMENTS} from "../../../types";
+import {UserProfile} from "../../../types";
 import {Competition, Experience} from "@/modules/auth/types";
 import {LayoutProps} from "@/lib/utils";
+import {DEPARTMENTS} from "@/lib/data";
 
 interface ProfileDetailsDialogProps extends LayoutProps {
     profile: UserProfile;

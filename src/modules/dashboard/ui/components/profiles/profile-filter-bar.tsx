@@ -20,7 +20,7 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { DEPARTMENTS } from "../../../types";
+import {DEPARTMENTS} from "@/lib/data";
 
 interface ProfileFilterBarProps {
     searchQuery: string;

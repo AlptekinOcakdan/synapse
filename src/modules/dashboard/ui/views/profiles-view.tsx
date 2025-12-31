@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ProfileCard } from "../components/profiles/profile-card";
 import { ProfileFilterBar } from "../components/profiles/profile-filter-bar";
-import { MOCK_PROFILES } from "../../types";
+import {MOCK_PROFILES} from "@/lib/data";
 
 export const ProfilesView = () => {
     // --- STATE ---
@@ -21,14 +21,8 @@ export const ProfilesView = () => {
         const titleMatch = p.title.toLocaleLowerCase("tr").includes(query);
         const textMatch = nameMatch || titleMatch;
 
-        // 2. Bölüm Filtresi (Çoklu Seçim - OR Logic)
-        // Eğer hiç bölüm seçilmediyse hepsi gelsin (true).
-        // Seçildiyse, profilin bölümü seçilenler listesinde var mı?
         const deptMatch = selectedDepartments.length === 0 || selectedDepartments.includes(p.department);
 
-        // 3. Yetenek Filtresi (Çoklu Seçim - OR Logic / Geniş Eşleşme)
-        // Eğer hiç yetenek girilmediyse hepsi gelsin.
-        // Girildiyse, profilin yeteneklerinden EN AZ BİRİ arananlardan biriyle eşleşiyor mu?
         const skillMatch = selectedSkills.length === 0 || p.skills.some(profileSkill =>
             selectedSkills.some(searchSkill =>
                 profileSkill.toLowerCase().includes(searchSkill.toLowerCase())

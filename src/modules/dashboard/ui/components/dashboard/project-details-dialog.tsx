@@ -12,8 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Trophy, User, Target, Layers, Briefcase, GraduationCap } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Project, DEPARTMENTS } from "../../../types";
+import { Project } from "../../../types";
 import {LayoutProps} from "@/lib/utils";
+import {DEPARTMENTS} from "@/lib/data";
 
 interface ProjectDetailsDialogProps extends LayoutProps{
     project: Project;
@@ -67,7 +68,7 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                                 <User className="w-5 h-5 text-primary mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium">Proje Sahibi</p>
-                                    <p className="text-sm text-muted-foreground">{project.owner}</p>
+                                    <p className="text-sm text-muted-foreground">{project.owner.name}</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">

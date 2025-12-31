@@ -27,9 +27,10 @@ export const DashboardNavigationBar = () => {
     }, []);
 
     const navLinks = [
-        { name: "Projeler", href: "/dashboard" },
+        { name: "Proje Pazarı", href: "/dashboard" },
         { name: "Yıldızlar Karması", href: "/dashboard/profiles" },
         { name: "Projelerim", href: "/dashboard/my-projects" },
+        { name: "Sohbetlerim", href: "/dashboard/chats" },
     ];
 
     const getLinkClass = (href: string) => {
@@ -60,15 +61,19 @@ export const DashboardNavigationBar = () => {
                     <div className="flex items-center gap-4">
 
                         {/* DESKTOP LINKS (Mobilde gizlenir) */}
-                        <div className="hidden md:flex items-center gap-6 mr-2">
+                        <div className="hidden md:flex items-center gap-4 mr-2">
                             {navLinks.map((link) => (
-                                <Link
+                                <Button
                                     key={link.name}
-                                    href={link.href}
-                                    className={getLinkClass(link.href)}
+                                    variant="nav" // Yeni eklediğimiz stil
+                                    size="sm"
+                                    asChild // Button'un Link gibi davranmasını sağlar
+                                    data-active={pathname === link.href} // Aktiflik durumunu CSS'e bildirir
                                 >
-                                    {link.name}
-                                </Link>
+                                    <Link href={link.href}>
+                                        {link.name}
+                                    </Link>
+                                </Button>
                             ))}
                             {/* Desktop Ayırıcı Çizgi */}
                             <div className="h-6 w-px bg-border/60 hidden lg:block" />

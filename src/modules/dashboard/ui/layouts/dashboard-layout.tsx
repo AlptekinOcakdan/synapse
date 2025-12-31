@@ -4,8 +4,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const DashboardLayout = ({ children }: LayoutProps) => {
     return (
-        // EKLENEN: 'max-w-[100vw]' ve 'overflow-x-hidden'
-        // Bu, sayfanın cihaz genişliğinden fazla olmasını kesinlikle engeller.
         <main className="min-h-dvh grid grid-rows-[5rem_1fr]">
             <DashboardNavigationBar />
             <div className="w-full h-full">

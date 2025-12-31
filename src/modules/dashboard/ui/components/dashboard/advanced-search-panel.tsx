@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { DEPARTMENTS } from "../../../types";
+import {DEPARTMENTS} from "@/lib/data";
+import {KeyboardEvent} from "react";
 
 interface AdvancedSearchPanelProps {
     isOpen: boolean;
@@ -56,7 +57,7 @@ export const AdvancedSearchPanel = ({
     };
 
     // Klavye ile ekleme (Enter)
-    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
             e.preventDefault();
             handleAddSkill();
@@ -144,7 +145,7 @@ export const AdvancedSearchPanel = ({
                             <Label className="flex items-center gap-2 text-sm font-semibold">
                                 <Award className="w-4 h-4 text-primary" /> Yetenekler
                             </Label>
-                            <div className="bg-background px-3 py-2 rounded-md border border-input min-h-[42px] focus-within:ring-1 focus-within:ring-ring transition-all flex flex-col justify-center">
+                            <div className="bg-background px-3 py-2 rounded-md border border-input min-h-10.5 focus-within:ring-1 focus-within:ring-ring transition-all flex flex-col justify-center">
                                 {/* Rozetler (Badges) */}
                                 <div className="flex flex-wrap gap-2 mb-2 empty:mb-0">
                                     <AnimatePresence>
@@ -175,7 +176,7 @@ export const AdvancedSearchPanel = ({
                                 {/* Input ve Ekle Butonu */}
                                 <div className="flex items-center gap-2 w-full">
                                     <Input
-                                        className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-8 placeholder:text-muted-foreground/50 text-sm flex-1 min-w-[120px]"
+                                        className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-8 placeholder:text-muted-foreground/50 text-sm flex-1 min-w-30"
                                         placeholder="Yetenek yaz..."
                                         value={skillInput}
                                         onChange={(e) => setSkillInput(e.target.value)}

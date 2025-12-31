@@ -14,7 +14,7 @@ import {
 import {ProjectCard} from "../components/dashboard/project-card";
 import {ProjectsFilterBar} from "../components/dashboard/projects-filter-bar";
 import {AdvancedSearchPanel} from "../components/dashboard/advanced-search-panel";
-import {MOCK_PROJECTS} from "../../types";
+import {MOCK_PROJECTS} from "@/lib/data";
 
 export const DashboardView = () => {
     // --- STATE ---
@@ -36,7 +36,7 @@ export const DashboardView = () => {
         // 1. Metin Araması (Başlık veya Sahip)
         const query = searchQuery.toLocaleLowerCase("tr");
         const title = p.title.toLocaleLowerCase("tr");
-        const owner = p.owner.toLocaleLowerCase("tr");
+        const owner = p.owner.name.toLocaleLowerCase("tr");
         const matchesSearch = title.includes(query) || owner.includes(query);
 
         // 2. Bölüm Filtresi (Positions dizisi içinde arar)

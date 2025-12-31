@@ -35,7 +35,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
                         <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-3 sm:gap-4">
                             <span className="flex items-center gap-1.5">
                                 <Users className="w-4 h-4" />
-                                <span className="truncate">{project.owner}</span>
+                                <span className="truncate">{project.owner.name}</span>
                             </span>
                             <span className="flex items-center gap-1.5 text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full text-xs">
                                 <Trophy className="w-3.5 h-3.5" />

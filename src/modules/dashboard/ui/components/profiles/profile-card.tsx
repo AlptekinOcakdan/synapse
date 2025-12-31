@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {DEPARTMENTS, UserProfile } from "../../../types";
+import {UserProfile } from "../../../types";
 import {ProfileDetailsDialog} from "@/modules/dashboard/ui/components/profiles/profile-details-dialog";
+import {DEPARTMENTS} from "@/lib/data";
 
 interface ProfileCardProps {
     profile: UserProfile;
