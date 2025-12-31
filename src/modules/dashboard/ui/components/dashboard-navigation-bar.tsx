@@ -33,13 +33,6 @@ export const DashboardNavigationBar = () => {
         { name: "Sohbetlerim", href: "/dashboard/chats" },
     ];
 
-    const getLinkClass = (href: string) => {
-        const isActive = pathname === href;
-        return `text-sm font-medium transition-colors hover:text-primary ${
-            isActive ? "text-primary font-bold" : "text-muted-foreground"
-        }`;
-    };
-
     return (
         // HomeNavbar yapısı: header -> nav -> div(flex justify-between)
         <header

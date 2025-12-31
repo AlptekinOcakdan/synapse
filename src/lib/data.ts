@@ -1,7 +1,7 @@
 
 
 // --- SABİTLER ---
-import {Department, Project, SimpleUser, UserProfile} from "@/modules/dashboard/types";
+import {ChatSession, Department, Project, SimpleUser, UserProfile} from "@/modules/dashboard/types";
 
 export const DEPARTMENTS: Department[] = [
     { value: "bilgisayar-muh", label: "Bilgisayar Mühendisliği" },
@@ -398,6 +398,49 @@ export const MOCK_MY_PROJECTS: Project[] = [
                 filled: 1,
                 skills: ["Supply Chain", "Analiz"]
             }
+        ]
+    }
+];
+
+export const CURRENT_USER_ID = 1; // Alptekin (Giriş yapan kullanıcı)
+
+export const MOCK_CHATS: ChatSession[] = [
+    {
+        id: "c1",
+        type: "direct",
+        name: "Zeynep Kaya",
+        avatar: "https://i.pravatar.cc/150?u=zeynep",
+        lastMessage: "Yarınki toplantı saat kaçta?",
+        lastMessageTime: "10:30",
+        unreadCount: 2,
+        participants: [
+            { id: 1, name: "Alptekin Ocakdan", avatar: "", status: "online" },
+            { id: 2, name: "Zeynep Kaya", avatar: "https://i.pravatar.cc/150?u=zeynep", status: "online" }
+        ],
+        messages: [
+            { id: "m1", senderId: 2, content: "Selam Alptekin, nasılsın?", timestamp: "2024-01-01T10:00:00" },
+            { id: "m2", senderId: 1, content: "İyiyim Zeynep, sen nasılsın?", timestamp: "2024-01-01T10:05:00" },
+            { id: "m3", senderId: 2, content: "Yarınki toplantı saat kaçta?", timestamp: "2024-01-01T10:30:00" },
+        ]
+    },
+    {
+        id: "c2",
+        type: "group",
+        name: "Otonom İHA Ekibi",
+        avatar: "", // Grup ikon (boşsa baş harfler)
+        lastMessage: "Raporları sisteme yükledim.",
+        lastMessageTime: "Dün",
+        unreadCount: 0,
+        participants: [
+            { id: 1, name: "Alptekin Ocakdan", avatar: "", status: "online" },
+            { id: 3, name: "Mehmet Demir", avatar: "", status: "offline" },
+            { id: 5, name: "Caner Erkin", avatar: "", status: "online" }
+        ],
+        messages: [
+            { id: "m10", senderId: 3, content: "Arkadaşlar motor sürücüleri geldi mi?", timestamp: "2024-01-01T09:00:00" },
+            { id: "m11", senderId: 5, content: "Evet, laboratuvara bıraktım.", timestamp: "2024-01-01T09:15:00" },
+            { id: "m12", senderId: 1, content: "Harika, akşam test edelim.", timestamp: "2024-01-01T09:20:00" },
+            { id: "m13", senderId: 5, content: "Raporları sisteme yükledim.", timestamp: "2024-01-01T18:00:00" },
         ]
     }
 ];

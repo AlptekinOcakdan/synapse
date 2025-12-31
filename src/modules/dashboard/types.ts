@@ -74,3 +74,29 @@ export interface ProjectFormData {
         skills: string[];
     }[];
 }
+
+export interface ChatUser {
+    id: number;
+    name: string;
+    avatar: string;
+    status: "online" | "offline";
+}
+
+export interface Message {
+    id: string;
+    senderId: number;
+    content: string;
+    timestamp: string; // ISO string
+}
+
+export interface ChatSession {
+    id: string;
+    type: "direct" | "group";
+    name: string; // Grup adı veya Kişi adı
+    avatar?: string; // Grup resmi veya kişi avatarı
+    lastMessage: string;
+    lastMessageTime: string;
+    unreadCount: number;
+    participants: ChatUser[]; // Katılımcı listesi
+    messages: Message[]; // Sohbet geçmişi
+}
