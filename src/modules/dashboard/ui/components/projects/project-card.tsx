@@ -61,7 +61,7 @@ export const ProjectCard = ({ project, currentUserId }: ProjectCardProps) => {
 
                     {/* --- AKSİYON BUTONLARI (Sağ Taraf) --- */}
                     {/* Burası detay dialog'undan bağımsız çalışır */}
-                    <div className="flex flex-row items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 shrink-0 pr-4">
+                    <div className="flex flex-row items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 shrink-0 px-4">
 
                         {/* Grup Sohbeti Butonu */}
                         <Button variant="secondary" className="flex-1 w-full lg:w-auto text-xs sm:text-sm h-9">

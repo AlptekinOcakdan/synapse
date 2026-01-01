@@ -1,12 +1,14 @@
 export interface Competition {
     name: string;
     rank: string;
+    date?: string;
 }
 
 export interface Experience {
     institution: string;
     duration: string;
     description: string;
+    role?: string;
     order: number;
 }
 
@@ -15,12 +17,10 @@ export interface SignUpFormData {
     lastName: string;
     email: string;
     otp: string;
-
-    // CV Bölümü
     department: string;
-    bio: string;           // YENİ: Kendini anlatan yazı
+    bio: string;
     skills: string[];
-    experiences: Experience[]; // GÜNCELLENDİ: Artık obje dizisi
+    experiences: Experience[];
     competitions: Competition[];
     certificates: string[];
     profileImage?: string | null;

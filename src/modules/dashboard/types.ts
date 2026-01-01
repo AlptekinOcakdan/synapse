@@ -1,5 +1,3 @@
-// --- 1. SABİTLER VE ENUMLAR ---
-
 import {Competition, Experience} from "@/modules/auth/types";
 
 export interface Department {
@@ -7,24 +5,27 @@ export interface Department {
     label: string;
 }
 
-// Proje Durumu için standart tip
 export type ProjectStatus = "ongoing" | "completed" | "recruiting" | "cancelled";
 
-// --- 3. KULLANICI (USER) YAPILARI ---
-
-// En temel kullanıcı verisi (Kartlarda, katılımcı listelerinde görünür)
 export interface SimpleUser {
     id: number;
     name: string;
     avatar: string;
-    department: string; // Department.value ile eşleşir
-    title: string;     // Örn: "Full Stack Developer"
+    department: string;
+    title: string;
 }
 
-// Detaylı Profil (Profil sayfasında ve Modalda görünür)
-// SimpleUser'dan miras alır, üzerine detay ekler.
+export interface SocialLinks {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    personalWebsite?: string;
+}
+
 export interface UserProfile extends SimpleUser {
+    email?: string;
     bio: string;
+    socialLinks?: SocialLinks;
     skills: string[];
     projectCount: number;
     top3Count: number;
@@ -34,19 +35,15 @@ export interface UserProfile extends SimpleUser {
     certificates?: string[];
 }
 
-// --- 4. PROJE (PROJECT) YAPILARI ---
-
-// Projedeki Açık veya Kapalı Pozisyon Tanımı
 export interface ProjectPosition {
-    id: string;         // UUID
-    department: string; // Department.value (örn: "bilgisayar-muh")
-    count: number;      // Bu pozisyon için toplam aranan kişi sayısı (Örn: 2)
-    filled: number;     // Şu an dolan kontenjan (Örn: 1)
-    skills: string[];   // Bu pozisyon için beklenen yetenekler
-    description?: string; // Opsiyonel açıklama
+    id: string;
+    department: string;
+    count: number;
+    filled: number;
+    skills: string[];
+    description?: string;
 }
 
-// Ana Proje Arayüzü (Hem Dashboard hem Anasayfa için TEK TİP)
 export interface Project {
     id: number;
     title: string;
@@ -63,7 +60,7 @@ export interface Project {
 
 export interface ProjectFormData {
     title: string;
-    competition: string; // Platform bilgisi genelde yarışmadan çıkarılabilir veya ayrı sorulabilir
+    competition: string;
     platform?: string;
     summary: string;
     status: ProjectStatus;
@@ -86,36 +83,32 @@ export interface Message {
     id: string;
     senderId: number;
     content: string;
-    timestamp: string; // ISO string
+    timestamp: string;
 }
 
 export interface ChatSession {
     id: string;
     type: "direct" | "group";
-    name: string; // Grup adı veya Kişi adı
-    avatar?: string; // Grup resmi veya kişi avatarı
+    name: string;
+    avatar?: string;
     lastMessage: string;
     lastMessageTime: string;
     unreadCount: number;
-    participants: ChatUser[]; // Katılımcı listesi
-    messages: Message[]; // Sohbet geçmişi
+    participants: ChatUser[];
+    messages: Message[];
 }
 
 export interface Academician {
     id: string;
     name: string;
-    title: string; // Örn: Prof. Dr., Doç. Dr., Dr. Öğr. Üyesi
-    department: string; // "computer-engineering" gibi slug veya direkt isim
+    title: string;
+    department: string;
     avatar: string;
     email: string;
     office?: string;
-
-    // Akademik Veriler
-    researchInterests: string[]; // İlgi alanları / Uzmanlıklar
-    publicationsCount: number;   // Yayın sayısı (Opsiyonel görsel şov için)
-    citationCount: number;       // Atıf sayısı
-    mentoredProjects: number;    // Yönettiği/Mentör olduğu proje sayısı
-
-    // Durum
-    isAvailableForMentorship: boolean; // Proje mentörlüğü kabul ediyor mu?
+    researchInterests: string[];
+    publicationsCount: number;
+    citationCount: number;
+    mentoredProjects: number;
+    isAvailableForMentorship: boolean;
 }

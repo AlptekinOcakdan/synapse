@@ -66,14 +66,14 @@ export const AuthButton = () => {
                 <DropdownMenuSeparator />
 
                 {/* Menü Öğeleri */}
-                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")} className="cursor-pointer">
+                <DropdownMenuItem onClick={() => router.push("/profile")} className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profilim</span>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")} className="cursor-pointer">
+                <DropdownMenuItem onClick={() => router.push("/profile/questions")} className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>Ayarlar</span>
+                    <span>Sorularım</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

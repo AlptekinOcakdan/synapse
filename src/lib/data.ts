@@ -1,7 +1,6 @@
-
-
 // --- SABİTLER ---
 import {Academician, ChatSession, Department, Project, SimpleUser, UserProfile} from "@/modules/dashboard/types";
+import {MailThread} from "@/modules/profile/types";
 
 export const DEPARTMENTS: Department[] = [
     { value: "bilgisayar-muh", label: "Bilgisayar Mühendisliği" },
@@ -501,5 +500,124 @@ export const MOCK_ACADEMICIANS: Academician[] = [
         citationCount: 45,
         mentoredProjects: 2,
         isAvailableForMentorship: true,
+    }
+];
+
+export const CURRENT_USER: UserProfile = {
+    id: 1,
+    name: "Alptekin Ocakdan",
+    title: "Yazılım Mühendisi & Full Stack Geliştirici",
+    department: "computer-engineering",
+    email: "alptekin.ocakdan@example.com",
+    bio: "Modern web teknolojileri ve ölçeklenebilir sistem mimarileri üzerine çalışan tutkulu bir geliştirici. Açık kaynak projelere katkı sağlamayı ve yeni teknolojileri deneyimlemeyi sever.",
+    avatar: "https://i.pravatar.cc/150?u=alp",
+    isAvailable: true,
+    socialLinks: {
+        github: "https://github.com/alptekinocakdan",
+        linkedin: "https://linkedin.com/in/alptekinocakdan",
+    },
+    skills: ["React", "Next.js", "Node.js", "TypeScript", "PostgreSQL", "Docker", "AWS"],
+    projectCount: 12,
+    top3Count: 4, // Devam eden
+    experiences: [
+        {
+            institution: "Tech Solutions Inc.",
+            role: "Senior Frontend Developer",
+            duration: "2023 - Günümüz",
+            description: "Kurumsal dashboard uygulamalarının geliştirilmesi ve UI kütüphanesinin yönetimi.",
+            order:1
+        },
+        {
+            institution: "Sakarya Üniversitesi",
+            role: "Araştırma Asistanı",
+            duration: "2021 - 2023",
+            description: "Büyük veri analizi ve yapay zeka projelerinde akademik çalışmalar.",
+            order:2
+        }
+    ],
+    competitions: [
+        { name: "Teknofest 2024", rank: "Finalist", date: "2024" },
+        { name: "Hackathon Turkey", rank: "1.lik Ödülü", date: "2023" }
+    ]
+};
+
+export const MOCK_MAILS: MailThread[] = [
+    {
+        id: "m-1",
+        academician: {
+            id: "ac-1",
+            name: "Prof. Dr. Ahmet Yılmaz",
+            title: "Prof. Dr.",
+            avatar: "https://i.pravatar.cc/150?u=ac1",
+            department: "Bilgisayar Müh."
+        },
+        subject: "İHA Projesi Teknik Destek",
+        // DİKKAT: Bu isim MOCK_PROJECTS[0].title ile aynı olmalı
+        relatedProject: "Otonom İHA İle Yangın Tespiti ve Müdahale Sistemi",
+        lastMessageDate: "10:30",
+        isUnread: true,
+        messages: [
+            {
+                id: "msg-1",
+                senderId: "u1",
+                content: "Hocam merhaba, İHA'nın görüntü işleme modülünde takıldığımız bir nokta var.",
+                timestamp: "2025-12-01T09:00:00",
+                isRead: true
+            },
+            {
+                id: "msg-2",
+                senderId: "ac-1",
+                content: "Merhaba, yarın ofis saatimde gelirseniz algoritmaya birlikte bakabiliriz.",
+                timestamp: "2025-12-01T10:30:00",
+                isRead: false
+            }
+        ]
+    },
+    {
+        id: "m-2",
+        academician: {
+            id: "ac-2",
+            name: "Doç. Dr. Zeynep Kaya",
+            title: "Doç. Dr.",
+            avatar: "https://i.pravatar.cc/150?u=ac2",
+            department: "Yazılım Müh."
+        },
+        subject: "Tarımsal Veri Seti Hakkında",
+        // DİKKAT: Bu isim MOCK_PROJECTS[3].title ile aynı olmalı
+        relatedProject: "Yapay Zeka Destekli Tarımsal Verimlilik Analizi",
+        lastMessageDate: "Dün",
+        isUnread: false,
+        messages: [
+            {
+                id: "msg-3",
+                senderId: "u1",
+                content: "Hocam, projemiz için gerekli olan uydu verilerine nasıl erişebiliriz?",
+                timestamp: "2025-11-30T14:00:00",
+                isRead: true
+            }
+        ]
+    },
+    {
+        id: "m-3",
+        academician: {
+            id: "ac-3",
+            name: "Dr. Öğr. Üyesi Mehmet Demir",
+            title: "Dr. Öğr. Üyesi",
+            avatar: "https://i.pravatar.cc/150?u=ac3",
+            department: "Elektrik-Elektronik Müh."
+        },
+        subject: "Genel Danışmanlık",
+        relatedProject: undefined, // Proje ile ilgisi yok
+        lastMessageDate: "2 gün önce",
+        isUnread: false,
+        messages: [
+            {
+                id: "msg-4",
+                senderId: "u1",
+                content: "Hocam merhaba, staj konusunda danışmak istemiştim.",
+                timestamp: "2025-11-28T11:00:00",
+                isRead: true
+            }
+        ]
     }
 ];
