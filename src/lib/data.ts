@@ -9,6 +9,7 @@ import {
     UserProfile
 } from "@/modules/dashboard/types";
 import {MailThread} from "@/modules/profile/types";
+import {AcademicianMailThread} from "@/modules/academician/types";
 
 export const DEPARTMENTS: Department[] = [
     { value: "bilgisayar-muh", label: "Bilgisayar Mühendisliği" },
@@ -144,314 +145,6 @@ export const MOCK_PROFILES: UserProfile[] = [
     },
 ];
 
-// --- 3. GENEL PROJELER (Project Interface Uyumlu) ---
-// Ana Sayfadaki liste
-export const MOCK_PROJECTS: Project[] = [
-    {
-        id: 1,
-        title: "Otonom İHA İle Yangın Tespiti ve Müdahale Sistemi",
-        owner: USERS.alptekin, // Obje Referansı
-        summary: "Orman yangınlarını erken tespit edip otonom olarak müdahale edebilen bir İHA sistemi geliştiriyoruz.",
-        platform: "Teknofest",
-        competition: "Savaşan İHA Yarışması",
-        date: "2024-01-15",
-        status: "recruiting",
-        participantsNeeded: 2,
-        participants: [], // Henüz kimse yok
-        positions: [
-            {
-                id: "p1-1",
-                department: "yazilim-muh",
-                count: 1,
-                filled: 0,
-                skills: ["Python", "OpenCV", "AI"],
-                description: "Görüntü işleme algoritmaları üzerine çalışacak."
-            },
-            {
-                id: "p1-2",
-                department: "makine-muh",
-                count: 1,
-                filled: 0,
-                skills: ["SolidWorks", "Aerodinamik"],
-                description: "İHA gövde tasarımı ve montajı."
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: "Engelsiz Yaşam İçin Görüntü İşleme Destekli Gözlük",
-        owner: USERS.ayse,
-        summary: "Görme engelli bireyler için nesne tanıma ve sesli asistan özellikli akıllı gözlük projesi.",
-        platform: "TÜBİTAK",
-        competition: "2209-A Araştırma Projeleri",
-        date: "2023-12-20",
-        status: "recruiting",
-        participantsNeeded: 1,
-        participants: [],
-        positions: [
-            {
-                id: "p2-1",
-                department: "elektrik-elektronik",
-                count: 1,
-                filled: 0,
-                skills: ["Embedded Systems", "C++", "PCB Tasarım"],
-                description: "Gözlük donanımı ve gömülü yazılım."
-            }
-        ]
-    },
-    {
-        id: 3,
-        title: "Blokzincir Tabanlı Tedarik Zinciri Yönetimi",
-        owner: USERS.mehmet,
-        summary: "Gıda güvenliğini sağlamak amacıyla tarladan sofraya izlenebilirlik sağlayan dApp.",
-        platform: "Hackathon",
-        competition: "Solana Global Hackathon",
-        date: "2024-02-01",
-        status: "recruiting",
-        participantsNeeded: 3,
-        participants: [USERS.caner], // Örnek: Caner katılmış olsun
-        positions: [
-            {
-                id: "p3-1",
-                department: "bilgisayar-muh",
-                count: 2,
-                filled: 0,
-                skills: ["Solidity", "Rust", "Smart Contracts"],
-            },
-            {
-                id: "p3-2",
-                department: "endustri-muh",
-                count: 1,
-                filled: 1, // Biri dolmuş (Caner)
-                skills: ["Lojistik", "Süreç Yönetimi"],
-            }
-        ]
-    },
-    {
-        id: 4,
-        title: "Yapay Zeka Destekli Tarımsal Verimlilik Analizi",
-        owner: USERS.zeynep,
-        summary: "Uydu görüntüleri ve sensör verileriyle tarlalardaki verimliliği artıran AI modeli.",
-        platform: "Teknofest",
-        competition: "Tarım Teknolojileri Yarışması",
-        date: "2023-11-10",
-        status: "recruiting",
-        participantsNeeded: 2,
-        participants: [],
-        positions: [
-            {
-                id: "p4-1",
-                department: "yazilim-muh",
-                count: 1,
-                filled: 0,
-                skills: ["Python", "TensorFlow", "Data Analysis"],
-            },
-            {
-                id: "p4-2",
-                department: "elektrik-elektronik",
-                count: 1,
-                filled: 0,
-                skills: ["IoT", "Arduino", "Sensörler"],
-            }
-        ]
-    },
-    {
-        id: 5,
-        title: "Elektrikli Araçlar İçin Yüksek Verimli BMS",
-        owner: USERS.caner,
-        summary: "Li-ion bataryaların ömrünü uzatan ve güvenliğini artıran yerli BMS tasarımı.",
-        platform: "Teknofest",
-        competition: "Efficiency Challenge",
-        date: "2024-01-05",
-        status: "ongoing",
-        participantsNeeded: 4,
-        participants: [],
-        positions: [
-            {
-                id: "p5-1",
-                department: "elektrik-elektronik",
-                count: 2,
-                filled: 0,
-                skills: ["Circuit Design", "Matlab", "Simulink"],
-            },
-            {
-                id: "p5-3",
-                department: "makine-muh",
-                count: 1,
-                filled: 0,
-                skills: ["Termal Analiz", "Ansys"],
-            },
-            {
-                id: "p5-4",
-                department: "yazilim-muh",
-                count: 1,
-                filled: 0,
-                skills: ["C", "Embedded Linux"],
-            }
-        ]
-    },
-];
-
-// --- 4. BENİM PROJELERİM (Dashboard İçin) ---
-// Kullanıcının sahibi olduğu projeler
-export const MOCK_MY_PROJECTS: Project[] = [
-    {
-        id: 10, // ID çakışmasın diye 10 verdim
-        title: "Otonom İHA İle Yangın Tespiti (Benim Projem)",
-        owner: USERS.alptekin,
-        summary: "Orman yangınlarını erken tespit edip otonom olarak müdahale edebilen bir İHA sistemi.",
-        platform: "Teknofest",
-        competition: "Savaşan İHA Yarışması",
-        status: "ongoing",
-        date: "2024-01-15",
-        participantsNeeded: 2,
-        participants: [USERS.ali, USERS.ayse], // Ali ve Ayşe katılmış
-        positions: [
-            {
-                id: "mp1-1",
-                department: "makine-muh",
-                count: 1,
-                filled: 1, // Dolu
-                skills: ["SolidWorks", "Aerodinamik"]
-            },
-            {
-                id: "mp1-2",
-                department: "yazilim-muh",
-                count: 1,
-                filled: 1, // Dolu
-                skills: ["ROS", "Python"]
-            }
-        ]
-    },
-    {
-        id: 11,
-        title: "Blokzincir Tabanlı Lojistik",
-        owner: USERS.zeynep,
-        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
-        platform: "Hackathon",
-        competition: "Solana Global Hackathon",
-        status: "completed",
-        date: "2023-11-20",
-        participantsNeeded: 0,
-        participants: [USERS.alptekin],
-        positions: [
-            {
-                id: "mp2-1",
-                department: "endustri-muh",
-                count: 1,
-                filled: 1,
-                skills: ["Supply Chain", "Analiz"]
-            }
-        ]
-    },
-    {
-        id: 12,
-        title: "Blokzincir Tabanlı Lojistik",
-        owner: USERS.zeynep,
-        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
-        platform: "Hackathon",
-        competition: "Solana Global Hackathon",
-        status: "completed",
-        date: "2023-11-20",
-        participantsNeeded: 0,
-        participants: [USERS.alptekin],
-        positions: [
-            {
-                id: "mp2-1",
-                department: "endustri-muh",
-                count: 1,
-                filled: 1,
-                skills: ["Supply Chain", "Analiz"]
-            }
-        ]
-    },
-    {
-        id: 13,
-        title: "Blokzincir Tabanlı Lojistik",
-        owner: USERS.zeynep,
-        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
-        platform: "Hackathon",
-        competition: "Solana Global Hackathon",
-        status: "completed",
-        date: "2023-11-20",
-        participantsNeeded: 0,
-        participants: [USERS.alptekin],
-        positions: [
-            {
-                id: "mp2-1",
-                department: "endustri-muh",
-                count: 1,
-                filled: 1,
-                skills: ["Supply Chain", "Analiz"]
-            }
-        ]
-    },
-    {
-        id: 14,
-        title: "Blokzincir Tabanlı Lojistik",
-        owner: USERS.zeynep,
-        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
-        platform: "Hackathon",
-        competition: "Solana Global Hackathon",
-        status: "completed",
-        date: "2023-11-20",
-        participantsNeeded: 0,
-        participants: [USERS.alptekin],
-        positions: [
-            {
-                id: "mp2-1",
-                department: "endustri-muh",
-                count: 1,
-                filled: 1,
-                skills: ["Supply Chain", "Analiz"]
-            }
-        ]
-    }
-];
-
-export const CURRENT_USER_ID = 1; // Alptekin (Giriş yapan kullanıcı)
-
-export const MOCK_CHATS: ChatSession[] = [
-    {
-        id: "c1",
-        type: "direct",
-        name: "Zeynep Kaya",
-        avatar: "https://i.pravatar.cc/150?u=zeynep",
-        lastMessage: "Yarınki toplantı saat kaçta?",
-        lastMessageTime: "10:30",
-        unreadCount: 2,
-        participants: [
-            { id: 1, name: "Alptekin Ocakdan", avatar: "", status: "online" },
-            { id: 2, name: "Zeynep Kaya", avatar: "https://i.pravatar.cc/150?u=zeynep", status: "online" }
-        ],
-        messages: [
-            { id: "m1", senderId: 2, content: "Selam Alptekin, nasılsın?", timestamp: "2024-01-01T10:00:00" },
-            { id: "m2", senderId: 1, content: "İyiyim Zeynep, sen nasılsın?", timestamp: "2024-01-01T10:05:00" },
-            { id: "m3", senderId: 2, content: "Yarınki toplantı saat kaçta?", timestamp: "2024-01-01T10:30:00" },
-        ]
-    },
-    {
-        id: "c2",
-        type: "group",
-        name: "Otonom İHA Ekibi",
-        avatar: "", // Grup ikon (boşsa baş harfler)
-        lastMessage: "Raporları sisteme yükledim.",
-        lastMessageTime: "Dün",
-        unreadCount: 0,
-        participants: [
-            { id: 1, name: "Alptekin Ocakdan", avatar: "", status: "online" },
-            { id: 3, name: "Mehmet Demir", avatar: "", status: "offline" },
-            { id: 5, name: "Caner Erkin", avatar: "", status: "online" }
-        ],
-        messages: [
-            { id: "m10", senderId: 3, content: "Arkadaşlar motor sürücüleri geldi mi?", timestamp: "2024-01-01T09:00:00" },
-            { id: "m11", senderId: 5, content: "Evet, laboratuvara bıraktım.", timestamp: "2024-01-01T09:15:00" },
-            { id: "m12", senderId: 1, content: "Harika, akşam test edelim.", timestamp: "2024-01-01T09:20:00" },
-            { id: "m13", senderId: 5, content: "Raporları sisteme yükledim.", timestamp: "2024-01-01T18:00:00" },
-        ]
-    }
-];
-
 export const MOCK_ACADEMICIANS: Academician[] = [
     {
         id: "ac-1",
@@ -510,6 +203,332 @@ export const MOCK_ACADEMICIANS: Academician[] = [
         isAvailableForMentorship: true,
     }
 ];
+
+// --- 3. GENEL PROJELER (Project Interface Uyumlu) ---
+// Ana Sayfadaki liste
+export const MOCK_PROJECTS: Project[] = [
+    {
+        id: 1,
+        title: "Otonom İHA İle Yangın Tespiti ve Müdahale Sistemi",
+        owner: USERS.alptekin, // Obje Referansı
+        summary: "Orman yangınlarını erken tespit edip otonom olarak müdahale edebilen bir İHA sistemi geliştiriyoruz.",
+        platform: "Teknofest",
+        competition: "Savaşan İHA Yarışması",
+        date: "2024-01-15",
+        status: "recruiting",
+        participantsNeeded: 2,
+        participants: [], // Henüz kimse yok
+        positions: [
+            {
+                id: "p1-1",
+                department: "yazilim-muh",
+                count: 1,
+                filled: 0,
+                skills: ["Python", "OpenCV", "AI"],
+                description: "Görüntü işleme algoritmaları üzerine çalışacak."
+            },
+            {
+                id: "p1-2",
+                department: "makine-muh",
+                count: 1,
+                filled: 0,
+                skills: ["SolidWorks", "Aerodinamik"],
+                description: "İHA gövde tasarımı ve montajı."
+            }
+        ],
+        needsAdvisor: true,
+        advisor: undefined
+    },
+    {
+        id: 2,
+        title: "Engelsiz Yaşam İçin Görüntü İşleme Destekli Gözlük",
+        owner: USERS.ayse,
+        summary: "Görme engelli bireyler için nesne tanıma ve sesli asistan özellikli akıllı gözlük projesi.",
+        platform: "TÜBİTAK",
+        competition: "2209-A Araştırma Projeleri",
+        date: "2023-12-20",
+        status: "recruiting",
+        participantsNeeded: 1,
+        participants: [],
+        positions: [
+            {
+                id: "p2-1",
+                department: "elektrik-elektronik",
+                count: 1,
+                filled: 0,
+                skills: ["Embedded Systems", "C++", "PCB Tasarım"],
+                description: "Gözlük donanımı ve gömülü yazılım."
+            }
+        ],
+        needsAdvisor: true,
+        advisor: MOCK_ACADEMICIANS[0] // Prof. Dr. Ahmet Yılmaz
+    },
+    {
+        id: 3,
+        title: "Blokzincir Tabanlı Tedarik Zinciri Yönetimi",
+        owner: USERS.mehmet,
+        summary: "Gıda güvenliğini sağlamak amacıyla tarladan sofraya izlenebilirlik sağlayan dApp.",
+        platform: "Hackathon",
+        competition: "Solana Global Hackathon",
+        date: "2024-02-01",
+        status: "recruiting",
+        participantsNeeded: 3,
+        participants: [USERS.caner], // Örnek: Caner katılmış olsun
+        positions: [
+            {
+                id: "p3-1",
+                department: "bilgisayar-muh",
+                count: 2,
+                filled: 0,
+                skills: ["Solidity", "Rust", "Smart Contracts"],
+            },
+            {
+                id: "p3-2",
+                department: "endustri-muh",
+                count: 1,
+                filled: 1, // Biri dolmuş (Caner)
+                skills: ["Lojistik", "Süreç Yönetimi"],
+            }
+        ],
+        needsAdvisor: false,
+        advisor: undefined
+    },
+    {
+        id: 4,
+        title: "Yapay Zeka Destekli Tarımsal Verimlilik Analizi",
+        owner: USERS.zeynep,
+        summary: "Uydu görüntüleri ve sensör verileriyle tarlalardaki verimliliği artıran AI modeli.",
+        platform: "Teknofest",
+        competition: "Tarım Teknolojileri Yarışması",
+        date: "2023-11-10",
+        status: "recruiting",
+        participantsNeeded: 2,
+        participants: [],
+        positions: [
+            {
+                id: "p4-1",
+                department: "yazilim-muh",
+                count: 1,
+                filled: 0,
+                skills: ["Python", "TensorFlow", "Data Analysis"],
+            },
+            {
+                id: "p4-2",
+                department: "elektrik-elektronik",
+                count: 1,
+                filled: 0,
+                skills: ["IoT", "Arduino", "Sensörler"],
+            }
+        ],
+        needsAdvisor: true,
+        advisor: undefined // Arş. Gör. Zeynep Çelik
+    },
+    {
+        id: 5,
+        title: "Elektrikli Araçlar İçin Yüksek Verimli BMS",
+        owner: USERS.caner,
+        summary: "Li-ion bataryaların ömrünü uzatan ve güvenliğini artıran yerli BMS tasarımı.",
+        platform: "Teknofest",
+        competition: "Efficiency Challenge",
+        date: "2024-01-05",
+        status: "ongoing",
+        participantsNeeded: 4,
+        participants: [],
+        positions: [
+            {
+                id: "p5-1",
+                department: "elektrik-elektronik",
+                count: 2,
+                filled: 0,
+                skills: ["Circuit Design", "Matlab", "Simulink"],
+            },
+            {
+                id: "p5-3",
+                department: "makine-muh",
+                count: 1,
+                filled: 0,
+                skills: ["Termal Analiz", "Ansys"],
+            },
+            {
+                id: "p5-4",
+                department: "yazilim-muh",
+                count: 1,
+                filled: 0,
+                skills: ["C", "Embedded Linux"],
+            }
+        ],
+        needsAdvisor: true,
+        advisor: undefined
+    },
+];
+
+// --- 4. BENİM PROJELERİM (Dashboard İçin) ---
+// Kullanıcının sahibi olduğu projeler
+export const MOCK_MY_PROJECTS: Project[] = [
+    {
+        id: 10, // ID çakışmasın diye 10 verdim
+        title: "Otonom İHA İle Yangın Tespiti (Benim Projem)",
+        owner: USERS.alptekin,
+        summary: "Orman yangınlarını erken tespit edip otonom olarak müdahale edebilen bir İHA sistemi.",
+        platform: "Teknofest",
+        competition: "Savaşan İHA Yarışması",
+        status: "ongoing",
+        date: "2024-01-15",
+        participantsNeeded: 2,
+        participants: [USERS.ali, USERS.ayse], // Ali ve Ayşe katılmış
+        positions: [
+            {
+                id: "mp1-1",
+                department: "makine-muh",
+                count: 1,
+                filled: 1, // Dolu
+                skills: ["SolidWorks", "Aerodinamik"]
+            },
+            {
+                id: "mp1-2",
+                department: "yazilim-muh",
+                count: 1,
+                filled: 1, // Dolu
+                skills: ["ROS", "Python"]
+            }
+        ],
+        needsAdvisor: true,
+        advisor: MOCK_ACADEMICIANS[0] // Prof. Dr. Ahmet Yılmaz
+    },
+    {
+        id: 11,
+        title: "Blokzincir Tabanlı Lojistik",
+        owner: USERS.zeynep,
+        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
+        platform: "Hackathon",
+        competition: "Solana Global Hackathon",
+        status: "completed",
+        date: "2023-11-20",
+        participantsNeeded: 0,
+        participants: [USERS.alptekin],
+        positions: [
+            {
+                id: "mp2-1",
+                department: "endustri-muh",
+                count: 1,
+                filled: 1,
+                skills: ["Supply Chain", "Analiz"]
+            }
+        ],
+        needsAdvisor: false
+    },
+    {
+        id: 12,
+        title: "Blokzincir Tabanlı Lojistik",
+        owner: USERS.zeynep,
+        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
+        platform: "Hackathon",
+        competition: "Solana Global Hackathon",
+        status: "completed",
+        date: "2023-11-20",
+        participantsNeeded: 0,
+        participants: [USERS.alptekin],
+        positions: [
+            {
+                id: "mp2-1",
+                department: "endustri-muh",
+                count: 1,
+                filled: 1,
+                skills: ["Supply Chain", "Analiz"]
+            }
+        ],
+        needsAdvisor: false
+    },
+    {
+        id: 13,
+        title: "Blokzincir Tabanlı Lojistik",
+        owner: USERS.zeynep,
+        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
+        platform: "Hackathon",
+        competition: "Solana Global Hackathon",
+        status: "completed",
+        date: "2023-11-20",
+        participantsNeeded: 0,
+        participants: [USERS.alptekin],
+        positions: [
+            {
+                id: "mp2-1",
+                department: "endustri-muh",
+                count: 1,
+                filled: 1,
+                skills: ["Supply Chain", "Analiz"]
+            }
+        ],
+        needsAdvisor: true
+    },
+    {
+        id: 14,
+        title: "Blokzincir Tabanlı Lojistik",
+        owner: USERS.zeynep,
+        summary: "Tedarik zincirinde şeffaflık sağlayan Solana tabanlı dApp.",
+        platform: "Hackathon",
+        competition: "Solana Global Hackathon",
+        status: "completed",
+        date: "2023-11-20",
+        participantsNeeded: 0,
+        participants: [USERS.alptekin],
+        positions: [
+            {
+                id: "mp2-1",
+                department: "endustri-muh",
+                count: 1,
+                filled: 1,
+                skills: ["Supply Chain", "Analiz"]
+            }
+        ],
+        needsAdvisor: true
+    }
+];
+
+export const CURRENT_USER_ID = 1; // Alptekin (Giriş yapan kullanıcı)
+
+export const MOCK_CHATS: ChatSession[] = [
+    {
+        id: "c1",
+        type: "direct",
+        name: "Zeynep Kaya",
+        avatar: "https://i.pravatar.cc/150?u=zeynep",
+        lastMessage: "Yarınki toplantı saat kaçta?",
+        lastMessageTime: "10:30",
+        unreadCount: 2,
+        participants: [
+            { id: 1, name: "Alptekin Ocakdan", avatar: "", status: "online" },
+            { id: 2, name: "Zeynep Kaya", avatar: "https://i.pravatar.cc/150?u=zeynep", status: "online" }
+        ],
+        messages: [
+            { id: "m1", senderId: 2, content: "Selam Alptekin, nasılsın?", timestamp: "2024-01-01T10:00:00" },
+            { id: "m2", senderId: 1, content: "İyiyim Zeynep, sen nasılsın?", timestamp: "2024-01-01T10:05:00" },
+            { id: "m3", senderId: 2, content: "Yarınki toplantı saat kaçta?", timestamp: "2024-01-01T10:30:00" },
+        ]
+    },
+    {
+        id: "c2",
+        type: "group",
+        name: "Otonom İHA Ekibi",
+        avatar: "", // Grup ikon (boşsa baş harfler)
+        lastMessage: "Raporları sisteme yükledim.",
+        lastMessageTime: "Dün",
+        unreadCount: 0,
+        participants: [
+            { id: 1, name: "Alptekin Ocakdan", avatar: "", status: "online" },
+            { id: 3, name: "Mehmet Demir", avatar: "", status: "offline" },
+            { id: 5, name: "Caner Erkin", avatar: "", status: "online" }
+        ],
+        messages: [
+            { id: "m10", senderId: 3, content: "Arkadaşlar motor sürücüleri geldi mi?", timestamp: "2024-01-01T09:00:00" },
+            { id: "m11", senderId: 5, content: "Evet, laboratuvara bıraktım.", timestamp: "2024-01-01T09:15:00" },
+            { id: "m12", senderId: 1, content: "Harika, akşam test edelim.", timestamp: "2024-01-01T09:20:00" },
+            { id: "m13", senderId: 5, content: "Raporları sisteme yükledim.", timestamp: "2024-01-01T18:00:00" },
+        ]
+    }
+];
+
+
 
 export const CURRENT_USER: UserProfile = {
     id: 1,
@@ -706,5 +725,55 @@ export const MOCK_ACADEMY_EVENTS: AcademyEvent[] = [
             { id: "p2", name: "Mehmet Demir", role: "Eğitmen", avatar: "https://i.pravatar.cc/150?u=md" }
         ],
         tags: ["Git", "Collaboration"]
+    }
+];
+
+export const MOCK_ACADEMICIAN_MAILS: AcademicianMailThread[] = [
+    {
+        id: "am-1",
+        student: {
+            id: "s-1",
+            name: "Ali Vural",
+            avatar: "https://i.pravatar.cc/150?u=s1",
+            department: "Bilgisayar Müh.",
+            grade: "4. Sınıf"
+        },
+        subject: "İHA Projesi Teknik Destek",
+        // Proje ismi MOCK_PROJECTS ile birebir aynı olmalı
+        relatedProject: "Otonom İHA İle Yangın Tespiti ve Müdahale Sistemi",
+        lastMessageDate: "10:30",
+        isUnread: true,
+        messages: [
+            {
+                id: "msg-1",
+                senderId: "s-1", // Öğrenci
+                content: "Hocam merhaba, İHA'nın görüntü işleme modülünde takıldığımız bir nokta var. Müsaitliğinizde danışabilir miyiz?",
+                timestamp: "2025-12-01T09:00:00",
+                isRead: true
+            }
+        ]
+    },
+    {
+        id: "am-2",
+        student: {
+            id: "s-2",
+            name: "Zeynep Kaya",
+            avatar: "https://i.pravatar.cc/150?u=s2",
+            department: "Yazılım Müh.",
+            grade: "3. Sınıf"
+        },
+        subject: "Staj Defteri Teslimi",
+        relatedProject: undefined, // Proje bağımsız
+        lastMessageDate: "Dün",
+        isUnread: false,
+        messages: [
+            {
+                id: "msg-2",
+                senderId: "s-2",
+                content: "Hocam, yaz stajı defterimi sisteme yükledim. Onayınızı bekliyorum.",
+                timestamp: "2025-11-30T14:00:00",
+                isRead: true
+            }
+        ]
     }
 ];

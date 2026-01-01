@@ -56,6 +56,8 @@ export interface Project {
     participantsNeeded: number;
     positions: ProjectPosition[];
     participants: SimpleUser[];
+    needsAdvisor: boolean;
+    advisor?: Academician;
 }
 
 export interface ProjectFormData {
