@@ -1,3 +1,4 @@
+// modules/dashboard/components/dashboard/project-card.tsx
 "use client";
 
 import { ArrowRight, Trophy, Users } from "lucide-react";
@@ -5,19 +6,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Project } from "../../../types";
-import { ProjectDetailsDialog } from "./project-details-dialog";
 import { ApplyProjectDialog } from "./apply-project-dialog";
+// useRouter ve usePathname, useSearchParams ekleyin
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface ProjectCardProps {
     project: Project;
 }
 
 export const ProjectCard = ({ project }: ProjectCardProps) => {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const handleOpenDetails = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("projectId", String(project.id));
+
+        // Modal açılırken sayfanın kaymasını (scroll jump) engellemek için { scroll: false }
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
     return (
         <Card className="hover:border-primary/50 transition-colors group">
             <CardContent className="p-4 sm:p-6 w-full">
                 <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-between items-start lg:items-center">
 
+                    {/* ... Sol taraf (İçerik) aynı kalıyor ... */}
                     <div className="space-y-3 w-full">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                             <Badge variant="outline" className="text-xs font-normal group-hover:border-primary/30 transition-colors">
@@ -44,18 +59,18 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
                         </div>
                     </div>
 
-                    <div className="flex flex-row items-start gap-3 w-full lg:w-auto mt-4 lg:mt-0">
-                        {/* Detaylar Modalı */}
-                        <ProjectDetailsDialog project={project}>
-                            <Button variant="outline" className="w-fit">
-                                Detaylar
-                            </Button>
-                        </ProjectDetailsDialog>
 
-                        {/* Başvuru Modalı */}
+                    <div className="flex flex-row items-start gap-3 w-full lg:w-auto mt-4 lg:mt-0">
+                        {/* Eski kullanım: <ProjectDetailsDialog ...> <Button>... </ProjectDetailsDialog>
+                            Yeni kullanım: Sadece Button ve onClick eventi.
+                        */}
+                        <Button variant="outline" className="w-fit" onClick={handleOpenDetails}>
+                            Detaylar
+                        </Button>
+
+                        {/* Başvuru Modalı aynı kalabilir veya onu da URL'e taşıyabilirsiniz */}
                         <ApplyProjectDialog project={project}>
                             <Button className="w-fit">
-                                {/* Mobilde Arrow ikonunu gizleyerek butonun çok uzamasını engelliyoruz */}
                                 Başvur <ArrowRight className="w-4 h-4 ml-2 hidden sm:inline-block" />
                             </Button>
                         </ApplyProjectDialog>

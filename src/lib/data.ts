@@ -1,7 +1,7 @@
 
 
 // --- SABİTLER ---
-import {ChatSession, Department, Project, SimpleUser, UserProfile} from "@/modules/dashboard/types";
+import {Academician, ChatSession, Department, Project, SimpleUser, UserProfile} from "@/modules/dashboard/types";
 
 export const DEPARTMENTS: Department[] = [
     { value: "bilgisayar-muh", label: "Bilgisayar Mühendisliği" },
@@ -442,5 +442,64 @@ export const MOCK_CHATS: ChatSession[] = [
             { id: "m12", senderId: 1, content: "Harika, akşam test edelim.", timestamp: "2024-01-01T09:20:00" },
             { id: "m13", senderId: 5, content: "Raporları sisteme yükledim.", timestamp: "2024-01-01T18:00:00" },
         ]
+    }
+];
+
+export const MOCK_ACADEMICIANS: Academician[] = [
+    {
+        id: "ac-1",
+        name: "Prof. Dr. Ahmet Yılmaz",
+        title: "Prof. Dr.",
+        department: "computer-engineering",
+        avatar: "https://i.pravatar.cc/150?u=ac1",
+        email: "ayilmaz@uni.edu.tr",
+        office: "M-304",
+        researchInterests: ["Yapay Zeka", "Derin Öğrenme", "Doğal Dil İşleme", "Doğal Dil İşsaleme", "Doğal Dil İşlemdse"],
+        publicationsCount: 45,
+        citationCount: 1250,
+        mentoredProjects: 12,
+        isAvailableForMentorship: true,
+    },
+    {
+        id: "ac-2",
+        name: "Doç. Dr. Ayşe Kaya",
+        title: "Doç. Dr.",
+        department: "software-engineering",
+        avatar: "https://i.pravatar.cc/150?u=ac2",
+        email: "akaya@uni.edu.tr",
+        office: "M-201",
+        researchInterests: ["Yazılım Mimarisi", "Mikroservisler", "Cloud Computing"],
+        publicationsCount: 28,
+        citationCount: 640,
+        mentoredProjects: 5,
+        isAvailableForMentorship: false, // Şu an dolu
+    },
+    {
+        id: "ac-3",
+        name: "Dr. Öğr. Üyesi Mehmet Demir",
+        title: "Dr. Öğr. Üyesi",
+        department: "electrical-engineering",
+        avatar: "https://i.pravatar.cc/150?u=ac3",
+        email: "mdemir@uni.edu.tr",
+        office: "E-105",
+        researchInterests: ["Gömülü Sistemler", "IoT", "Sinyal İşleme"],
+        publicationsCount: 15,
+        citationCount: 300,
+        mentoredProjects: 8,
+        isAvailableForMentorship: true,
+    },
+    {
+        id: "ac-4",
+        name: "Arş. Gör. Zeynep Çelik",
+        title: "Arş. Gör.",
+        department: "computer-engineering",
+        avatar: "https://i.pravatar.cc/150?u=ac4",
+        email: "zcelik@uni.edu.tr",
+        office: "M-308",
+        researchInterests: ["Bilgisayarlı Görme", "Görüntü İşleme"],
+        publicationsCount: 5,
+        citationCount: 45,
+        mentoredProjects: 2,
+        isAvailableForMentorship: true,
     }
 ];

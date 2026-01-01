@@ -31,10 +31,10 @@ export const DashboardNavigationBar = () => {
         { name: "Yıldızlar Karması", href: "/dashboard/profiles" },
         { name: "Projelerim", href: "/dashboard/my-projects" },
         { name: "Sohbetlerim", href: "/dashboard/chats" },
+        { name: "Uzman Havuzu", href: "/dashboard/academics" },
     ];
 
     return (
-        // HomeNavbar yapısı: header -> nav -> div(flex justify-between)
         <header
             className={`top-0 w-full z-50 transition-all duration-300 border-b h-20 ${
                 isScrolled
@@ -54,7 +54,7 @@ export const DashboardNavigationBar = () => {
                     <div className="flex items-center gap-4">
 
                         {/* DESKTOP LINKS (Mobilde gizlenir) */}
-                        <div className="hidden md:flex items-center gap-4 mr-2">
+                        <div className="hidden lg:flex items-center gap-4 mr-2">
                             {navLinks.map((link) => (
                                 <Button
                                     key={link.name}
@@ -76,7 +76,7 @@ export const DashboardNavigationBar = () => {
                         <AuthButton />
 
                         {/* MOBILE MENU (Sadece mobilde görünür) */}
-                        <div className="md:hidden flex items-center ml-2">
+                        <div className="lg:hidden flex items-center ml-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon" className="text-muted-foreground">

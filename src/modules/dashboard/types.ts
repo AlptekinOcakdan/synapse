@@ -100,3 +100,22 @@ export interface ChatSession {
     participants: ChatUser[]; // Katılımcı listesi
     messages: Message[]; // Sohbet geçmişi
 }
+
+export interface Academician {
+    id: string;
+    name: string;
+    title: string; // Örn: Prof. Dr., Doç. Dr., Dr. Öğr. Üyesi
+    department: string; // "computer-engineering" gibi slug veya direkt isim
+    avatar: string;
+    email: string;
+    office?: string;
+
+    // Akademik Veriler
+    researchInterests: string[]; // İlgi alanları / Uzmanlıklar
+    publicationsCount: number;   // Yayın sayısı (Opsiyonel görsel şov için)
+    citationCount: number;       // Atıf sayısı
+    mentoredProjects: number;    // Yönettiği/Mentör olduğu proje sayısı
+
+    // Durum
+    isAvailableForMentorship: boolean; // Proje mentörlüğü kabul ediyor mu?
+}

@@ -60,25 +60,49 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
 
             <CardContent className="flex-1 space-y-5 pb-4">
                 {/* --- İSTATİSTİKLER (Grid Yapısı) --- */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-muted/30 rounded-lg p-3 border flex flex-col items-center justify-center text-center gap-1 hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium uppercase tracking-wider">
-                            <Briefcase className="w-3.5 h-3.5" />
-                            Projeler
+                <div className="grid grid-cols-2 gap-4">
+                    {/* 1. KART: TAMAMLANAN PROJELER */}
+                    <div className="group relative overflow-hidden rounded-xl border border-border/40 bg-linear-to-br from-muted/50 via-muted/20 to-transparent p-4 flex flex-col items-center justify-center text-center hover:border-border/80 transition-all duration-300">
+
+                        {/* İkon */}
+                        <div className="mb-2 p-2 rounded-full bg-background/50 border border-border/50 shadow-sm group-hover:scale-110 transition-transform duration-300 z-10">
+                            <Briefcase className="w-4 h-4 text-muted-foreground" />
                         </div>
-                        <span className="text-2xl font-bold text-foreground">
+
+                        {/* Sayı Değeri */}
+                        <span className="text-3xl font-black tracking-tight text-foreground z-10 mb-0.5">
                             {profile.projectCount}
                         </span>
+
+                        {/* Açıklayıcı Metin (Düzeltildi) */}
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 z-10">
+                            Tamamlanan Proje
+                        </span>
+
+                        {/* Arka Plan Dekoru */}
+                        <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full bg-foreground/5 blur-2xl group-hover:bg-foreground/10 transition-colors duration-500" />
                     </div>
 
-                    <div className="bg-primary/5 rounded-lg p-3 border border-primary/10 flex flex-col items-center justify-center text-center gap-1 hover:bg-primary/10 transition-colors">
-                        <div className="flex items-center gap-1.5 text-primary/80 text-xs font-medium uppercase tracking-wider">
-                            <Trophy className="w-3.5 h-3.5" />
-                            İlk 3 Derece
+                    {/* 2. KART: AKTİF / DEVAM EDEN PROJELER */}
+                    <div className="group relative overflow-hidden rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col items-center justify-center text-center hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all duration-300">
+
+                        {/* İkon */}
+                        <div className="mb-2 p-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.2)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] group-hover:scale-110 transition-all duration-300 z-10">
+                            <Trophy className="w-4 h-4 text-indigo-400" />
                         </div>
-                        <span className="text-2xl font-bold text-primary">
+
+                        {/* Sayı Değeri */}
+                        <span className="text-3xl font-black tracking-tight text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] z-10 mb-0.5">
                             {profile.top3Count}
                         </span>
+
+                        {/* Açıklayıcı Metin (Düzeltildi) */}
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400/80 z-10">
+                        Aktif Proje
+                        </span>
+
+                        {/* Arka Plan Glow Efekti */}
+                        <div className="absolute bottom-0 left-0 -ml-4 -mb-4 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
                     </div>
                 </div>
 

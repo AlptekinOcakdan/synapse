@@ -27,11 +27,17 @@ export const Footer = () => {
                                 />
                             </div>
 
-                            {/* SOLUTIONS Yazısı */}
-                            {/* -mt-1 veya -mt-2 ile görselle yazı arasındaki boşluğu kapatıyoruz */}
-                            <span className="text-[9px] md:text-[17px] font-bold tracking-[0.35em] leading-none text-transparent bg-clip-text bg-linear-to-b from-white via-slate-200 to-slate-500 -mt-3 md:-mt-5 ml-1">
-                                SOLUTIONS
-                            </span>
+                            {/* SOLUTIONS Görseli (Metin yerine) */}
+                            {/* Metindeki -mt ve ml değerlerini görseli içeren div'e uygulayarak hizalamayı koruyoruz */}
+                            <div className="w-20 md:w-36 -mt-3 md:-mt-5 ml-1">
+                                <Image
+                                    src="/solutions.png"
+                                    width={800} // Görselin orijinal genişliğine göre ayarlayın
+                                    height={200} // Görselin orijinal yüksekliğine göre ayarlayın
+                                    alt="Solutions"
+                                    className="object-contain w-full h-auto"
+                                />
+                            </div>
                         </div>
                     </div>
 

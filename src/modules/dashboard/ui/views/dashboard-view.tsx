@@ -1,7 +1,9 @@
+// modules/dashboard/ui/views/dashboard-view.tsx
 "use client";
 
-import {useState} from "react";
-import {Separator} from "@/components/ui/separator";
+import { useState, useMemo } from "react"; // useMemo performans için iyi olur
+import { useSearchParams, useRouter, usePathname } from "next/navigation"; // Next.js Navigation Hooks
+import { Separator } from "@/components/ui/separator";
 import {
     Pagination,
     PaginationContent,
@@ -11,35 +13,53 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import {ProjectCard} from "../components/dashboard/project-card";
-import {ProjectsFilterBar} from "../components/dashboard/projects-filter-bar";
-import {AdvancedSearchPanel} from "../components/dashboard/advanced-search-panel";
-import {MOCK_PROJECTS} from "@/lib/data";
+import { ProjectCard } from "../components/dashboard/project-card";
+import { ProjectsFilterBar } from "../components/dashboard/projects-filter-bar";
+import { AdvancedSearchPanel } from "../components/dashboard/advanced-search-panel";
+import { MOCK_PROJECTS } from "@/lib/data";
+import {ProjectDetailsDialog} from "@/modules/dashboard/ui/components/dashboard/project-details-dialog";
 
 export const DashboardView = () => {
-    // --- STATE ---
+    // --- URL STATE MANAGEMENT ---
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // URL'den projectId'yi al
+    const selectedProjectId = searchParams.get("projectId");
+
+    // URL'deki ID'ye göre projeyi bul
+    const selectedProject = useMemo(() => {
+        return MOCK_PROJECTS.find(p => String(p.id) === selectedProjectId);
+    }, [selectedProjectId]);
+
+    // Dialog kapandığında URL'i temizle
+    const handleCloseDialog = (open: boolean) => {
+        if (!open) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.delete("projectId");
+            // scroll: false önemli, sayfa başına atlamasın diye
+            router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        }
+    };
+
+    // --- NORMAL STATE ---
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-
-    // Gelişmiş filtre state'leri
     const [selectedDepartment, setSelectedDepartment] = useState<string>("");
     const [skills, setSkills] = useState<string[]>([]);
 
-    // --- LOGIC ---
     const toggleSort = () => {
         setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
     };
 
-    // FİLTRELEME MANTIĞI
     const filteredProjects = MOCK_PROJECTS.filter((p) => {
-        // 1. Metin Araması (Başlık veya Sahip)
         const query = searchQuery.toLocaleLowerCase("tr");
         const title = p.title.toLocaleLowerCase("tr");
         const owner = p.owner.name.toLocaleLowerCase("tr");
         const matchesSearch = title.includes(query) || owner.includes(query);
 
-        // 2. Bölüm Filtresi (Positions dizisi içinde arar)
         let matchesDept = true;
         if (selectedDepartment) {
             matchesDept = p.positions.some((pos) => pos.department === selectedDepartment);
@@ -63,6 +83,15 @@ export const DashboardView = () => {
     return (
         <div className="space-y-6 max-w-full px-4 py-6">
 
+            {/* --- GLOBAL PROJECT MODAL (URL DRIVEN) --- */}
+            {selectedProject && (
+                <ProjectDetailsDialog
+                    project={selectedProject}
+                    open={true} // Her zaman açık, çünkü render ediliyorsa URL'de var demektir
+                    onOpenChange={handleCloseDialog}
+                />
+            )}
+
             {/* --- HEADER --- */}
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Projeler</h1>
@@ -72,6 +101,7 @@ export const DashboardView = () => {
             </div>
 
             {/* --- FILTER SECTION --- */}
+            {/* ... Burası aynı kalıyor ... */}
             <div className="flex flex-col gap-4">
                 <ProjectsFilterBar
                     searchQuery={searchQuery}
@@ -108,6 +138,7 @@ export const DashboardView = () => {
 
             {/* --- PAGINATION --- */}
             <div className="flex justify-center mt-8">
+                {/* ... Pagination aynı ... */}
                 <Pagination>
                     <PaginationContent>
                         <PaginationItem>
@@ -118,9 +149,6 @@ export const DashboardView = () => {
                         </PaginationItem>
                         <PaginationItem>
                             <PaginationLink href="#">2</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">3</PaginationLink>
                         </PaginationItem>
                         <PaginationItem>
                             <PaginationEllipsis />

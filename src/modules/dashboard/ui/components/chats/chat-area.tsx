@@ -184,7 +184,7 @@ export const ChatArea = ({ chat, onMobileMenuOpen }: ChatAreaProps) => {
                         ref={textareaRef}
                         placeholder="Bir mesaj yazın..."
                         // GÜNCELLEME: 'break-words', 'whitespace-pre-wrap' ve 'w-full' eklendi
-                        className="min-h-6 max-h-25 w-[calc(100dvw-6rem)] border-none shadow-none focus-visible:ring-0 resize-none bg-transparent px-2 py-1.5 md:w-[calc(85dvw-11.75rem)] wrap-break-word whitespace-pre-wrap"
+                        className="flex-1 w-full min-h-6 max-h-32 border-none shadow-none focus-visible:ring-0 resize-none bg-transparent px-2 py-1.5 wrap-break-word whitespace-pre-wrap"
                         rows={1}
                         value={inputValue}
                         onChange={handleInput}

@@ -1,37 +1,45 @@
+// modules/dashboard/ui/views/project-details-dialog.tsx
 "use client";
 
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogDescription, // Eklenmeli
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Trophy, User, Target, Layers, Briefcase, GraduationCap } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Project } from "../../../types";
-import {LayoutProps} from "@/lib/utils";
-import {DEPARTMENTS} from "@/lib/data";
+import { Project } from "../../../types"; // Yolunuzu kontrol edin
+import { DEPARTMENTS } from "@/lib/data";
+import {ReactNode} from "react"; // Yolunuzu kontrol edin
 
-interface ProjectDetailsDialogProps extends LayoutProps{
+interface ProjectDetailsDialogProps {
     project: Project;
+    children?: ReactNode; // Artık opsiyonel
+    open?: boolean;             // Dışarıdan kontrol için
+    onOpenChange?: (open: boolean) => void; // Dışarıdan kontrol için
 }
 
-export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialogProps) => {
+export const ProjectDetailsDialog = ({
+                                         project,
+                                         children,
+                                         open,
+                                         onOpenChange
+                                     }: ProjectDetailsDialogProps) => {
 
-    // Bölüm label'ını bulmak için yardımcı fonksiyon
     const getDeptLabel = (val: string) => {
         return DEPARTMENTS.find(d => d.value === val)?.label || val;
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            {/* Eğer children (buton) varsa Trigger render et, yoksa etme (URL modu) */}
+            {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+
             <DialogContent className="max-w-2xl max-h-[90vh] p-0 overflow-hidden">
                 <DialogHeader className="p-6 pb-2">
                     <div className="flex items-center gap-2 mb-2">
@@ -43,14 +51,15 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                         </Badge>
                     </div>
                     <DialogTitle className="text-2xl leading-tight">{project.title}</DialogTitle>
+                    {/* DialogDescription erişilebilirlik için gereklidir, gizli de olsa ekleyin */}
                     <DialogDescription className="hidden">
-                        Proje detayları.
+                        {project.summary}
                     </DialogDescription>
                 </DialogHeader>
 
                 <ScrollArea className="h-full max-h-[60vh] px-6">
                     <div className="space-y-6 pb-6">
-                        {/* Özet */}
+                        {/* ... İçerik aynı kalacak ... */}
                         <div className="space-y-2">
                             <h4 className="font-semibold text-sm text-foreground/80 flex items-center gap-2">
                                 <Layers className="w-4 h-4" /> Proje Özeti
@@ -62,7 +71,6 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
 
                         <Separator />
 
-                        {/* Genel Bilgiler Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
                                 <User className="w-5 h-5 text-primary mt-0.5" />
@@ -96,7 +104,6 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
 
                         <Separator />
 
-                        {/* --- YENİ KISIM: AÇIK POZİSYONLAR --- */}
                         <div className="space-y-4">
                             <h4 className="font-semibold text-sm text-foreground/80 flex items-center gap-2">
                                 <Briefcase className="w-4 h-4" /> Açık Pozisyonlar ve Gereksinimler
@@ -129,7 +136,6 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                                 ))}
                             </div>
                         </div>
-
                     </div>
                 </ScrollArea>
             </DialogContent>
