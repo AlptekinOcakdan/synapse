@@ -106,3 +106,15 @@
     @apply bg-background text-foreground selection:bg-violet-500/30 selection:text-violet-200 antialiased;
   }
 }
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 15s linear infinite;
+    min-width: 100%; /* Metnin en az container kadar geniş olmasını sağlar */
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); } /* Metin uzunluğuna göre ayarlanabilir */
+}

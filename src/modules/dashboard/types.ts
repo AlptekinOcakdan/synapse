@@ -112,3 +112,26 @@ export interface Academician {
     mentoredProjects: number;
     isAvailableForMentorship: boolean;
 }
+
+export type AcademyEventStatus = "live" | "upcoming" | "ended";
+
+export interface Participant {
+    id: string;
+    name: string;
+    avatar?: string;
+    role: string; // Örn: Eğitmen, Konuk
+}
+
+export interface AcademyEvent {
+    id: string;
+    title: string;
+    description: string;
+    date: string; // ISO String
+    duration: string; // "45 dk", "1 saat" vb.
+    status: AcademyEventStatus;
+    platform: "YouTube" | "Zoom" | "Google Meet";
+    url: string; // Yayın linki
+    thumbnail: string; // Kapak görseli
+    participants: Participant[];
+    tags: string[];
+}

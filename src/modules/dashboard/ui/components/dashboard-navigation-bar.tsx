@@ -32,6 +32,7 @@ export const DashboardNavigationBar = () => {
         { name: "Projelerim", href: "/dashboard/my-projects" },
         { name: "Sohbetlerim", href: "/dashboard/chats" },
         { name: "Uzman Havuzu", href: "/dashboard/academics" },
+        { name: "Synapse Akademi", href: "/dashboard/academy" },
     ];
 
     return (
@@ -54,7 +55,7 @@ export const DashboardNavigationBar = () => {
                     <div className="flex items-center gap-4">
 
                         {/* DESKTOP LINKS (Mobilde gizlenir) */}
-                        <div className="hidden lg:flex items-center gap-4 mr-2">
+                        <div className="hidden xl:flex items-center gap-4 mr-2">
                             {navLinks.map((link) => (
                                 <Button
                                     key={link.name}
@@ -76,7 +77,7 @@ export const DashboardNavigationBar = () => {
                         <AuthButton />
 
                         {/* MOBILE MENU (Sadece mobilde görünür) */}
-                        <div className="lg:hidden flex items-center ml-2">
+                        <div className="xl:hidden flex items-center ml-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon" className="text-muted-foreground">

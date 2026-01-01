@@ -1,5 +1,13 @@
 // --- SABİTLER ---
-import {Academician, ChatSession, Department, Project, SimpleUser, UserProfile} from "@/modules/dashboard/types";
+import {
+    Academician,
+    AcademyEvent,
+    ChatSession,
+    Department,
+    Project,
+    SimpleUser,
+    UserProfile
+} from "@/modules/dashboard/types";
 import {MailThread} from "@/modules/profile/types";
 
 export const DEPARTMENTS: Department[] = [
@@ -619,5 +627,84 @@ export const MOCK_MAILS: MailThread[] = [
                 isRead: true
             }
         ]
+    }
+];
+
+export const MOCK_ACADEMY_EVENTS: AcademyEvent[] = [
+    {
+        id: "ev-1",
+        title: "Modern Frontend Mimarileri: Next.js 15 ve Ötesi",
+        description: "Server Components, Server Actions ve yeni routing yapısının derinlemesine incelenmesi.",
+        date: new Date().toISOString(), // ŞU AN (Canlı Testi İçin)
+        duration: "60 dk",
+        status: "live",
+        platform: "YouTube",
+        url: "https://youtube.com",
+        thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=1000&auto=format&fit=crop",
+        participants: [
+            { id: "p1", name: "Alptekin Ocakdan", role: "Eğitmen", avatar: "https://i.pravatar.cc/150?u=alp" },
+            { id: "p2", name: "Mehmet Demir", role: "Moderatör", avatar: "https://i.pravatar.cc/150?u=md" }
+        ],
+        tags: ["Frontend", "Next.js", "React"]
+    },
+    {
+        id: "ev-2",
+        title: "Yapay Zeka ile Kodlama Pratikleri",
+        description: "Copilot ve ChatGPT kullanarak verimli kod yazma teknikleri.",
+        date: "2026-02-15T14:00:00", // GELECEK
+        duration: "45 dk",
+        status: "upcoming",
+        platform: "YouTube",
+        url: "https://youtube.com",
+        thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop",
+        participants: [
+            { id: "p3", name: "Zeynep Kaya", role: "Eğitmen", avatar: "https://i.pravatar.cc/150?u=zk" }
+        ],
+        tags: ["AI", "Productivity"]
+    },
+    {
+        id: "ev-3",
+        title: "Siber Güvenlik 101: Web Zaafiyetleri",
+        description: "OWASP Top 10 ve temel web güvenliği önlemleri.",
+        date: "2026-02-20T19:00:00", // GELECEK (Daha ileri tarih)
+        duration: "90 dk",
+        status: "upcoming",
+        platform: "YouTube",
+        url: "https://youtube.com",
+        thumbnail: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
+        participants: [
+            { id: "p4", name: "Caner Erkin", role: "Siber Güvenlik Uzmanı", avatar: "" }
+        ],
+        tags: ["Security", "Cyber"]
+    },
+    {
+        id: "ev-4",
+        title: "Docker ve Kubernetes ile Mikroservisler",
+        description: "Konteyner mimarisine giriş ve orkestrasyon temelleri.",
+        date: "2025-12-20T20:00:00", // GEÇMİŞ
+        duration: "120 dk",
+        status: "ended",
+        platform: "YouTube",
+        url: "https://youtube.com",
+        thumbnail: "https://images.unsplash.com/photo-1667372393119-c85c020799a3?q=80&w=1000&auto=format&fit=crop",
+        participants: [
+            { id: "p1", name: "Alptekin Ocakdan", role: "Eğitmen", avatar: "https://i.pravatar.cc/150?u=alp" }
+        ],
+        tags: ["DevOps", "Docker"]
+    },
+    {
+        id: "ev-5",
+        title: "Git ve GitHub ile Takım Çalışması",
+        description: "Versiyon kontrol sistemleri ve branch stratejileri.",
+        date: "2025-11-15T18:00:00", // GEÇMİŞ (Daha eski)
+        duration: "60 dk",
+        status: "ended",
+        platform: "YouTube",
+        url: "https://youtube.com",
+        thumbnail: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=1000&auto=format&fit=crop",
+        participants: [
+            { id: "p2", name: "Mehmet Demir", role: "Eğitmen", avatar: "https://i.pravatar.cc/150?u=md" }
+        ],
+        tags: ["Git", "Collaboration"]
     }
 ];
