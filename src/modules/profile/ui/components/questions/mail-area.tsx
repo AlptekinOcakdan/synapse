@@ -1,7 +1,7 @@
 "use client";
 
-import {useState, useRef, useEffect, ChangeEvent} from "react";
-import {Send, Menu, Paperclip, MoreVertical, GraduationCap, FileText, ImageIcon} from "lucide-react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
+import { Send, Menu, Paperclip, MoreVertical, GraduationCap, FileText, ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,21 +14,33 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { MailThread, MailMessage } from "@/modules/profile/types";
-import {CURRENT_USER_ID, MOCK_PROJECTS} from "@/lib/data";
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {DocumentUploadDialog} from "@/modules/profile/ui/components/questions/document-upload-dialog";
-import {PhotoUploadDialog} from "@/modules/profile/ui/components/questions/photo-upload-dialog";
+import { MailThread } from "@/modules/profile/types";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { DocumentUploadDialog } from "@/modules/profile/ui/components/questions/document-upload-dialog";
+import { PhotoUploadDialog } from "@/modules/profile/ui/components/questions/photo-upload-dialog";
+
+// --- CONVEX IMPORTS ---
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface MailAreaProps {
     mailThread: MailThread;
+    currentUserId: Id<"users">; // Mesajı kimin attığını belirlemek için gerekli
     onMobileMenuOpen: () => void;
 }
 
-export const MailArea = ({ mailThread, onMobileMenuOpen }: MailAreaProps) => {
-    const [messages, setMessages] = useState<MailMessage[]>(mailThread.messages);
-    const [inputValue, setInputValue] = useState("");
+export const MailArea = ({ mailThread, currentUserId, onMobileMenuOpen }: MailAreaProps) => {
+    // 1. MESAJLARI ÇEK (Real-time)
+    // mailThread.id'nin Convex ID formatında geldiğinden emin olun (Types dosyasında Id<"mailThreads"> yapmıştık)
+    const messages = useQuery(api.mails.getMessages, {
+        threadId: mailThread.id as Id<"mailThreads">
+    });
 
+    // 2. MESAJ GÖNDERME MUTATION
+    const sendMessage = useMutation(api.mails.sendMessage);
+
+    const [inputValue, setInputValue] = useState("");
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -39,69 +51,71 @@ export const MailArea = ({ mailThread, onMobileMenuOpen }: MailAreaProps) => {
     const [isDocDialogOpen, setIsDocDialogOpen] = useState(false);
     const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
 
-    const handleFileUpload = (file: File) => {
-        console.log("Dosya alındı, sunucuya gönderiliyor:", file.name, file.type);
-        const newMessage = {
-            id: crypto.randomUUID(),
-            senderId: "current_user_id", // Constants'dan alın
-            content: `📎 Dosya Gönderildi: ${file.name}`,
-            timestamp: new Date().toISOString(),
-            isRead: true
-        };
-
-        // setMessages([...messages, newMessage]); // State'i güncelle
-    };
-
-    // Mesaj gönderilince scrol
+    // Otomatik Scroll (Mesajlar güncellendiğinde en alta in)
     useEffect(() => {
-        if (scrollRef.current) {
+        if (messages && scrollRef.current) {
             scrollRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!inputValue.trim()) return;
 
-        const newMessage: MailMessage = {
-            id: crypto.randomUUID(),
-            senderId: CURRENT_USER_ID,
-            content: inputValue.trim(),
-            timestamp: new Date().toISOString(),
-            isRead: true
-        };
+        const content = inputValue.trim();
+        setInputValue(""); // Optimistik UI temizliği
 
-        setMessages([...messages, newMessage]);
-        setInputValue("");
+        try {
+            await sendMessage({
+                threadId: mailThread.id as Id<"mailThreads">,
+                senderId: currentUserId,
+                content: content
+            });
+        } catch (error) {
+            console.error("Mesaj gönderilemedi:", error);
+            // Hata olursa inputu geri doldurabilir veya toast gösterebilirsiniz
+        }
+    };
+
+    const handleFileUpload = async (file: File) => {
+        // Not: Gerçek dosya yükleme (AWS S3 vb.) entegrasyonu buraya gelecek.
+        // Şimdilik dosya ismini mesaj olarak gönderiyoruz.
+        console.log("Dosya seçildi:", file.name);
+
+        try {
+            await sendMessage({
+                threadId: mailThread.id as Id<"mailThreads">,
+                senderId: currentUserId,
+                content: `📎 Dosya Gönderildi: ${file.name}`
+            });
+        } catch (error) {
+            console.error("Dosya mesajı gönderilemedi:", error);
+        }
     };
 
     const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setInputValue(e.target.value);
     };
 
+    // İlgili Projeye Gitme Mantığı
     const handleOpenProject = () => {
-        if (!mailThread.relatedProject) {
-            console.log("Mailde ilişkili proje bilgisi yok.");
+        if (!mailThread.relatedProjectId) {
+            console.log("Mailde ilişkili proje ID'si yok.");
             return;
         }
 
-        console.log("Aranan Proje İsmi:", mailThread.relatedProject);
-
-        // Proje isminden ID'yi buluyoruz
-        // Not: trim() ve toLowerCase() kullanarak eşleşme şansını artırıyoruz
-        const project = MOCK_PROJECTS.find(p =>
-            p.title.toLowerCase().trim() === mailThread.relatedProject?.toLowerCase().trim()
-        );
-
-        if (project) {
-            console.log("Proje Bulundu, ID:", project.id);
-            const params = new URLSearchParams(searchParams.toString());
-            params.set("projectId", String(project.id));
-            router.push(`${pathname}?${params.toString()}`, { scroll: false });
-        } else {
-            console.warn("DİKKAT: Proje Bulunamadı! Mock verilerini kontrol edin.");
-            console.log("Mevcut Projeler:", MOCK_PROJECTS.map(p => p.title));
-        }
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("projectId", mailThread.relatedProjectId);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
+
+    // Yükleniyor Durumu
+    if (!messages) {
+        return (
+            <div className="h-full w-full flex items-center justify-center bg-background">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-full w-full bg-background relative">
@@ -156,47 +170,55 @@ export const MailArea = ({ mailThread, onMobileMenuOpen }: MailAreaProps) => {
             {/* --- MAIL CONTENT --- */}
             <ScrollArea className="h-[calc(100dvh-5rem)] w-full px-4 bg-muted/5">
                 <div className="flex flex-col gap-6 pb-6 pt-6 max-w-4xl mx-auto">
-                    {messages.map((msg) => {
-                        const isMe = msg.senderId === CURRENT_USER_ID;
+                    {messages.length === 0 ? (
+                        <div className="text-center text-muted-foreground text-sm py-10 opacity-70">
+                            Henüz bu konuşmada bir mesaj yok.
+                        </div>
+                    ) : (
+                        messages.map((msg) => {
+                            // Backend'den gelen senderId string'ini, currentUserId (ID Object) ile karşılaştırıyoruz
+                            const isMe = msg.senderId === String(currentUserId);
 
-                        return (
-                            <div key={msg.id} className={cn(
-                                "flex flex-col gap-2 p-4 rounded-xl border shadow-xs",
-                                isMe ? "bg-white dark:bg-card ml-8" : "bg-white dark:bg-card mr-8"
-                            )}>
-                                {/* Mesaj Header */}
-                                <div className="flex items-center justify-between border-b pb-2 mb-1">
-                                    <div className="flex items-center gap-2">
-                                        <Avatar className="h-8 w-8">
-                                            {isMe ? (
-                                                <AvatarFallback>BN</AvatarFallback> // Kullanıcı Avatarı
-                                            ) : (
-                                                <AvatarImage src={mailThread.academician.avatar} />
-                                            )}
-                                        </Avatar>
-                                        <div>
-                                            <p className="text-sm font-semibold">
-                                                {isMe ? "Ben" : mailThread.academician.name}
-                                            </p>
-                                            <p className="text-[10px] text-muted-foreground">
-                                                {isMe ? "Öğrenci" : "Akademisyen"}
-                                            </p>
+                            return (
+                                <div key={msg.id} className={cn(
+                                    "flex flex-col gap-2 p-4 rounded-xl border shadow-xs transition-all",
+                                    isMe ? "bg-white dark:bg-card ml-8 border-primary/20" : "bg-white dark:bg-card mr-8"
+                                )}>
+                                    {/* Mesaj Header */}
+                                    <div className="flex items-center justify-between border-b pb-2 mb-1">
+                                        <div className="flex items-center gap-2">
+                                            <Avatar className="h-8 w-8">
+                                                {isMe ? (
+                                                    <AvatarFallback className="bg-primary/10 text-primary">BN</AvatarFallback>
+                                                ) : (
+                                                    <AvatarImage src={mailThread.academician.avatar} />
+                                                )}
+                                                {!isMe && <AvatarFallback>AK</AvatarFallback>}
+                                            </Avatar>
+                                            <div>
+                                                <p className="text-sm font-semibold">
+                                                    {isMe ? "Ben" : mailThread.academician.name}
+                                                </p>
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    {isMe ? "Öğrenci" : "Akademisyen"}
+                                                </p>
+                                            </div>
                                         </div>
+                                        <span className="text-xs text-muted-foreground">
+                                            {new Date(msg.timestamp).toLocaleString('tr-TR', {
+                                                day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit'
+                                            })}
+                                        </span>
                                     </div>
-                                    <span className="text-xs text-muted-foreground">
-                                        {new Date(msg.timestamp).toLocaleString('tr-TR', {
-                                            day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit'
-                                        })}
-                                    </span>
-                                </div>
 
-                                {/* Mesaj İçeriği */}
-                                <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-                                    {msg.content}
+                                    {/* Mesaj İçeriği */}
+                                    <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
+                                        {msg.content}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    )}
                     <div ref={scrollRef} />
                 </div>
             </ScrollArea>
@@ -208,16 +230,16 @@ export const MailArea = ({ mailThread, onMobileMenuOpen }: MailAreaProps) => {
                         <Textarea
                             ref={textareaRef}
                             placeholder="Yanıtınızı buraya yazın..."
-                            className="min-h-25 resize-none pr-12 bg-muted/20 focus:bg-background transition-colors"
+                            className="min-h-25 resize-none pr-12 bg-muted/20 focus:bg-background transition-colors focus-visible:ring-1"
                             value={inputValue}
                             onChange={handleInput}
                         />
 
                         <div className="absolute bottom-2 right-2 flex gap-2">
-                            {/* DROPDOWN MENU BAŞLANGICI */}
+                            {/* DROPDOWN MENU */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground transition-colors">
                                         <Paperclip className="w-4 h-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -236,13 +258,14 @@ export const MailArea = ({ mailThread, onMobileMenuOpen }: MailAreaProps) => {
                         <Button
                             onClick={handleSendMessage}
                             disabled={!inputValue.trim()}
-                            className="gap-2"
+                            className="gap-2 shadow-sm"
                         >
                             Yanıtla <Send className="w-4 h-4" />
                         </Button>
                     </div>
                 </div>
             </div>
+
             <DocumentUploadDialog
                 open={isDocDialogOpen}
                 onOpenChange={setIsDocDialogOpen}

@@ -28,15 +28,9 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-// Mock Yarışma Listesi
-const COMPETITIONS = [
-    "Teknofest",
-    "TÜBİTAK 2209-A",
-    "TÜBİTAK 2209-B",
-    "Hackathon",
-    "Global Game Jam",
-    "Solution Challenge"
-];
+// --- CONVEX IMPORTS ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 type ProjectStatusFilterType = "all" | "completed" | "ongoing";
 
@@ -49,14 +43,18 @@ interface MyProjectsAdvancedFilterProps {
 }
 
 export const ProjectsAdvancedFilter = ({
-                                             isOpen,
-                                             selectedCompetition,
-                                             setSelectedCompetition,
-                                             statusFilter,
-                                             setStatusFilter,
-                                         }: MyProjectsAdvancedFilterProps) => {
+                                           isOpen,
+                                           selectedCompetition,
+                                           setSelectedCompetition,
+                                           statusFilter,
+                                           setStatusFilter,
+                                       }: MyProjectsAdvancedFilterProps) => {
 
     const [openComp, setOpenComp] = useState(false);
+
+    // --- FETCH DATA ---
+    const competitionsData = useQuery(api.projects.getCompetitions);
+    const competitions = competitionsData || [];
 
     return (
         <AnimatePresence>
@@ -90,14 +88,16 @@ export const ProjectsAdvancedFilter = ({
                                     <Command>
                                         <CommandInput placeholder="Yarışma ara..." />
                                         <CommandList>
-                                            <CommandEmpty>Yarışma bulunamadı.</CommandEmpty>
+                                            <CommandEmpty>
+                                                {competitionsData === undefined ? "Yükleniyor..." : "Yarışma bulunamadı."}
+                                            </CommandEmpty>
                                             <CommandGroup>
-                                                {COMPETITIONS.map((comp) => (
+                                                {competitions.map((comp) => (
                                                     <CommandItem
                                                         key={comp}
                                                         value={comp}
-                                                        onSelect={(currentValue) => {
-                                                            setSelectedCompetition(currentValue === selectedCompetition ? "" : currentValue);
+                                                        onSelect={() => {
+                                                            setSelectedCompetition(selectedCompetition === comp ? "" : comp);
                                                             setOpenComp(false);
                                                         }}
                                                     >

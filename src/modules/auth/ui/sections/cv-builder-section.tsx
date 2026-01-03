@@ -28,19 +28,8 @@ import {
 import {ScrollArea} from "@/components/ui/scroll-area";
 import Image from "next/image";
 import {ProfilePhotoDialog} from "@/modules/auth/ui/components/profile-photo-modal";
-
-const DEPARTMENTS = [
-    { value: "bilgisayar-muh", label: "Bilgisayar Mühendisliği" },
-    { value: "elektrik-elektronik", label: "Elektrik-Elektronik Mühendisliği" },
-    { value: "makine", label: "Makine Mühendisliği" },
-    { value: "endustri", label: "Endüstri Mühendisliği" },
-    { value: "mimarlik", label: "Mimarlık" },
-    { value: "tip", label: "Tıp Fakültesi" },
-    { value: "hukuk", label: "Hukuk Fakültesi" },
-    { value: "psikoloji", label: "Psikoloji" },
-    { value: "isletme", label: "İşletme" },
-    { value: "diger", label: "Diğer" },
-];
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface CVBuilderSectionProps {
     data: SignUpFormData;
@@ -54,6 +43,8 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
     const [skillInput, setSkillInput] = useState("");
     const [openDepartment, setOpenDepartment] = useState(false);
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+    const departments = useQuery(api.departments.get);
 
     // DEĞİŞİKLİK 3: Initial state'e 'order: 0' eklendi
     const [tempExp, setTempExp] = useState<Experience>({
@@ -191,45 +182,57 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
             <div className="grid gap-8">
                 {/* 1. Biyografi & Bölüm (Aynı) */}
                 <div className="space-y-4">
-                    <div className="space-y-2 flex flex-col items-start">
-                        <Label className="flex items-center gap-2">
-                            <GraduationCap className="w-4 h-4 text-primary" /> Bölümün
-                        </Label>
-                        <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" role="combobox" aria-expanded={openDepartment} className="w-fit max-w-full justify-between font-normal">
+                    <div className="grid sm:grid-cols-2 gap-4 items-start">
+                        <div className="space-y-2 flex flex-col items-start">
+                            <Label className="flex items-center gap-2">
+                                <GraduationCap className="w-4 h-4 text-primary" /> Bölümün
+                            </Label>
+                            <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" role="combobox" aria-expanded={openDepartment} className="w-full sm:w-fit max-w-full justify-between font-normal">
                                     <span className="truncate mr-2">
-                                        {data.department ? DEPARTMENTS.find((dept) => dept.value === data.department)?.label : "Bölümünü ara veya seç..."}
+                                        {data.department ? data.department : "Bölümünü ara veya seç..."}
                                     </span>
-                                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" className="w-[--radix-popover-trigger-width] p-0">
-                                <Command filter={(value, search) => value.toLocaleLowerCase("tr").includes(search.toLocaleLowerCase("tr")) ? 1 : 0}>
-                                    <CommandInput placeholder="Bölüm ara..." />
-                                    <CommandList className="overflow-hidden">
-                                        <ScrollArea className="h-72">
-                                            <CommandEmpty>Bölüm bulunamadı.</CommandEmpty>
-                                            <CommandGroup>
-                                                {DEPARTMENTS.map((dept) => (
-                                                    <CommandItem
-                                                        key={dept.value}
-                                                        value={dept.label}
-                                                        onSelect={() => {
-                                                            updateData({ ...data, department: dept.value });
-                                                            setOpenDepartment(false);
-                                                        }}
-                                                    >
-                                                        <Check className={cn("mr-2 h-4 w-4", data.department === dept.value ? "opacity-100" : "opacity-0")} />
-                                                        {dept.label}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </ScrollArea>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                                        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[--radix-popover-trigger-width] p-0">
+                                    <Command filter={(value, search) => value.toLocaleLowerCase("tr").includes(search.toLocaleLowerCase("tr")) ? 1 : 0}>
+                                        <CommandInput placeholder="Bölüm ara..." />
+                                        <CommandList className="overflow-hidden">
+                                            <ScrollArea className="h-72">
+                                                <CommandEmpty>Bölüm bulunamadı.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {(departments || []).map((dept) => (
+                                                        <CommandItem
+                                                            key={dept.label}
+                                                            value={dept.label}
+                                                            onSelect={() => {
+                                                                updateData({ ...data, department: dept.label });
+                                                                setOpenDepartment(false);
+                                                            }}
+                                                        >
+                                                            <Check className={cn("mr-2 h-4 w-4", data.department === dept.label ? "opacity-100" : "opacity-0")} />
+                                                            {dept.label}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </ScrollArea>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-2">
+                                <User className="w-4 h-4 text-primary" /> Şehir
+                            </Label>
+                            <Input
+                                placeholder="Örn: Ankara"
+                                value={data.city || ""}
+                                onChange={(e) => updateData({ ...data, city: e.target.value })}
+                            />
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <Label className="flex items-center gap-2"><User className="w-4 h-4 text-primary" /> Hakkında (Bio)</Label>
@@ -369,3 +372,4 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
         </motion.div>
     );
 };
+

@@ -18,6 +18,7 @@ export interface SignUpFormData {
     email: string;
     otp: string;
     department: string;
+    city: string | null;
     bio: string;
     skills: string[];
     experiences: Experience[];

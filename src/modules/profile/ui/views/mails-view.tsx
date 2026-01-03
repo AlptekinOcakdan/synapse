@@ -1,75 +1,67 @@
-// modules/dashboard/ui/views/mails-view.tsx
 "use client";
 
 import { useState, useMemo } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Mail } from "lucide-react";
+import { Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from "@/components/ui/sheet";
-import { MOCK_MAILS, MOCK_PROJECTS } from "@/lib/data"; // MOCK_PROJECTS eklendi
-import { MailThread } from "@/modules/profile/types";
-import { ProjectDetailsDialog } from "@/modules/dashboard/ui/components/dashboard/project-details-dialog";
-import {MailSidebar} from "@/modules/profile/ui/components/questions/mail-sidebar";
-import {MailArea} from "@/modules/profile/ui/components/questions/mail-area"; // Import eklendi
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { MailSidebar } from "@/modules/profile/ui/components/questions/mail-sidebar";
+import { MailArea } from "@/modules/profile/ui/components/questions/mail-area";
+import { MailThread } from "@/modules/profile/types"; // Tipleri buradan çekiyoruz
 
-export const MailsView = () => {
+// --- CONVEX ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+
+interface MailsViewProps {
+    userId: Id<"users">;
+}
+
+export const MailsView = ({userId}:MailsViewProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const viewer = useQuery(api.users.getViewerProfile, { userId: userId });
 
-    // 1. MAIL STATE (Mevcut)
+    // 1. DATA FETCHING
+    // viewer yüklenmeden sorgu yapma ("skip")
+    const threads = useQuery(
+        api.mails.getMailThreads,
+        userId ? { userId: userId } : "skip"
+    );
+
+    // 2. MAIL SEÇİMİ
     const currentMailId = searchParams.get("mailId");
+
     const selectedMail = useMemo(() => {
-        if (!currentMailId) return null;
-        return MOCK_MAILS.find((m) => m.id === currentMailId) || null;
-    }, [currentMailId]);
+        if (!currentMailId || !threads) return null;
+        return threads.find((m) => m.id === currentMailId) || null;
+    }, [currentMailId, threads]);
 
-    // 2. PROJECT MODAL STATE (Yeni Eklenen)
-    const currentProjectId = searchParams.get("projectId");
-    const selectedProject = useMemo(() => {
-        if (!currentProjectId) return null;
-        // String/Number dönüşümüne dikkat edin, veri tipinize göre ayarlayın
-        return MOCK_PROJECTS.find((p) => String(p.id) === currentProjectId) || null;
-    }, [currentProjectId]);
-
-    // Mail Seçme Fonksiyonu
     const handleSelectMail = (mail: MailThread) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set("mailId", mail.id);
-        // Proje detayı açıksa, mail değiştirirken onu kapatmak isteyebilirsiniz veya açık bırakabilirsiniz.
-        // params.delete("projectId"); // İsterseniz bu satırı açarak mail değişince modalı kapatabilirsiniz.
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
         setIsMobileMenuOpen(false);
     };
 
-    // Proje Modalını Kapatma Fonksiyonu
-    const handleCloseProjectDialog = (open: boolean) => {
-        if (!open) {
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete("projectId");
-            // scroll: false ile sayfa zıplamasını engelliyoruz
-            router.push(`${pathname}?${params.toString()}`, { scroll: false });
-        }
-    };
+    // Loading State
+    if (threads === undefined || !viewer) {
+        return (
+            <div className="h-[calc(100dvh-5rem)] w-full flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="h-[calc(100dvh-5rem)] w-full flex overflow-hidden bg-background relative">
-
-            {/* --- GLOBAL PROJECT MODAL --- */}
-            {selectedProject && (
-                <ProjectDetailsDialog
-                    project={selectedProject}
-                    open={true}
-                    onOpenChange={handleCloseProjectDialog}
-                />
-            )}
-
             {/* DESKTOP SIDEBAR */}
             <div className="hidden md:block w-80 lg:w-96 shrink-0 h-full">
                 <MailSidebar
-                    mails={MOCK_MAILS}
+                    mails={threads} // Artık tip tam uyumlu, hata vermez
                     selectedMailId={selectedMail?.id || null}
                     onSelectMail={handleSelectMail}
                 />
@@ -77,18 +69,16 @@ export const MailsView = () => {
 
             {/* MAIN AREA */}
             <div className="flex-1 flex flex-col h-full min-w-0 relative">
-                {/* ... Mobil Sidebar ve Diğer Kodlar Aynı ... */}
+
                 {/* MOBIL SIDEBAR */}
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                     <SheetContent side="left" className="p-0 w-80">
                         <SheetHeader className="sr-only">
-                            <SheetTitle>Posta Kutusu Menüsü</SheetTitle>
-                            <SheetDescription>
-                                Gelen kutusu ve arşiv klasörleri arasında geçiş yapın.
-                            </SheetDescription>
+                            <SheetTitle>Posta Kutusu</SheetTitle>
+                            <SheetDescription>Menü</SheetDescription>
                         </SheetHeader>
                         <MailSidebar
-                            mails={MOCK_MAILS}
+                            mails={threads}
                             selectedMailId={selectedMail?.id || null}
                             onSelectMail={handleSelectMail}
                         />
@@ -99,11 +89,11 @@ export const MailsView = () => {
                     <MailArea
                         key={selectedMail.id}
                         mailThread={selectedMail}
+                        currentUserId={userId} // MailArea'ya ID'yi gönderiyoruz
                         onMobileMenuOpen={() => setIsMobileMenuOpen(true)}
                     />
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center bg-muted/10">
-                        {/* Boş Durum İçeriği Aynı */}
                         <div className="h-24 w-24 bg-muted/20 rounded-full flex items-center justify-center mb-6">
                             <Mail className="h-10 w-10 opacity-20" />
                         </div>
@@ -111,11 +101,7 @@ export const MailsView = () => {
                         <p className="max-w-sm text-sm text-muted-foreground mb-6">
                             Akademisyenlerinizle yaptığınız yazışmaları buradan yönetebilirsiniz.
                         </p>
-                        <Button
-                            className="md:hidden"
-                            variant="outline"
-                            onClick={() => setIsMobileMenuOpen(true)}
-                        >
+                        <Button className="md:hidden" variant="outline" onClick={() => setIsMobileMenuOpen(true)}>
                             Postaları Aç
                         </Button>
                     </div>

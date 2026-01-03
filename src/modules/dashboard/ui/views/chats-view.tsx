@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react"; // useMemo eklendi
-import { Menu } from "lucide-react";
+import { useState } from "react";
+import { Menu, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Sheet,
@@ -10,81 +10,86 @@ import {
     SheetTitle,
     SheetDescription
 } from "@/components/ui/sheet";
-import { ChatSession } from "@/modules/dashboard/types";
 import { ChatSidebar } from "@/modules/dashboard/ui/components/chats/chat-sidebar";
-import { MOCK_CHATS } from "@/lib/data";
 import { ChatArea } from "@/modules/dashboard/ui/components/chats/chat-area";
-// GÜNCELLEME 1: Next.js navigation kancalarını ekledik
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
+// --- CONVEX ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+
 export const ChatsView = () => {
-    // GÜNCELLEME 2: URL yönetimi için hook'lar
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // GÜNCELLEME 3: selectedChat'i state yerine URL'den türetiyoruz (Derived State)
-    // URL'de ?chatId=123 varsa, o ID'yi alıp MOCK_CHATS içinden buluyoruz.
-    const currentChatId = searchParams.get("chatId");
+    // URL'den Chat ID'yi al
+    const currentChatId = searchParams.get("chatId") as Id<"conversations"> | null;
 
-    const selectedChat = useMemo(() => {
-        if (!currentChatId) return null;
-        return MOCK_CHATS.find((c) => c.id === currentChatId) || null;
-    }, [currentChatId]);
+    // 1. Tüm Sohbetleri Çek (Sidebar İçin)
+    const chats = useQuery(api.chats.listConversations);
 
-    // GÜNCELLEME 4: Sohbet seçildiğinde sadece URL'i değiştiriyoruz
-    const handleSelectChat = (chat: ChatSession) => {
+    // 2. Seçili Sohbetin Detayını Çek (ChatArea Header İçin)
+    // Eğer ID yoksa "skip" et.
+    const selectedChat = useQuery(
+        api.chats.getChat,
+        currentChatId ? { conversationId: currentChatId } : "skip"
+    );
+
+    const handleSelectChat = (chatId: string) => {
         const params = new URLSearchParams(searchParams);
-        params.set("chatId", chat.id);
-
-        // replace yerine push kullanırsak tarayıcı 'geri' tuşu ile önceki sohbete dönebilir
-        // scroll: false ile sayfanın en tepeye zıplamasını engelleriz
+        params.set("chatId", chatId);
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
-
         setIsMobileMenuOpen(false);
     };
 
+    // Loading State
+    if (chats === undefined) {
+        return (
+            <div className="h-[calc(100dvh-5rem)] w-full flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
     return (
         <div className="h-[calc(100dvh-5rem)] w-full flex overflow-hidden bg-background">
-
             {/* DESKTOP SIDEBAR */}
             <div className="hidden md:block w-80 lg:w-96 shrink-0 h-full">
                 <ChatSidebar
-                    chats={MOCK_CHATS}
-                    selectedChatId={selectedChat?.id || null}
-                    onSelectChat={handleSelectChat}
+                    chats={chats || []} // Convex verisi
+                    selectedChatId={currentChatId}
+                    onSelectChat={(chat) => handleSelectChat(chat.id)}
                 />
             </div>
 
             {/* CHAT AREA */}
             <div className="flex-1 flex flex-col h-full min-w-0 relative">
-
-                {/* MOBIL HEADER - Sadece chat seçiliyken mobilde geri butonu veya menü göstermek için opsiyonel mantık eklenebilir */}
+                {/* MOBIL HEADER */}
                 <div className="md:hidden absolute top-4 left-4 z-50">
                     <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                         <SheetContent side="left" className="p-0 w-80">
                             <SheetHeader className="sr-only">
                                 <SheetTitle>Sohbet Listesi</SheetTitle>
-                                <SheetDescription>
-                                    Geçmiş sohbetlerinizi buradan görüntüleyebilir ve seçebilirsiniz.
-                                </SheetDescription>
+                                <SheetDescription>Sohbet geçmişi</SheetDescription>
                             </SheetHeader>
-
                             <ChatSidebar
-                                chats={MOCK_CHATS}
-                                selectedChatId={selectedChat?.id || null}
-                                onSelectChat={handleSelectChat}
+                                chats={chats || []}
+                                selectedChatId={currentChatId}
+                                onSelectChat={(chat) => handleSelectChat(chat.id)}
                             />
                         </SheetContent>
                     </Sheet>
                 </div>
 
-                {selectedChat ? (
+                {currentChatId && selectedChat ? (
                     <ChatArea
-                        key={selectedChat.id} // Key değiştiğinde bileşeni resetler (önemli)
-                        chat={selectedChat}
+                        key={currentChatId} // ID değişince resetle
+                        chatData={selectedChat} // Convex'ten gelen header verisi
+                        chatId={currentChatId}  // Mesajları çekmek için ID
                         onMobileMenuOpen={() => setIsMobileMenuOpen(true)}
                     />
                 ) : (

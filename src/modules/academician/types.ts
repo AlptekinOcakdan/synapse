@@ -1,4 +1,4 @@
-import {MailMessage} from "@/modules/profile/types";
+import {Id} from "@/convex/_generated/dataModel";
 
 export interface StudentParticipant {
     id: string;
@@ -9,11 +9,24 @@ export interface StudentParticipant {
 }
 
 export interface AcademicianMailThread {
-    id: string;
-    student: StudentParticipant; // Karşı taraf artık öğrenci
+    id: Id<"mailThreads">;
+    academician: {
+        id: Id<"users">;
+        name: string;
+        title: string;
+        avatar: string;
+        department: string;
+    };
     subject: string;
-    relatedProject?: string; // İlgili proje başlığı
+    relatedProject?: string;
+    relatedProjectId?: Id<"projects">;
     lastMessageDate: string;
     isUnread: boolean;
-    messages: MailMessage[]; // Mesaj yapısı aynı kalabilir
+    messages: { // Sidebar önizlemesi için
+        id: Id<"mailMessages">;
+        senderId: string;
+        content: string;
+        timestamp: string;
+        isRead: boolean;
+    }[];
 }

@@ -1,4 +1,5 @@
 import {Competition, Experience} from "@/modules/auth/types";
+import { Id } from "@/convex/_generated/dataModel";
 
 export interface Department {
     value: string;
@@ -8,11 +9,12 @@ export interface Department {
 export type ProjectStatus = "ongoing" | "completed" | "recruiting" | "cancelled";
 
 export interface SimpleUser {
-    id: number;
+    id: Id<"users">;
     name: string;
     avatar: string;
     department: string;
     title: string;
+    city: string | null;
 }
 
 export interface SocialLinks {
@@ -45,7 +47,7 @@ export interface ProjectPosition {
 }
 
 export interface Project {
-    id: number;
+    id: Id<"projects">;
     title: string;
     summary: string;
     owner: SimpleUser;
@@ -75,7 +77,7 @@ export interface ProjectFormData {
 }
 
 export interface ChatUser {
-    id: number;
+    id: string;
     name: string;
     avatar: string;
     status: "online" | "offline";
@@ -101,7 +103,7 @@ export interface ChatSession {
 }
 
 export interface Academician {
-    id: string;
+    id: Id<"users">;
     name: string;
     title: string;
     department: string;

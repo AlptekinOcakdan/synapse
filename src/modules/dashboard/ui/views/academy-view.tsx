@@ -2,34 +2,28 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademyEventCard } from "../components/academy/academy-event-card";
-import { MOCK_ACADEMY_EVENTS } from "@/lib/data";
-import { LayoutGrid, ListVideo } from "lucide-react";
+import { LayoutGrid, ListVideo, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+
+// --- CONVEX IMPORTS ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export const AcademyView = () => {
 
-    // --- MANTIK ---
+    // Veriyi Backend'den çek (Zaten sıralanmış ve gruplanmış geliyor)
+    const data = useQuery(api.academy.getAcademyEvents);
 
-    // 1. Planlananlar: Canlı veya Gelecek
-    const plannedEvents = MOCK_ACADEMY_EVENTS.filter(
-        (e) => e.status === "live" || e.status === "upcoming"
-    ).sort((a, b) => {
-        // Önce "live" olanlar en başa
-        if (a.status === "live" && b.status !== "live") return -1;
-        if (a.status !== "live" && b.status === "live") return 1;
+    // Loading State
+    if (data === undefined) {
+        return (
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
-        // Sonra tarihe göre ARTAN (En yakın tarih en üstte)
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
-
-    // 2. Tamamlananlar: Geçmiş
-    const completedEvents = MOCK_ACADEMY_EVENTS.filter(
-        (e) => e.status === "ended"
-    ).sort((a, b) => {
-        // Tarihe göre AZALAN (En yeni biten en üstte)
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
-
+    const { planned, completed } = data;
 
     return (
         <div className="space-y-8 max-w-full px-4 py-8">
@@ -61,9 +55,9 @@ export const AcademyView = () => {
 
                 {/* --- TAB 1: PLANLANANLAR --- */}
                 <TabsContent value="planned" className="mt-0">
-                    {plannedEvents.length > 0 ? (
+                    {planned.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {plannedEvents.map((event) => (
+                            {planned.map((event) => (
                                 <AcademyEventCard key={event.id} event={event} />
                             ))}
                         </div>
@@ -76,9 +70,9 @@ export const AcademyView = () => {
 
                 {/* --- TAB 2: TAMAMLANANLAR --- */}
                 <TabsContent value="completed" className="mt-0">
-                    {completedEvents.length > 0 ? (
+                    {completed.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {completedEvents.map((event) => (
+                            {completed.map((event) => (
                                 <AcademyEventCard key={event.id} event={event} />
                             ))}
                         </div>

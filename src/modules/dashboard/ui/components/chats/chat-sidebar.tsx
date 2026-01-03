@@ -8,18 +8,28 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {ChatSession} from "@/modules/dashboard/types";
+
+// Tip Tanımlaması (Convex Dönüşüne Uygun)
+interface ChatItem {
+    id: string;
+    type: "direct" | "group";
+    name: string;
+    avatar?: string;
+    lastMessage: string;
+    lastMessageTime: string;
+    unreadCount: number;
+}
 
 interface ChatSidebarProps {
-    chats: ChatSession[];
+    chats: any[]; // veya ChatItem[]
     selectedChatId: string | null;
-    onSelectChat: (chat: ChatSession) => void;
+    onSelectChat: (chat: any) => void;
 }
 
 export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebarProps) => {
     const [search, setSearch] = useState("");
 
-    // Filtreleme Fonksiyonu
+    // Filtreleme
     const filterChats = (type: "direct" | "group") => {
         return chats.filter(c =>
             c.type === type &&
@@ -27,7 +37,7 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
         );
     };
 
-    const ChatListItem = ({ chat }: { chat: ChatSession }) => (
+    const ChatListItem = ({ chat }: { chat: ChatItem }) => (
         <button
             onClick={() => onSelectChat(chat)}
             className={cn(
@@ -45,8 +55,8 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
                     <span className="text-[10px] text-muted-foreground shrink-0">{chat.lastMessageTime}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                    <p className="text-xs text-muted-foreground truncate max-w-35">
-                        {chat.lastMessage}
+                    <p className="text-xs text-muted-foreground truncate max-w-35 min-h-[1rem]">
+                        {chat.lastMessage || "Henüz mesaj yok"}
                     </p>
                     {chat.unreadCount > 0 && (
                         <Badge className="h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px]">
@@ -60,7 +70,6 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
 
     return (
         <div className="flex flex-col h-full border-r bg-background/50 backdrop-blur-sm">
-            {/* Header & Search */}
             <div className="p-4 border-b space-y-4">
                 <h2 className="text-xl font-bold px-1">Sohbetler</h2>
                 <div className="relative">
@@ -74,7 +83,6 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
                 </div>
             </div>
 
-            {/* Tabs & List */}
             <Tabs defaultValue="direct" className="flex-1 flex flex-col min-h-0">
                 <div className="px-4 mt-2">
                     <TabsList className="grid w-full grid-cols-2">
@@ -86,7 +94,7 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
                 <TabsContent value="direct" className="flex-1 min-h-0 m-0">
                     <ScrollArea className="h-full px-2 py-2">
                         <div className="space-y-1">
-                            {filterChats("direct").map(chat => (
+                            {filterChats("direct").map((chat: any) => (
                                 <ChatListItem key={chat.id} chat={chat} />
                             ))}
                             {filterChats("direct").length === 0 && (
@@ -99,12 +107,9 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
                 <TabsContent value="group" className="flex-1 min-h-0 m-0">
                     <ScrollArea className="h-full px-2 py-2">
                         <div className="space-y-1">
-                            {filterChats("group").map(chat => (
+                            {filterChats("group").map((chat: any) => (
                                 <ChatListItem key={chat.id} chat={chat} />
                             ))}
-                            {filterChats("group").length === 0 && (
-                                <p className="text-center text-xs text-muted-foreground py-4">Grup bulunamadı.</p>
-                            )}
                         </div>
                     </ScrollArea>
                 </TabsContent>

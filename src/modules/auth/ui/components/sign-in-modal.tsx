@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {FormEvent, useState} from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,10 @@ import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { SynapseLogo } from "@/components/synapse-logo";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import { useAction, useMutation } from "convex/react"; // Convex Hook'ları
+import { toast } from "sonner";
+import {api} from "@/convex/_generated/api";
+import {loginAction} from "@/actions/auth"; // Toast bildirimi için
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -18,47 +22,68 @@ interface AuthModalProps {
 type AuthStep = "EMAIL" | "OTP";
 
 export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
-    const router = useRouter();
+    useRouter();
     const [step, setStep] = useState<AuthStep>("EMAIL");
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    // E-posta gönderme simülasyonus
-    const handleSendCode = async (e: React.FormEvent) => {
+    // Convex Fonksiyonları
+    const sendSignInCode = useAction(api.auth.sendSignInCode);
+    const verifySignIn = useMutation(api.auth.verifySignIn);
+
+    // 1. ADIM: E-posta Gönderme
+    const handleSendCode = async (e: FormEvent) => {
         e.preventDefault();
         if (!email) return;
 
         setIsLoading(true);
-        // API isteği simülasyonu (1.5 saniye)
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep("OTP");
+        try {
+            await sendSignInCode({ email });
+            toast.success("Doğrulama kodu gönderildi!");
+            setStep("OTP");
+        } catch (error) {
+            console.error(error);
+            // Hatayı kullanıcıya göster
+            toast.error(error instanceof Error ? error.message : "Bir hata oluştu.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    // OTP doğrulama simülasyonu
+    // 2. ADIM: OTP Doğrulama
     const handleVerifyOtp = async () => {
         if (otp.length !== 6) return;
 
         setIsLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        onClose(false);
-        router.push("/dashboard");
+        try {
+            // 1. Convex ile OTP doğrula ve userId'yi al
+            const result = await verifySignIn({ email, code: otp });
+
+            toast.success("Giriş başarılı! Yönlendiriliyorsunuz...");
+            await loginAction({ userId: result.userId, role: result.role });
+
+        } catch (error) {
+            // Sadece verifySignIn'dan gelen hataları yakala
+            console.error(error);
+            toast.error("Kod hatalı veya süresi dolmuş.");
+            setOtp("");
+            setIsLoading(false);
+        }
     };
 
     const resetFlow = () => {
         setStep("EMAIL");
         setOtp("");
+        setEmail("");
     };
 
     return (
         <Dialog open={isOpen} onOpenChange={(val) => {
             onClose(val);
-            if (!val) setTimeout(resetFlow, 300); // Modal kapanınca state'i sıfırla
+            if (!val) setTimeout(resetFlow, 300);
         }}>
             <DialogContent className="sm:max-w-100 bg-background border-border p-0 overflow-hidden gap-0">
-                {/* Header Alanı */}
                 <div className="p-6 pb-2 flex flex-col items-center text-center">
                     <div className="mb-4 scale-90">
                         <SynapseLogo />
@@ -70,14 +95,13 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
                         </DialogTitle>
                         <DialogDescription className="text-center mx-auto max-w-70">
                             {step === "EMAIL"
-                                ? "AYBU e-posta adresini girerek giriş yapabilir veya kayıt olabilirsin."
+                                ? "AYBU e-posta adresini girerek hesabına eriş."
                                 : <span className="text-foreground font-medium">{email}</span>}
                             {step === "OTP" && " adresine gönderilen 6 haneli kodu gir."}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
 
-                {/* Form Alanı */}
                 <div className="p-6 pt-2">
                     {step === "EMAIL" ? (
                         <form onSubmit={handleSendCode} className="flex flex-col gap-4">
@@ -98,7 +122,7 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
                                 </div>
                             </div>
                             <Button type="submit" size="lg" className="w-full font-bold" disabled={isLoading}>
-                                {isLoading ? <Loader2 className="animate-spin" /> : "Giriş Kodunu Gönder"}
+                                {isLoading ? <Loader2 className="animate-spin mr-2" /> : "Giriş Kodunu Gönder"}
                             </Button>
                         </form>
                     ) : (
@@ -107,10 +131,14 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
                                 maxLength={6}
                                 value={otp}
                                 onChange={setOtp}
-                                onComplete={handleVerifyOtp}
+                                onComplete={() => {
+                                    // onComplete React state update batching yüzünden
+                                    // anlık çalışmayabilir, useEffect veya butona basılması daha sağlıklıdır.
+                                    // Ancak UX için buraya da koyabiliriz.
+                                    if(otp.length === 6 && !isLoading) void handleVerifyOtp();
+                                }}
                                 disabled={isLoading}
                             >
-                                {/* Gap-2 ile kutucukları ayırıyoruz */}
                                 <InputOTPGroup className="gap-2">
                                     <InputOTPSlot index={0} />
                                     <InputOTPSlot index={1} />
@@ -123,18 +151,19 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
 
                             <div className="flex flex-col gap-2 w-full">
                                 <Button
-                                    onClick={handleVerifyOtp}
+                                    onClick={handleVerifyOtp} // Butona basıldığında manuel tetikleme
                                     disabled={otp.length !== 6 || isLoading}
                                     className="w-full"
                                     size="lg"
                                 >
-                                    {isLoading ? <Loader2 className="animate-spin" /> : "Doğrula ve Giriş Yap"}
+                                    {isLoading ? <Loader2 className="animate-spin mr-2" /> : "Doğrula ve Giriş Yap"}
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setStep("EMAIL")}
                                     className="text-muted-foreground hover:text-foreground"
+                                    disabled={isLoading}
                                 >
                                     <ArrowLeft className="w-4 h-4 mr-2" />
                                     E-postayı Değiştir
@@ -144,7 +173,6 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
                     )}
                 </div>
 
-                {/* Footer / Bilgi Notu */}
                 <div className="bg-secondary/30 p-4 text-center border-t border-border">
                     <p className="text-xs text-muted-foreground">
                         Synapse&apos;a giriş yaparak <span className="underline cursor-pointer hover:text-foreground">Kullanım Koşulları</span>&apos;nı kabul etmiş olursunuz.

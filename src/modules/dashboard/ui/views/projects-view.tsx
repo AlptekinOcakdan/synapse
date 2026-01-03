@@ -1,23 +1,19 @@
 "use client";
 
-import {useState} from "react";
-import {Plus} from "lucide-react";
-import {Separator} from "@/components/ui/separator";
-import {Button} from "@/components/ui/button";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
-import {ProjectCard} from "@/modules/dashboard/ui/components/projects/project-card";
-import {CreateProjectDialog} from "@/modules/dashboard/ui/components/projects/create-project-dialog";
-import {ProjectsFilterBar} from "@/modules/dashboard/ui/components/projects/projects-filter-bar";
-import {ProjectsAdvancedFilter} from "@/modules/dashboard/ui/components/projects/projects-advanced-filter";
-import {MOCK_MY_PROJECTS} from "@/lib/data";
+import { useState, useMemo } from "react";
+import { Plus, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+// Pagination bileşenlerini kaldırdık çünkü "Projelerim" listesi genelde kısadır
+// Eğer çok uzarsa DashboardView'daki gibi Load More yapısı kurabilirsin.
+import { ProjectCard } from "@/modules/dashboard/ui/components/projects/project-card";
+import { CreateProjectDialog } from "@/modules/dashboard/ui/components/projects/create-project-dialog";
+import { ProjectsFilterBar } from "@/modules/dashboard/ui/components/projects/projects-filter-bar";
+import { ProjectsAdvancedFilter } from "@/modules/dashboard/ui/components/projects/projects-advanced-filter";
+
+// --- CONVEX IMPORTS ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export const ProjectsView = () => {
     // --- STATE ---
@@ -29,33 +25,54 @@ export const ProjectsView = () => {
     const [selectedCompetition, setSelectedCompetition] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "ongoing">("all");
 
+    // --- DATA FETCHING ---
+    // Backend'den hem sahibi olunan hem de üye olunan projeleri çeker
+    const myProjects = useQuery(api.projects.getMyProjects);
+
+    // Kullanıcının kendi ID'sini çekmek (ProjectCard içinde yetki kontrolü için gerekebilir)
+    // Şimdilik basitçe projeyi listelemeye odaklanıyoruz.
+
     // --- LOGIC ---
     const toggleSort = () => {
         setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
     };
 
-    // FİLTRELEME MANTIĞI
-    const filteredProjects = MOCK_MY_PROJECTS.filter((p) => {
-        // 1. Metin Araması
-        const query = searchQuery.toLocaleLowerCase("tr");
-        const titleMatches = p.title.toLocaleLowerCase("tr").includes(query);
+    // FİLTRELEME MANTIĞI (Client-Side)
+    const filteredProjects = useMemo(() => {
+        if (!myProjects) return [];
 
-        // 2. Yarışma Filtresi
-        const compMatches = selectedCompetition
-            ? p.competition === selectedCompetition
-            : true;
+        return myProjects.filter((p) => {
+            // 1. Metin Araması
+            const query = searchQuery.toLocaleLowerCase("tr");
+            const titleMatches = p.title.toLocaleLowerCase("tr").includes(query);
 
-        // 3. Durum Filtresi (Tamamlandı / Devam Ediyor)
-        const statusMatches = statusFilter === "all"
-            ? true
-            : p.status === statusFilter;
+            // 2. Yarışma Filtresi
+            const compMatches = selectedCompetition
+                ? p.competition === selectedCompetition
+                : true;
 
-        return titleMatches && compMatches && statusMatches;
-    }).sort((a, b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
+            // 3. Durum Filtresi
+            // Backend status string dönüyor, frontend enum bekliyor olabilir, string comparison yeterli
+            const statusMatches = statusFilter === "all"
+                ? true
+                : p.status === statusFilter;
+
+            return titleMatches && compMatches && statusMatches;
+        }).sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+        });
+    }, [myProjects, searchQuery, selectedCompetition, statusFilter, sortOrder]);
+
+    // --- LOADING STATE ---
+    if (myProjects === undefined) {
+        return (
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 w-full px-4 py-6">
@@ -102,35 +119,19 @@ export const ProjectsView = () => {
             {/* --- PROJECTS LIST --- */}
             <div className="space-y-4">
                 {filteredProjects.length === 0 ? (
-                    <div
-                        className="text-center py-20 text-muted-foreground border border-dashed rounded-lg bg-muted/10">
-                        Henüz bu kriterlere uygun bir projen yok.
+                    <div className="text-center py-20 text-muted-foreground border border-dashed rounded-lg bg-muted/10">
+                        {searchQuery || selectedCompetition || statusFilter !== "all"
+                            ? "Arama kriterlerine uygun proje bulunamadı."
+                            : "Henüz bir projen yok veya bir projeye katılmadın."}
                     </div>
                 ) : (
                     filteredProjects.map((project) => (
-                        <ProjectCard key={project.id} project={project} currentUserId={1}/>
+                        <ProjectCard
+                            key={project.id}
+                            project={project}
+                        />
                     ))
                 )}
-            </div>
-
-            {/* --- PAGINATION --- */}
-            <div className="flex justify-center mt-8">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#"/>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#" isActive>1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationEllipsis/>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext href="#"/>
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
             </div>
         </div>
     );

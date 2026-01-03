@@ -40,7 +40,7 @@ export const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
                     <p className="text-primary font-medium text-sm">{user.title}</p>
                     <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs mt-1">
                         <MapPin className="w-3.5 h-3.5" />
-                        <span>Sakarya, Türkiye</span>
+                        <span>{user.city || "Şehir belirtilmemiş"}</span>
                     </div>
                 </div>
 

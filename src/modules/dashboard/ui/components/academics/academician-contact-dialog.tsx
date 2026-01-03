@@ -1,6 +1,6 @@
 "use client";
 
-import {FormEvent, useState} from "react";
+import { FormEvent, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -24,8 +24,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Mail, Link2, Loader2 } from "lucide-react";
 import { Academician } from "@/modules/dashboard/types";
-import { MOCK_PROJECTS } from "@/lib/data";
-import {LayoutProps} from "@/lib/utils";
+import { LayoutProps } from "@/lib/utils";
+import { toast } from "sonner"; // Toast bildirimi için
+
+// --- CONVEX IMPORTS ---
+import { useQuery, useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface AcademicianContactDialogProps extends LayoutProps {
     academician: Academician;
@@ -38,34 +43,47 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
     // Form State
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
-    const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(undefined);
+    const [selectedProjectId, setSelectedProjectId] = useState<string>("none");
 
-    // Kullanıcının kendi projelerini filtreliyoruz (Örnek olarak hepsini gösteriyoruz)
-    // Gerçek uygulamada: MOCK_PROJECTS.filter(p => p.owner.id === currentUserId)
-    const myProjects = MOCK_PROJECTS;
+    // 1. Kullanıcının Kendi Projelerini Çek (Dropdown için)
+    const myProjects = useQuery(api.projects.getMyProjects);
 
+    // 2. E-posta Gönderme Action'ı
+    const sendEmail = useAction(api.mail.sendContactEmail);
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
+        if(!subject.trim() || !message.trim()) {
+            toast.error("Lütfen konu ve mesaj alanlarını doldurunuz.");
+            return;
+        }
+
         setIsLoading(true);
 
-        // API isteği simülasyonu
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        try {
+            // Backend Action'ı Çağır
+            await sendEmail({
+                // Frontend'de academician.email YOK. Sadece ID gönderiyoruz.
+                academicianId: academician.id as Id<"users">,
+                subject: subject,
+                message: message,
+                projectId: selectedProjectId !== "none" ? (selectedProjectId as Id<"projects">) : undefined
+            });
 
-        console.log("E-posta Gönderildi:", {
-            to: academician.email,
-            subject,
-            message,
-            relatedProject: selectedProjectId
-        });
+            toast.success("E-postanız başarıyla gönderildi!");
 
-        setIsLoading(false);
-        setOpen(false);
-        setSubject("");
-        setMessage("");
-        setSelectedProjectId(undefined);
+            // Formu Temizle ve Kapat
+            setOpen(false);
+            setSubject("");
+            setMessage("");
+            setSelectedProjectId("none");
 
-        // Buraya bir Toast (Success Notification) eklenebilir.
-        alert("E-postanız başarıyla gönderildi!");
+        } catch (error) {
+            console.error(error);
+            toast.error("E-posta gönderilirken bir hata oluştu.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const getInitials = (name: string) => {
@@ -89,7 +107,7 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Kime Kısmı - Görsel Bilgi */}
+                {/* Kime Kısmı - Sadece İsim ve Avatar */}
                 <div className="flex items-center gap-3 p-3 bg-muted/40 rounded-lg border border-border/50">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={academician.avatar} />
@@ -97,12 +115,13 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
                     </Avatar>
                     <div className="flex flex-col text-sm">
                         <span className="font-semibold">{academician.name}</span>
+                        <span className="text-xs text-muted-foreground">{academician.title}</span>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-2">
 
-                    {/* Proje Seçimi */}
+                    {/* Proje Seçimi (Opsiyonel) */}
                     <div className="space-y-2">
                         <Label htmlFor="project" className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
                             <Link2 className="w-3.5 h-3.5" /> İlgili Proje (Opsiyonel)
@@ -113,8 +132,8 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none">Proje ile ilgisi yok</SelectItem>
-                                {myProjects.map((project) => (
-                                    <SelectItem key={project.id} value={String(project.id)}>
+                                {myProjects?.map((project) => (
+                                    <SelectItem key={project.id} value={project.id}>
                                         {project.title}
                                     </SelectItem>
                                 ))}
@@ -152,7 +171,7 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
                     </div>
 
                     <DialogFooter className="pt-2 gap-2 sm:gap-0">
-                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                        <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>
                             İptal
                         </Button>
                         <Button type="submit" disabled={isLoading || !subject || !message}>

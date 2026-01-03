@@ -8,13 +8,15 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator";
 import {UserProfile } from "../../../types";
 import {ProfileDetailsDialog} from "@/modules/dashboard/ui/components/profiles/profile-details-dialog";
-import {DEPARTMENTS} from "@/lib/data";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface ProfileCardProps {
     profile: UserProfile;
 }
 
 export const ProfileCard = ({ profile }: ProfileCardProps) => {
+    const departments = useQuery(api.users.getDepartments);
 
     // İsimden baş harfleri alma
     const getInitials = (name: string) => {
@@ -24,7 +26,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
     };
 
     const getDeptLabel = (val: string) => {
-        return DEPARTMENTS.find(d => d.value === val)?.label || val;
+        return (departments || []).find(d => d.value === val)?.label || val;
     };
 
     return (

@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Save, UserMinus} from "lucide-react";
 import {LayoutProps} from "@/lib/utils";
 import {Project} from "@/modules/dashboard/types";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface ProjectEditDialogProps extends LayoutProps{
     project: Project;
@@ -31,7 +32,7 @@ export const ProjectEditDialog = ({ project, children }: ProjectEditDialogProps)
     // Katılımcıları mock state olarak tutuyoruz
     const [participants, setParticipants] = useState(project.participants);
 
-    const handleRemoveParticipant = (id: number) => {
+    const handleRemoveParticipant = (id: Id<"users">) => {
         setParticipants(participants.filter(p => p.id !== id));
     };
 

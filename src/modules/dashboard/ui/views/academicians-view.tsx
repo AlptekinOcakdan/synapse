@@ -3,26 +3,39 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { MOCK_ACADEMICIANS, DEPARTMENTS } from "@/lib/data"; // Verileri import et
 import { AcademicianCard } from "../components/academics/academician-card";
 
+// --- CONVEX IMPORTS ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
 export const AcademiciansView = () => {
+    // --- STATE ---
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
 
-    // Filtreleme Mantığı
-    const filteredAcademicians = MOCK_ACADEMICIANS.filter((academician) => {
-        const matchesSearch =
-            academician.name.toLocaleLowerCase("tr").includes(searchQuery.toLocaleLowerCase("tr")) ||
-            academician.researchInterests.some(tag => tag.toLocaleLowerCase("tr").includes(searchQuery.toLocaleLowerCase("tr")));
-
-        const matchesDept = selectedDepartment === "all" || academician.department === selectedDepartment;
-
-        return matchesSearch && matchesDept;
+    // --- DATA FETCHING ---
+    // 1. Akademisyenleri Çek (Filtreler ile)
+    const academicians = useQuery(api.users.getAcademicians, {
+        searchQuery: searchQuery,
+        department: selectedDepartment
     });
+
+    // 2. Bölümleri Çek (Dinamik Liste)
+    const departmentsData = useQuery(api.users.getDepartments);
+    const departments = departmentsData || [];
+
+    // --- LOADING STATE ---
+    if (academicians === undefined) {
+        return (
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 max-w-full px-4 py-6">
@@ -58,7 +71,7 @@ export const AcademiciansView = () => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">Tüm Bölümler</SelectItem>
-                        {DEPARTMENTS.map((dept) => (
+                        {departments.map((dept) => (
                             <SelectItem key={dept.value} value={dept.value}>
                                 {dept.label}
                             </SelectItem>
@@ -71,8 +84,8 @@ export const AcademiciansView = () => {
 
             {/* --- GRID LIST --- */}
             <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-6">
-                {filteredAcademicians.length > 0 ? (
-                    filteredAcademicians.map((academician) => (
+                {academicians.length > 0 ? (
+                    academicians.map((academician) => (
                         <AcademicianCard key={academician.id} academician={academician} />
                     ))
                 ) : (

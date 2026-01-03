@@ -21,7 +21,7 @@ export const AcademicianMailSidebar = ({ mails, selectedMailId, onSelectMail }: 
 
     const filteredMails = mails.filter(m =>
         (m.subject.toLowerCase().includes(search.toLowerCase()) ||
-            m.student.name.toLowerCase().includes(search.toLowerCase()))
+            m.academician.name.toLowerCase().includes(search.toLowerCase()))
     );
 
     const MailListItem = ({ mail }: { mail: AcademicianMailThread }) => (
@@ -38,15 +38,15 @@ export const AcademicianMailSidebar = ({ mails, selectedMailId, onSelectMail }: 
             <div className="flex justify-between items-start w-full">
                 <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8 border bg-background">
-                        <AvatarImage src={mail.student.avatar} />
-                        <AvatarFallback>{mail.student.name.substring(0, 2)}</AvatarFallback>
+                        <AvatarImage src={mail.academician.avatar} />
+                        <AvatarFallback>{mail.academician.name.substring(0, 2)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col overflow-hidden text-left">
                         <span className="text-sm font-semibold truncate max-w-35">
-                            {mail.student.name}
+                            {mail.academician.name}
                         </span>
                         <span className="text-[10px] text-muted-foreground truncate">
-                            {mail.student.department}
+                            {mail.academician.department}
                         </span>
                     </div>
                 </div>

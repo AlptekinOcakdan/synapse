@@ -5,7 +5,6 @@ import {SynapseLogo} from "@/components/synapse-logo";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import {Separator} from "@/components/ui/separator";
-import {AuthButton} from "@/modules/auth/ui/components/auth-button";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Menu} from "lucide-react";
 
@@ -34,7 +33,7 @@ export const AcademicianNavigationBar = () => {
                             ))}
                             <Separator orientation="vertical" className="h-6 w-px hidden lg:block"/>
                         </div>
-                        <AuthButton/>
+                        {/*<AuthButton/>*/}
                         <div className="md:hidden flex items-center ml-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

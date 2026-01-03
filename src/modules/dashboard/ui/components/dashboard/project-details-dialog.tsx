@@ -1,4 +1,3 @@
-// modules/dashboard/ui/views/project-details-dialog.tsx
 "use client";
 
 import {
@@ -14,8 +13,9 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar, Trophy, User, Target, Layers, Briefcase, GraduationCap } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Project } from "../../../types"; // Yolunuzu kontrol edin
-import { DEPARTMENTS } from "@/lib/data";
 import {ReactNode} from "react"; // Yolunuzu kontrol edin
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface ProjectDetailsDialogProps {
     project: Project;
@@ -30,9 +30,10 @@ export const ProjectDetailsDialog = ({
                                          open,
                                          onOpenChange
                                      }: ProjectDetailsDialogProps) => {
+    const departments = useQuery(api.users.getDepartments);
 
     const getDeptLabel = (val: string) => {
-        return DEPARTMENTS.find(d => d.value === val)?.label || val;
+        return (departments || []).find(d => d.value === val)?.label || val;
     };
 
     return (

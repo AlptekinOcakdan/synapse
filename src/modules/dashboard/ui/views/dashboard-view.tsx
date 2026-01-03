@@ -1,44 +1,47 @@
-// modules/dashboard/ui/views/dashboard-view.tsx
 "use client";
 
-import { useState, useMemo } from "react"; // useMemo performans için iyi olur
-import { useSearchParams, useRouter, usePathname } from "next/navigation"; // Next.js Navigation Hooks
+import { useState, useMemo } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button"; // Buton eklendi
 import { ProjectCard } from "../components/dashboard/project-card";
 import { ProjectsFilterBar } from "../components/dashboard/projects-filter-bar";
 import { AdvancedSearchPanel } from "../components/dashboard/advanced-search-panel";
-import { MOCK_PROJECTS } from "@/lib/data";
-import {ProjectDetailsDialog} from "@/modules/dashboard/ui/components/dashboard/project-details-dialog";
+import { ProjectDetailsDialog } from "@/modules/dashboard/ui/components/dashboard/project-details-dialog";
+import { Loader2, ArrowDown } from "lucide-react";
+
+// --- CONVEX IMPORTS ---
+import { usePaginatedQuery, useQuery } from "convex/react";
+import {api} from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+
+const ITEMS_PER_PAGE = 6; // İlk açılışta ve her yüklemede kaç tane gelsin
 
 export const DashboardView = () => {
-    // --- URL STATE MANAGEMENT ---
+    // --- URL STATE ---
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-
-    // URL'den projectId'yi al
     const selectedProjectId = searchParams.get("projectId");
 
-    // URL'deki ID'ye göre projeyi bul
-    const selectedProject = useMemo(() => {
-        return MOCK_PROJECTS.find(p => String(p.id) === selectedProjectId);
-    }, [selectedProjectId]);
+    // --- CONVEX PAGINATION ---
+    // usePaginatedQuery bize 'results' (şu ana kadar yüklenenler), 'status' ve 'loadMore' verir.
+    const { results, status, loadMore } = usePaginatedQuery(
+        api.projects.getProjects,
+        {}, // Argümanlar (varsa)
+        { initialNumItems: ITEMS_PER_PAGE } // Başlangıç sayısı
+    );
 
-    // Dialog kapandığında URL'i temizle
+    // Modal verisi
+    const selectedProjectData = useQuery(
+        api.projects.getProject,
+        selectedProjectId ? { id: selectedProjectId as Id<"projects"> } : "skip"
+    );
+
     const handleCloseDialog = (open: boolean) => {
         if (!open) {
             const params = new URLSearchParams(searchParams.toString());
             params.delete("projectId");
-            // scroll: false önemli, sayfa başına atlamasın diye
             router.push(`${pathname}?${params.toString()}`, { scroll: false });
         }
     };
@@ -54,40 +57,57 @@ export const DashboardView = () => {
         setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
     };
 
-    const filteredProjects = MOCK_PROJECTS.filter((p) => {
-        const query = searchQuery.toLocaleLowerCase("tr");
-        const title = p.title.toLocaleLowerCase("tr");
-        const owner = p.owner.name.toLocaleLowerCase("tr");
-        const matchesSearch = title.includes(query) || owner.includes(query);
+    // --- FİLTRELEME MANTIĞI ---
+    // Filtreleme şu an "yüklenmiş veriler" üzerinde çalışır.
+    const filteredProjects = useMemo(() => {
+        // results undefined ise boş dizi
+        const currentProjects = results || [];
 
-        let matchesDept = true;
-        if (selectedDepartment) {
-            matchesDept = p.positions.some((pos) => pos.department === selectedDepartment);
-        }
+        return currentProjects.filter((p) => {
+            const query = searchQuery.toLocaleLowerCase("tr");
+            const title = p.title.toLocaleLowerCase("tr");
+            const ownerName = p.owner?.name?.toLocaleLowerCase("tr") || "";
 
-        let matchesSkills = true;
-        if (skills.length > 0) {
-            matchesSkills = p.positions.some((pos) => {
-                const positionSkills = pos.skills.map(s => s.toLowerCase());
-                return skills.some(searchSkill => positionSkills.includes(searchSkill.toLowerCase()));
-            });
-        }
+            const matchesSearch = title.includes(query) || ownerName.includes(query);
 
-        return matchesSearch && matchesDept && matchesSkills;
-    }).sort((a, b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
+            let matchesDept = true;
+            if (selectedDepartment) {
+                matchesDept = p.positions.some((pos) => pos.department === selectedDepartment);
+            }
+
+            let matchesSkills = true;
+            if (skills.length > 0) {
+                matchesSkills = p.positions.some((pos) => {
+                    const positionSkills = pos.skills.map(s => s.toLowerCase());
+                    return skills.some(searchSkill => positionSkills.includes(searchSkill.toLowerCase()));
+                });
+            }
+
+            return matchesSearch && matchesDept && matchesSkills;
+        }).sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+        });
+    }, [results, searchQuery, sortOrder, selectedDepartment, skills]);
+
+
+    // --- YÜKLENİYOR DURUMU (İlk Yükleme) ---
+    if (status === "LoadingFirstPage") {
+        return (
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 max-w-full px-4 py-6">
-
-            {/* --- GLOBAL PROJECT MODAL (URL DRIVEN) --- */}
-            {selectedProject && (
+            {/* --- MODAL --- */}
+            {selectedProjectId && selectedProjectData && (
                 <ProjectDetailsDialog
-                    project={selectedProject}
-                    open={true} // Her zaman açık, çünkü render ediliyorsa URL'de var demektir
+                    project={selectedProjectData}
+                    open={true}
                     onOpenChange={handleCloseDialog}
                 />
             )}
@@ -100,8 +120,7 @@ export const DashboardView = () => {
                 </p>
             </div>
 
-            {/* --- FILTER SECTION --- */}
-            {/* ... Burası aynı kalıyor ... */}
+            {/* --- FILTER --- */}
             <div className="flex flex-col gap-4">
                 <ProjectsFilterBar
                     searchQuery={searchQuery}
@@ -123,11 +142,13 @@ export const DashboardView = () => {
 
             <Separator />
 
-            {/* --- PROJECTS LIST --- */}
+            {/* --- LİSTE --- */}
             <div className="space-y-4">
                 {filteredProjects.length === 0 ? (
                     <div className="text-center py-20 text-muted-foreground">
-                        Aradığınız kriterlere uygun proje bulunamadı.
+                        {status === "Exhausted"
+                            ? "Aradığınız kriterlere uygun proje bulunamadı."
+                            : "Projeler yükleniyor..."}
                     </div>
                 ) : (
                     filteredProjects.map((project) => (
@@ -136,28 +157,32 @@ export const DashboardView = () => {
                 )}
             </div>
 
-            {/* --- PAGINATION --- */}
-            <div className="flex justify-center mt-8">
-                {/* ... Pagination aynı ... */}
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#" isActive>1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">2</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext href="#" />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+            {/* --- PAGINATION (LOAD MORE) --- */}
+            <div className="flex justify-center mt-8 pb-10">
+                {/* DÜZELTME BURADA: Statü "CanLoadMore" VEYA "LoadingMore" ise butonu göster */}
+                {(status === "CanLoadMore" || status === "LoadingMore") && (
+                    <Button
+                        onClick={() => loadMore(ITEMS_PER_PAGE)}
+                        disabled={status === "LoadingMore"}
+                        variant="outline"
+                        className="w-full max-w-xs"
+                    >
+                        {status === "LoadingMore" ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Yükleniyor...
+                            </>
+                        ) : (
+                            <>
+                                Daha Fazla Göster <ArrowDown className="ml-2 h-4 w-4" />
+                            </>
+                        )}
+                    </Button>
+                )}
+
+                {/* Tümü Yüklendi Mesajı */}
+                {status === "Exhausted" && filteredProjects.length > 0 && (
+                    <p className="text-xs text-muted-foreground">Tüm projeler listelendi.</p>
+                )}
             </div>
         </div>
     );

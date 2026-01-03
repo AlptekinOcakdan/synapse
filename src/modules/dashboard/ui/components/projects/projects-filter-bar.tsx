@@ -14,13 +14,13 @@ interface MyProjectsFilterBarProps {
 }
 
 export const ProjectsFilterBar = ({
-                                        searchQuery,
-                                        setSearchQuery,
-                                        sortOrder,
-                                        toggleSort,
-                                        isAdvancedOpen,
-                                        toggleAdvanced,
-                                    }: MyProjectsFilterBarProps) => {
+                                      searchQuery,
+                                      setSearchQuery,
+                                      sortOrder,
+                                      toggleSort,
+                                      isAdvancedOpen,
+                                      toggleAdvanced,
+                                  }: MyProjectsFilterBarProps) => {
     return (
         <div className="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center w-full">
             <div className="relative w-full lg:w-96 shrink-0">

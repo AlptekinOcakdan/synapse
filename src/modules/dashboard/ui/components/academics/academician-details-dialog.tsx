@@ -1,5 +1,6 @@
 "use client";
 
+import { ReactNode } from "react";
 import {
     Dialog,
     DialogContent,
@@ -24,9 +25,9 @@ import {
     Lightbulb,
     ExternalLink
 } from "lucide-react";
-import { DEPARTMENTS } from "@/lib/data";
 import { Academician } from "@/modules/dashboard/types";
-import {ReactNode} from "react";
+// İletişim Dialog'unu ekledik
+import { AcademicianContactDialog } from "./academician-contact-dialog";
 
 interface AcademicianDetailsDialogProps {
     academician: Academician;
@@ -35,7 +36,8 @@ interface AcademicianDetailsDialogProps {
 
 export const AcademicianDetailsDialog = ({ academician, children }: AcademicianDetailsDialogProps) => {
 
-    const deptLabel = DEPARTMENTS.find(d => d.value === academician.department)?.label || academician.department;
+    // Veritabanından gelen bölüm ismini kullanıyoruz
+    const deptLabel = academician.department || "Bölüm Belirtilmemiş";
 
     const getInitials = (name: string) => {
         const parts = name.split(" ");
@@ -51,19 +53,16 @@ export const AcademicianDetailsDialog = ({ academician, children }: AcademicianD
 
             <DialogContent className="max-w-2xl max-h-[90vh] p-0 overflow-hidden flex flex-col gap-0 border-none shadow-2xl">
 
-                {/* --- ACCESSIBILITY FIX (EKLENDİ) --- */}
-                {/* DialogTitle zorunludur. Tasarımın bozulmaması için 'sr-only' ile görsel olarak gizliyoruz
-                    ancak ekran okuyucular (ve Radix UI) için orada bulunuyor.
-                */}
+                {/* --- ACCESSIBILITY --- */}
                 <DialogHeader className="sr-only">
                     <DialogTitle>{academician.name} Profili</DialogTitle>
                     <DialogDescription>
-                        {academician.title} ünvanlı akademisyenin detaylı bilgileri, yayınları ve iletişim kanalları.
+                        {academician.title} ünvanlı akademisyenin detaylı bilgileri.
                     </DialogDescription>
                 </DialogHeader>
 
                 {/* --- HEADER BANNER --- */}
-                <div className="relative bg-linear-to-r from-primary/20 via-primary/10 to-background h-32 w-full">
+                <div className="relative bg-linear-to-r from-primary/20 via-primary/10 to-background h-32 w-full shrink-0">
                     <div className="absolute top-4 right-4">
                         {academician.isAvailableForMentorship ? (
                             <Badge className="bg-green-500/90 hover:bg-green-600 text-white border-none gap-1.5 py-1.5 px-3">
@@ -78,7 +77,7 @@ export const AcademicianDetailsDialog = ({ academician, children }: AcademicianD
                 </div>
 
                 {/* --- PROFILE INFO HEADER --- */}
-                <div className="px-8 pb-6 -mt-12 flex flex-col items-start gap-4">
+                <div className="px-8 pb-6 -mt-12 flex flex-col items-start gap-4 shrink-0">
                     <Avatar className="h-28 w-28 border-[5px] border-background shadow-xl">
                         <AvatarImage src={academician.avatar} alt={academician.name} />
                         <AvatarFallback className="text-3xl bg-primary text-primary-foreground font-bold">
@@ -98,7 +97,8 @@ export const AcademicianDetailsDialog = ({ academician, children }: AcademicianD
 
                 <Separator />
 
-                <ScrollArea className="flex-1 p-0">
+                {/* --- SCROLLABLE CONTENT --- */}
+                <ScrollArea className="flex-1 p-0 w-full">
                     <div className="px-8 py-6 space-y-8">
 
                         {/* --- STATS GRID --- */}
@@ -126,26 +126,50 @@ export const AcademicianDetailsDialog = ({ academician, children }: AcademicianD
                                 <Lightbulb className="w-4 h-4 text-primary" /> Çalışma ve Uzmanlık Alanları
                             </h3>
                             <div className="flex flex-wrap gap-2">
-                                {academician.researchInterests.map((interest) => (
-                                    <Badge key={interest} variant="secondary" className="px-3 py-1 text-sm font-normal border-border/50">
-                                        {interest}
-                                    </Badge>
-                                ))}
+                                {academician.researchInterests.length > 0 ? (
+                                    academician.researchInterests.map((interest) => (
+                                        <Badge key={interest} variant="secondary" className="px-3 py-1 text-sm font-normal border-border/50">
+                                            {interest}
+                                        </Badge>
+                                    ))
+                                ) : (
+                                    <span className="text-sm text-muted-foreground italic">Belirtilmemiş</span>
+                                )}
                             </div>
                         </div>
 
+                        {/* Ofis Bilgisi (Varsa) */}
+                        {academician.office && (
+                            <div className="text-sm text-muted-foreground bg-muted/20 p-3 rounded-md">
+                                <span className="font-semibold text-foreground">Ofis:</span> {academician.office}
+                            </div>
+                        )}
 
                     </div>
                 </ScrollArea>
 
                 {/* --- FOOTER ACTION --- */}
-                <div className="p-4 border-t bg-muted/20 flex gap-3 justify-end">
-                    <Button variant="outline">
-                        Akademik Profil <ExternalLink className="w-4 h-4 ml-2" />
+                <div className="p-4 border-t bg-muted/20 flex gap-3 justify-end shrink-0">
+
+                    {/* Google Akademik Araması */}
+                    <Button variant="outline" asChild>
+                        <a
+                            href={`https://scholar.google.com/scholar?q=${encodeURIComponent(academician.name)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Akademik Profil <ExternalLink className="w-4 h-4 ml-2" />
+                        </a>
                     </Button>
-                    <Button>
-                        <Mail className="w-4 h-4 mr-2" /> İletişime Geç
-                    </Button>
+
+                    {/* İletişim Dialog'unu Tetikleme */}
+                    <AcademicianContactDialog academician={academician}>
+                        <Button disabled={!academician.isAvailableForMentorship}>
+                            <Mail className="w-4 h-4 mr-2" />
+                            {academician.isAvailableForMentorship ? "İletişime Geç" : "Meşgul"}
+                        </Button>
+                    </AcademicianContactDialog>
+
                 </div>
             </DialogContent>
         </Dialog>

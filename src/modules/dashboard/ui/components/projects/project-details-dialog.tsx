@@ -27,17 +27,19 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Project } from "../../../types";
 import { LayoutProps } from "@/lib/utils";
-import {DEPARTMENTS} from "@/lib/data";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface ProjectDetailsDialogProps extends LayoutProps {
     project: Project;
 }
 
 export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialogProps) => {
+    const departments = useQuery(api.users.getDepartments);
 
     // Bölüm label'ını bulmak için yardımcı fonksiyon
     const getDeptLabel = (val: string) => {
-        return DEPARTMENTS.find(d => d.value === val)?.label || val;
+        return (departments || []).find(d => d.value === val)?.label || val;
     };
 
     // İsim Baş Harfleri

@@ -20,7 +20,10 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import {DEPARTMENTS} from "@/lib/data";
+
+// --- CONVEX IMPORTS ---
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface ProfileFilterBarProps {
     searchQuery: string;
@@ -42,6 +45,12 @@ export const ProfileFilterBar = ({
 
     const [isDeptOpen, setIsDeptOpen] = useState(false);
     const [skillInput, setSkillInput] = useState("");
+
+    // --- FETCH DATA FROM DB ---
+    const departmentsData = useQuery(api.users.getDepartments);
+
+    // Fallback while loading or if empty
+    const departments = departmentsData || [];
 
     // --- HANDLERS ---
 
@@ -110,9 +119,11 @@ export const ProfileFilterBar = ({
                             <Command>
                                 <CommandInput placeholder="Bölüm ara..." />
                                 <CommandList>
-                                    <CommandEmpty>Bölüm bulunamadı.</CommandEmpty>
+                                    <CommandEmpty>
+                                        {departmentsData === undefined ? "Yükleniyor..." : "Bölüm bulunamadı."}
+                                    </CommandEmpty>
                                     <CommandGroup>
-                                        {DEPARTMENTS.map((dept) => (
+                                        {departments.map((dept) => (
                                             <CommandItem
                                                 key={dept.value}
                                                 value={dept.label}
@@ -139,7 +150,8 @@ export const ProfileFilterBar = ({
                     {selectedDepartments.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-2">
                             {selectedDepartments.map((deptVal) => {
-                                const label = DEPARTMENTS.find(d => d.value === deptVal)?.label || deptVal;
+                                // Find label from the fetched data
+                                const label = departments.find(d => d.value === deptVal)?.label || deptVal;
                                 return (
                                     <Badge key={deptVal} variant="secondary" className="px-2 py-0.5 text-xs bg-background border">
                                         {label}

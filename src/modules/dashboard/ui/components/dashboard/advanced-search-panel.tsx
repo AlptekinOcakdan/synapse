@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Award, Check, ChevronsUpDown, GraduationCap, X, Plus } from "lucide-react"; // Plus ikonu eklendi
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +25,6 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import {DEPARTMENTS} from "@/lib/data";
 import {KeyboardEvent} from "react";
 
 interface AdvancedSearchPanelProps {
@@ -41,7 +42,7 @@ export const AdvancedSearchPanel = ({
                                         skills,
                                         setSkills,
                                     }: AdvancedSearchPanelProps) => {
-
+    const departments = useQuery(api.users.getDepartments);
     const [skillInput, setSkillInput] = useState("");
     const [openDepartment, setOpenDepartment] = useState(false);
 
@@ -95,7 +96,7 @@ export const AdvancedSearchPanel = ({
                                     >
                                         <span className="truncate mr-2">
                                             {selectedDepartment
-                                                ? DEPARTMENTS.find((dept) => dept.value === selectedDepartment)?.label
+                                                ? (departments || []).find((dept) => dept.value === selectedDepartment)?.label
                                                 : "Bölümünü ara veya seç..."}
                                         </span>
                                         <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -114,7 +115,7 @@ export const AdvancedSearchPanel = ({
                                             <ScrollArea className="h-56 sm:h-72">
                                                 <CommandEmpty>Bölüm bulunamadı.</CommandEmpty>
                                                 <CommandGroup>
-                                                    {DEPARTMENTS.map((dept) => (
+                                                    {(departments || []).map((dept) => (
                                                         <CommandItem
                                                             key={dept.value}
                                                             value={dept.label}

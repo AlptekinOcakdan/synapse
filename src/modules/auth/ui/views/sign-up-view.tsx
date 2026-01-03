@@ -8,6 +8,9 @@ import {BasicInfoSection} from "@/modules/auth/ui/sections/basic-info-section";
 import {OTPSection} from "@/modules/auth/ui/sections/otp-section";
 import {CVBuilderSection} from "@/modules/auth/ui/sections/cv-builder-section";
 import {SignUpFormData} from "@/modules/auth/types";
+import { useAction, useMutation } from "convex/react";
+import {api} from "@/convex/_generated/api";
+import {toast} from "sonner";
 
 type Step = "BASIC_INFO" | "OTP" | "CV_BUILDER";
 
@@ -16,6 +19,10 @@ export const SignUpView = () => {
     const [step, setStep] = useState<Step>("BASIC_INFO");
     const [isLoading, setIsLoading] = useState(false);
 
+    const sendOtpAction = useAction(api.auth.sendOtp);
+    const verifyOtpMutation = useMutation(api.auth.verifyOtp);
+    const completeSignUpMutation = useMutation(api.auth.completeStudentSignUp);
+
     // Form Verileri (Global State gibi davranır)
     const [formData, setFormData] = useState<SignUpFormData>({
         firstName: "",
@@ -23,6 +30,7 @@ export const SignUpView = () => {
         email: "",
         otp: "",
         department: "",
+        city: null,
         skills: [],
         bio: "",
         experiences: [],
@@ -34,27 +42,53 @@ export const SignUpView = () => {
     const handleBasicInfoSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // API Simülasyonu: Kayıt başlat ve OTP gönder
-        await new Promise(r => setTimeout(r, 1000));
-        setIsLoading(false);
-        setStep("OTP");
+        try {
+            await sendOtpAction({
+                email: formData.email,
+                firstName: formData.firstName
+            });
+            toast.success("Doğrulama kodu gönderildi!");
+            setStep("OTP");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Bir hata oluştu");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleOTPSubmit = async () => {
         setIsLoading(true);
-        // API Simülasyonu: OTP doğrula
-        await new Promise(r => setTimeout(r, 1000));
-        setIsLoading(false);
-        setStep("CV_BUILDER");
+        try {
+            await verifyOtpMutation({
+                email: formData.email,
+                code: formData.otp
+            });
+            toast.success("Kod doğrulandı!");
+            setStep("CV_BUILDER");
+        } catch (error) {
+            toast.error("Hatalı kod, lütfen tekrar deneyin.");
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleFinalSubmit = async () => {
         setIsLoading(true);
-        // API Simülasyonu: Tüm profili kaydet
-        await new Promise(r => setTimeout(r, 2000));
-        console.log("Kayıt Tamamlandı:", formData);
-        setIsLoading(false);
-        router.push("/dashboard");
+        try {
+            await completeSignUpMutation({
+                ...formData,
+                // profileImage null ise undefined olarak gönder veya olduğu gibi
+                profileImage: formData.profileImage || undefined,
+            });
+            toast.success("Aramıza hoş geldin! 🎉");
+            router.push("/dashboard");
+        } catch (error) {
+            console.error(error);
+            toast.error("Kayıt oluşturulurken bir hata oluştu.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

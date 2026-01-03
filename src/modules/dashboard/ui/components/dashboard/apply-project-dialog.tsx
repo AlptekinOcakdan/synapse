@@ -15,9 +15,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
 import { Project } from "../../../types";
-import {LayoutProps} from "@/lib/utils";
+import { LayoutProps } from "@/lib/utils";
 
-interface ApplyProjectDialogProps extends LayoutProps{
+// --- CONVEX & TOAST IMPORTS ---
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
+import {api} from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel"; // Toast bildirimi
+
+interface ApplyProjectDialogProps extends LayoutProps {
     project: Project;
 }
 
@@ -26,6 +32,8 @@ export const ApplyProjectDialog = ({ project, children }: ApplyProjectDialogProp
     const [motivation, setMotivation] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const applyMutation = useMutation(api.applications.applyToProject);
+
     const MAX_CHARS = 1000;
 
     const handleSubmit = async () => {
@@ -33,22 +41,27 @@ export const ApplyProjectDialog = ({ project, children }: ApplyProjectDialogProp
 
         setIsSubmitting(true);
 
-        // API isteği simülasyonu
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        try {
+            // Backend'e istek atıyoruz
+            await applyMutation({
+                // Frontend'deki string ID'yi Convex ID tipine çeviriyoruz
+                projectId: project.id as Id<"projects">,
+                motivation: motivation,
+            });
 
-        console.log("Başvuru gönderildi:", {
-            projectId: project.id,
-            motivation: motivation
-        });
+            // Başarılı olursa
+            toast.success("Başvurunuz başarıyla iletildi!");
+            setIsOpen(false);
+            setMotivation("");
 
-        // Başarılı işlem sonrası
-        setIsSubmitting(false);
-        setIsOpen(false);
-        setMotivation("");
-
-        // Eğer toast kullanıyorsan:
-        // toast.success("Başvurunuz başarıyla iletildi!");
-        alert("Başvurunuz başarıyla iletildi!"); // Geçici bildirim
+        } catch (error) {
+            console.error("Başvuru hatası:", error);
+            // Backend'den gelen hatayı (örn: "Zaten başvurdunuz") kullanıcıya göster
+            const errorMessage = error instanceof Error ? error.message : "Başvuru sırasında bir hata oluştu.";
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -56,7 +69,7 @@ export const ApplyProjectDialog = ({ project, children }: ApplyProjectDialogProp
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-125">
                 <DialogHeader>
                     <DialogTitle>Projeye Başvur</DialogTitle>
                     <DialogDescription>

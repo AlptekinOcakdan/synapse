@@ -24,10 +24,11 @@ import {
 import { UserProfile } from "../../../types";
 import { Competition, Experience } from "@/modules/auth/types";
 import { LayoutProps } from "@/lib/utils";
-import { DEPARTMENTS, MOCK_PROJECTS } from "@/lib/data";
 import { ProjectStatusBadge } from "@/modules/dashboard/ui/components/profiles/project-status-badge";
 // 1. useRouter'ı import ediyoruz
 import { useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface ProfileDetailsDialogProps extends LayoutProps {
     profile: UserProfile;
@@ -36,9 +37,14 @@ interface ProfileDetailsDialogProps extends LayoutProps {
 export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialogProps) => {
     // 2. Router hook'unu tanımlıyoruz
     const router = useRouter();
+    const departments = useQuery(api.users.getDepartments);
+    const userProjects = useQuery(
+        api.projects.getProjectsByUser,
+        profile.id ? { userId: profile.id } : "skip"
+    );
 
     const getDeptLabel = (val: string) => {
-        return DEPARTMENTS.find(d => d.value === val)?.label || val;
+        return (departments || []).find(d => d.value === val)?.label || val;
     };
 
     const getInitials = (name: string) => {
@@ -57,11 +63,6 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
     const bio = profile.bio || "Henüz bir biyografi eklenmemiş.";
     const experiences: Experience[] = profile.experiences || [];
     const competitions: Competition[] = profile.competitions || [];
-
-    const userProjects = MOCK_PROJECTS.filter(project =>
-        project.owner.id === profile.id ||
-        project.participants.some(p => p.id === profile.id)
-    );
 
     return (
         <Dialog>
@@ -191,7 +192,7 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                             </div>
                         </section>
 
-                        {userProjects.length > 0 && (
+                        {userProjects && userProjects.length > 0 && (
                             <>
                                 <Separator />
                                 <section className="space-y-4">
@@ -200,6 +201,7 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                                     </h3>
                                     <div className="grid grid-cols-1 gap-4">
                                         {userProjects.map((project) => {
+                                            if (!project) return null;
                                             const isOwner = project.owner.id === profile.id;
                                             return (
                                                 <div key={project.id} className="group border rounded-xl p-4 hover:border-primary/50 transition-colors bg-card">
