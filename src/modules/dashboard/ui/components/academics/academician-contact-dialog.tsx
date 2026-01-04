@@ -25,10 +25,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Mail, Link2, Loader2 } from "lucide-react";
 import { Academician } from "@/modules/dashboard/types";
 import { LayoutProps } from "@/lib/utils";
-import { toast } from "sonner"; // Toast bildirimi için
+import { toast } from "sonner";
 
 // --- CONVEX IMPORTS ---
-import { useQuery, useAction } from "convex/react";
+import { useQuery, useMutation } from "convex/react"; // useAction yerine useMutation
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -45,13 +45,23 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
     const [message, setMessage] = useState("");
     const [selectedProjectId, setSelectedProjectId] = useState<string>("none");
 
-    // 1. Kullanıcının Kendi Projelerini Çek (Dropdown için)
+    // 1. Kullanıcının Kendi Projelerini Çek
     const myProjects = useQuery(api.projects.getMyProjects);
 
-    // 2. E-posta Gönderme Action'ı
-    const sendEmail = useAction(api.mail.sendContactEmail);
+    // 2. Mevcut Kullanıcıyı Çek (Gönderen ID'si için gerekli)
+    // NOT: Senin projende user'ı çeken fonksiyonun adı farklı olabilir (örn: api.users.getMe)
+    const currentUser = useQuery(api.users.getAuthUser);
+
+    // 3. Mesajlaşma Mutasyonu (Mail değil, Mesaj Başlatma)
+    const createThread = useMutation(api.messages.createThreadAndSendMessage);
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
+        if (!currentUser) {
+            toast.error("Oturum açma bilgisi alınamadı.");
+            return;
+        }
 
         if(!subject.trim() || !message.trim()) {
             toast.error("Lütfen konu ve mesaj alanlarını doldurunuz.");
@@ -61,16 +71,17 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
         setIsLoading(true);
 
         try {
-            // Backend Action'ı Çağır
-            await sendEmail({
-                // Frontend'de academician.email YOK. Sadece ID gönderiyoruz.
-                academicianId: academician.id as Id<"users">,
+            // Backend Mutation'ı Çağır (messages.ts)
+            // Bu işlem DB'ye kaydeder VE arka planda mail gönderir.
+            await createThread({
+                initiatorId: currentUser.id as Id<"users">, // Gönderen
+                recipientId: academician.id as Id<"users">,  // Alıcı
                 subject: subject,
-                message: message,
-                projectId: selectedProjectId !== "none" ? (selectedProjectId as Id<"projects">) : undefined
+                content: message, // Backend 'content' bekliyor
+                relatedProjectId: selectedProjectId !== "none" ? (selectedProjectId as Id<"projects">) : undefined
             });
 
-            toast.success("E-postanız başarıyla gönderildi!");
+            toast.success("Mesajınız gönderildi ve akademisyene bildirildi!");
 
             // Formu Temizle ve Kapat
             setOpen(false);
@@ -80,7 +91,7 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
 
         } catch (error) {
             console.error(error);
-            toast.error("E-posta gönderilirken bir hata oluştu.");
+            toast.error("Mesaj gönderilirken bir hata oluştu.");
         } finally {
             setIsLoading(false);
         }
@@ -103,11 +114,12 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
                         <Mail className="w-5 h-5 text-primary" /> İletişime Geç
                     </DialogTitle>
                     <DialogDescription>
-                        Aşağıdaki formu doldurarak akademisyene doğrudan e-posta gönderebilirsiniz.
+                        Aşağıdaki formu doldurarak akademisyene mesaj gönderebilirsiniz.
+                        Bu işlem sistem üzerinden iletilir ve e-posta bildirimi yapılır.
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Kime Kısmı - Sadece İsim ve Avatar */}
+                {/* Kime Kısmı */}
                 <div className="flex items-center gap-3 p-3 bg-muted/40 rounded-lg border border-border/50">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={academician.avatar} />
@@ -121,7 +133,7 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-2">
 
-                    {/* Proje Seçimi (Opsiyonel) */}
+                    {/* Proje Seçimi */}
                     <div className="space-y-2">
                         <Label htmlFor="project" className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
                             <Link2 className="w-3.5 h-3.5" /> İlgili Proje (Opsiyonel)
@@ -174,7 +186,7 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
                         <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>
                             İptal
                         </Button>
-                        <Button type="submit" disabled={isLoading || !subject || !message}>
+                        <Button type="submit" disabled={isLoading || !subject || !message || !currentUser}>
                             {isLoading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gönderiliyor

@@ -16,26 +16,14 @@ export const Footer = () => {
                         />
                         <div className="flex flex-col items-center justify-center">
                             {/* 940 Görseli */}
-                            <div className="w-20 md:w-36"> {/* Logonun ekrandaki boyutu buradaki w- değeriyle yönetilir */}
+                            <div className="w-36"> {/* Logonun ekrandaki boyutu buradaki w- değeriyle yönetilir */}
                                 <Image
-                                    src="/940.png"
+                                    src="/940-logo.png"
                                     width={750}
                                     height={500}
                                     quality={100}
                                     alt="940 Solutions"
                                     className="object-contain w-full h-auto drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-                                />
-                            </div>
-
-                            {/* SOLUTIONS Görseli (Metin yerine) */}
-                            {/* Metindeki -mt ve ml değerlerini görseli içeren div'e uygulayarak hizalamayı koruyoruz */}
-                            <div className="w-20 md:w-36 -mt-3 md:-mt-5 ml-1">
-                                <Image
-                                    src="/solutions.png"
-                                    width={800} // Görselin orijinal genişliğine göre ayarlayın
-                                    height={200} // Görselin orijinal yüksekliğine göre ayarlayın
-                                    alt="Solutions"
-                                    className="object-contain w-full h-auto"
                                 />
                             </div>
                         </div>

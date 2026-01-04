@@ -1,7 +1,8 @@
 import {v} from "convex/values";
-import {mutation, query} from "./_generated/server";
+import {mutation, MutationCtx, query, QueryCtx} from "./_generated/server";
 import {paginationOptsValidator} from "convex/server";
 import {Academician, UserProfile} from "@/modules/dashboard/types";
+import {Doc} from "@/convex/_generated/dataModel";
 
 export const getProfiles = query({
     args: {
@@ -390,4 +391,26 @@ export const getBasicUser = query({
             role: user.role
         };
     },
+});
+
+export const getAuthUser = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) return null;
+
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_email", (q) => q.eq("email", identity.email!))
+            .first();
+
+        if (!user) return null;
+
+        return {
+            id: user._id,
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            role: user.role
+        };
+    }
 });

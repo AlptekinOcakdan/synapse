@@ -174,24 +174,28 @@ export default defineSchema({
     // 7. RESMİ MAİLLEŞME
     mailThreads: defineTable({
         subject: v.string(),
-        initiatorId: v.id("users"),
-        recipientId: v.id("users"),
+        initiatorId: v.id("users"), // Soruyu soran (Öğrenci)
+        recipientId: v.id("users"), // Cevaplayacak olan (Akademisyen)
         relatedProjectId: v.optional(v.id("projects")),
         lastMessageDate: v.string(),
+        // Bu thread'e ait en son e-postanın Message-ID'si (Threading için kritik)
+        lastMessageId: v.optional(v.string()),
         status: v.union(v.literal("active"), v.literal("archived")),
     })
         .index("by_user_participation", ["initiatorId", "recipientId"]),
 
-    // DÜZELTME: id referansı "mailThreads" olmalıydı (önceki kodda mail_threads idi)
     mailMessages: defineTable({
         threadId: v.id("mailThreads"),
         senderId: v.id("users"),
         content: v.string(),
+        // Mesajın kaynağı: Platformdan mı yazıldı, Mailden mi geldi?
+        source: v.optional(v.union(v.literal("platform"), v.literal("email"))),
+        // Eğer mailden geldiyse o mailin unique ID'si
+        messageId: v.optional(v.string()),
         isRead: v.boolean(),
         timestamp: v.string(),
     })
         .index("by_thread", ["threadId"]),
-
     events: defineTable({
         title: v.string(),
         description: v.string(),

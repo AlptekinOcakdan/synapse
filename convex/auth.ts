@@ -58,7 +58,7 @@ export const sendOtp = action({
     `;
 
         // mail.ts içindeki sendEmail aksiyonunu tetikliyoruz
-        await ctx.runAction(internal.mail.sendEmail, {
+        await ctx.runAction(internal.emails.sendEmail, {
             to: args.email,
             subject: "Synapse Giriş Kodun",
             html: emailHtml
@@ -229,7 +229,7 @@ export const sendSignInCode = action({
       </div>
     `;
 
-        await ctx.runAction(internal.mail.sendEmail, {
+        await ctx.runAction(internal.emails.sendEmail, {
             to: args.email,
             subject: "Synapse Giriş Kodu",
             html: emailHtml

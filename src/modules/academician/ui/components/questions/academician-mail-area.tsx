@@ -20,24 +20,25 @@ import { PhotoUploadDialog } from "@/modules/profile/ui/components/questions/pho
 
 // --- CONVEX IMPORTS ---
 import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { api } from "@/convex/_generated/api"; // API importu
 import { Id } from "@/convex/_generated/dataModel";
 import { AcademicianMailThread } from "@/modules/academician/types";
 
 interface AcademicianMailAreaProps {
     mailThread: AcademicianMailThread;
-    currentUserId: Id<"users">; // Backend'e göndereceğimiz güvenli ID
+    currentUserId: Id<"users">;
     onMobileMenuOpen: () => void;
 }
 
 export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpen }: AcademicianMailAreaProps) => {
-    // 1. MESAJLARI ÇEK
-    const messages = useQuery(api.mails.getMessages, {
-        threadId: mailThread.id
+
+    // 1. DÜZELTME: api.mails yerine api.messages kullanıyoruz
+    const messages = useQuery(api.messages.getMessages, {
+        threadId: mailThread.id as Id<"mailThreads"> // ID tip dönüşümü gerekebilir
     });
 
-    // 2. MESAJ GÖNDERME
-    const sendMessage = useMutation(api.mails.sendMessage);
+    // 2. DÜZELTME: api.mails yerine api.messages kullanıyoruz
+    const sendMessage = useMutation(api.messages.sendMessage);
 
     const [inputValue, setInputValue] = useState("");
     const router = useRouter();
@@ -59,26 +60,28 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
         if (!inputValue.trim()) return;
 
         const content = inputValue.trim();
-        setInputValue(""); // Optimistik temizlik
+        setInputValue(""); // Optimistik UI temizliği
 
         try {
             await sendMessage({
-                threadId: mailThread.id,
+                threadId: mailThread.id as Id<"mailThreads">,
                 senderId: currentUserId,
                 content: content
             });
+            // Not: Backend zaten bu işlemden sonra otomatik olarak e-posta bildirimi tetikleyecek.
         } catch (error) {
             console.error("Mesaj gönderilemedi:", error);
-            // Hata olursa inputu geri doldurabilirsin
+            setInputValue(content); // Hata durumunda mesajı geri yükle
         }
     };
 
+    // Dosya yükleme simülasyonu (Message olarak atar)
     const handleFileUpload = async (file: File) => {
         try {
             await sendMessage({
-                threadId: mailThread.id,
+                threadId: mailThread.id as Id<"mailThreads">,
                 senderId: currentUserId,
-                content: `📎 Dosya: ${file.name}`
+                content: `📎 Dosya Gönderildi: ${file.name}`
             });
         } catch (error) {
             console.error("Dosya yükleme hatası:", error);
@@ -97,8 +100,8 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    // Backend 'academician' key'i ile öğrenciyi dönüyor. Karışıklığı önlemek için değişkene atıyoruz.
-    const student = mailThread.academician;
+    // Backend'den gelen veriyi değişkene ata
+    const student = mailThread.academician; // Not: İsimlendirme 'academician' kalsa da içerik 'karşı taraf'tır.
 
     if (!messages) {
         return (
@@ -137,12 +140,12 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                                     </Badge>
                                 )}
                             </h3>
-                            {/* ÖĞRENCİ BİLGİSİ */}
+                            {/* KULLANICI BİLGİSİ (Öğrenci veya diğer taraf) */}
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <User className="w-4 h-4" />
                                 <span className="font-medium text-foreground/80">{student.name}</span>
                                 <span className="text-xs opacity-50">•</span>
-                                <span className="text-xs">{student.title}</span>
+                                <span className="text-xs">{student.title || "Öğrenci"}</span>
                                 <span className="text-xs opacity-50">•</span>
                                 <span className="text-xs">{student.department}</span>
                             </div>
@@ -156,7 +159,7 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Öğrenci Profilini Gör</DropdownMenuItem>
+                            <DropdownMenuItem>Profilini Gör</DropdownMenuItem>
                             <DropdownMenuItem>Arşivle</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -170,41 +173,41 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                         <p className="text-center text-muted-foreground text-sm mt-10">Henüz mesaj yok.</p>
                     ) : (
                         messages.map((msg) => {
-                            // SENDER ID KONTROLÜ (String karşılaştırma)
-                            const isMe = msg.senderId === String(currentUserId);
+                            // SENDER ID KONTROLÜ
+                            // Backend senderId'yi string olarak gönderiyorsa burada string'e çevirip kıyaslıyoruz
+                            const isMe = String(msg.senderId) === String(currentUserId);
 
                             return (
                                 <div key={msg.id} className={cn(
-                                    "flex flex-col gap-2 p-4 rounded-xl border shadow-sm transition-all",
-                                    isMe ? "bg-white dark:bg-card ml-12 border-primary/20" : "bg-white dark:bg-card mr-12"
+                                    "flex flex-col gap-2 p-4 rounded-xl border shadow-sm transition-all max-w-[85%]",
+                                    isMe
+                                        ? "bg-primary/5 dark:bg-primary/10 ml-auto border-primary/20 rounded-br-none"
+                                        : "bg-white dark:bg-card mr-auto rounded-bl-none"
                                 )}>
-                                    <div className="flex items-center justify-between border-b pb-2 mb-1">
+                                    <div className="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-2 mb-1 gap-4">
                                         <div className="flex items-center gap-2">
-                                            <Avatar className="h-8 w-8">
+                                            <Avatar className="h-6 w-6">
                                                 {isMe ? (
-                                                    <AvatarFallback className="bg-primary/10 text-primary">DR</AvatarFallback>
+                                                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">BN</AvatarFallback>
                                                 ) : (
                                                     <AvatarImage src={student.avatar} />
                                                 )}
                                                 {!isMe && <AvatarFallback>{student.name.substring(0, 2)}</AvatarFallback>}
                                             </Avatar>
-                                            <div>
-                                                <p className="text-sm font-semibold">
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-semibold">
                                                     {isMe ? "Siz" : student.name}
-                                                </p>
-                                                <p className="text-[10px] text-muted-foreground">
-                                                    {isMe ? "Akademisyen" : "Öğrenci"}
-                                                </p>
+                                                </span>
                                             </div>
                                         </div>
-                                        <span className="text-xs text-muted-foreground">
+                                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                                             {new Date(msg.timestamp).toLocaleString('tr-TR', {
                                                 day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'
                                             })}
                                         </span>
                                     </div>
 
-                                    <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
+                                    <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90 break-words">
                                         {msg.content}
                                     </div>
                                 </div>
@@ -221,9 +224,15 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                     <div className="relative">
                         <Textarea
                             placeholder="Yanıtınızı buraya yazın..."
-                            className="min-h-25 resize-none pr-12 bg-muted/20 focus:bg-background transition-colors"
+                            className="min-h-25 resize-none pr-12 bg-muted/30 focus:bg-background transition-colors"
                             value={inputValue}
                             onChange={handleInput}
+                            onKeyDown={(e) => {
+                                // Ctrl + Enter ile gönderme özelliği
+                                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                    handleSendMessage();
+                                }
+                            }}
                         />
                         <div className="absolute bottom-2 right-2 flex gap-2">
                             <DropdownMenu>
@@ -243,13 +252,18 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                             </DropdownMenu>
                         </div>
                     </div>
-                    <div className="flex justify-end">
-                        <Button onClick={handleSendMessage} disabled={!inputValue.trim()} className="gap-2">
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted-foreground hidden sm:inline-block">
+                            Göndermek için Ctrl + Enter
+                        </span>
+                        <Button onClick={handleSendMessage} disabled={!inputValue.trim()} className="gap-2 ml-auto">
                             Yanıtla <Send className="w-4 h-4" />
                         </Button>
                     </div>
                 </div>
             </div>
+
+            {/* --- DIALOGS --- */}
             <DocumentUploadDialog
                 open={isDocDialogOpen}
                 onOpenChange={setIsDocDialogOpen}

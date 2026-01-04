@@ -33,12 +33,12 @@ interface MailAreaProps {
 export const MailArea = ({ mailThread, currentUserId, onMobileMenuOpen }: MailAreaProps) => {
     // 1. MESAJLARI ÇEK (Real-time)
     // mailThread.id'nin Convex ID formatında geldiğinden emin olun (Types dosyasında Id<"mailThreads"> yapmıştık)
-    const messages = useQuery(api.mails.getMessages, {
+    const messages = useQuery(api.messages.getMessages, {
         threadId: mailThread.id as Id<"mailThreads">
     });
 
     // 2. MESAJ GÖNDERME MUTATION
-    const sendMessage = useMutation(api.mails.sendMessage);
+    const sendMessage = useMutation(api.messages.sendMessage);
 
     const [inputValue, setInputValue] = useState("");
     const router = useRouter();

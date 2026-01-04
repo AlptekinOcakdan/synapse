@@ -37,7 +37,7 @@ export const AcademicianMailsView = ({userId}: AcademicianMailsViewProps) => {
     const viewer = useQuery(api.users.getViewerProfile, {userId: userId});
 
     const threads = useQuery(
-        api.mails.getMailThreads,
+        api.messages.getMailThreads,
         userId ? { userId: userId } : "skip"
     );
 

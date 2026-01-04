@@ -28,7 +28,7 @@ export const MailsView = ({userId}:MailsViewProps) => {
     // 1. DATA FETCHING
     // viewer yüklenmeden sorgu yapma ("skip")
     const threads = useQuery(
-        api.mails.getMailThreads,
+        api.messages.getMailThreads,
         userId ? { userId: userId } : "skip"
     );
 

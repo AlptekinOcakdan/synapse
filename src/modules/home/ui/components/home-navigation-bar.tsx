@@ -32,8 +32,9 @@ export const HomeNavigationBar = () => {
     }, []);
 
     const navLinks = [
+        { name: "Ana Sayfa", href: "/" },
         { name: "Nasıl Çalışır?", href: "#nasil-calisir" },
-        { name: "Kurumsal", href: "#kurumsal" },
+        { name: "Kurumsal", href: "/about" },
     ];
 
     return (
@@ -49,7 +50,7 @@ export const HomeNavigationBar = () => {
                     <SynapseLogo />
 
                     {/* --- DESKTOP MENU --- */}
-                    <div className="hidden md:flex items-center gap-6">
+                    <div className="hidden lg:flex items-center gap-6">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
@@ -75,7 +76,7 @@ export const HomeNavigationBar = () => {
                     </div>
 
                     {/* --- MOBILE MENU (Sheet) --- */}
-                    <div className="md:hidden">
+                    <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon" className="text-muted-foreground">
