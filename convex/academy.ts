@@ -1,22 +1,11 @@
 import { v } from "convex/values";
-import {query, mutation, QueryCtx, MutationCtx} from "./_generated/server";
-import {Doc} from "@/convex/_generated/dataModel";
-
-// Helper: Kullanıcıyı bul
-async function getCurrentUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    return await ctx.db
-        .query("users")
-        .withIndex("by_email", (q) => q.eq("email", identity.email!))
-        .first();
-}
+import {query, mutation,} from "./_generated/server";
 
 // 1. Tüm Etkinlikleri Getir (Gruplanmış ve Sıralanmış)
 export const getAcademyEvents = query({
-    args: {},
-    handler: async (ctx) => {
-        const currentUser = await getCurrentUser(ctx);
+    args: {userId: v.id("users")},
+    handler: async (ctx,args) => {
+        const currentUser = await ctx.db.get(args.userId);
         const allEvents = await ctx.db.query("events").collect();
 
         // Takip edilen etkinlikleri bul (Eğer kullanıcı giriş yaptıysa)
@@ -64,9 +53,9 @@ export const getAcademyEvents = query({
 
 // 2. Etkinlik Takip Et / Takipten Çık (Toggle)
 export const toggleSubscription = mutation({
-    args: { eventId: v.id("events") },
+    args: { eventId: v.id("events"), userId: v.id("users") },
     handler: async (ctx, args) => {
-        const user = await getCurrentUser(ctx);
+        const user = await ctx.db.get(args.userId);
         if (!user) throw new Error("Giriş yapmalısınız.");
 
         const existing = await ctx.db

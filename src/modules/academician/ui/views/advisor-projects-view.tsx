@@ -23,7 +23,11 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
-export const AdvisorProjectsView = () => {
+interface AdvisorProjectsViewProps {
+    userId: Id<"users">;
+}
+
+export const AdvisorProjectsView = ({userId}: AdvisorProjectsViewProps) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [message, setMessage] = useState("");
@@ -44,7 +48,8 @@ export const AdvisorProjectsView = () => {
         try {
             await applyForMentorship({
                 projectId: selectedProject.id as Id<"projects">,
-                message: message
+                message: message,
+                userId: userId
             });
 
             toast.success("Danışmanlık talebiniz iletildi.");

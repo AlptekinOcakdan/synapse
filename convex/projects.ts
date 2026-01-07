@@ -154,16 +154,10 @@ export const getProject = query({
 });
 
 export const getMyProjects = query({
-    args: {},
-    handler: async (ctx) => {
-        // 1. Kimlik Doğrulama
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return [];
+    args: {userId: v.id("users")},
+    handler: async (ctx,args) => {
 
-        const user = await ctx.db
-            .query("users")
-            .withIndex("by_email", (q) => q.eq("email", identity.email!))
-            .first();
+        const user = await ctx.db.get(args.userId);
 
         if (!user) return [];
 
@@ -259,6 +253,7 @@ export const getCompetitions = query({
 
 export const createProject = mutation({
     args: {
+        userId: v.id("users"),
         title: v.string(),
         summary: v.string(),
         competition: v.string(), // Frontend boş string gönderiyorsa v.string() kalsın, optional ise v.optional()
@@ -273,17 +268,7 @@ export const createProject = mutation({
         ),
     },
     handler: async (ctx, args) => {
-        // 1. Kimlik Doğrulama
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-            throw new Error("Proje oluşturmak için giriş yapmalısınız.");
-        }
-
-        const user = await ctx.db
-            .query("users")
-            .withIndex("by_email", (q) => q.eq("email", identity.email!))
-            .first();
-
+        const user = await ctx.db.get(args.userId);
         if (!user) throw new Error("Kullanıcı bulunamadı.");
 
         // 2. Arama Alanlarını (Search Fields) Otomatik Oluştur

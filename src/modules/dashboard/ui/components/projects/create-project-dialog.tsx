@@ -29,7 +29,8 @@ import { LayoutProps } from "@/lib/utils";
 // --- CONVEX & TOAST IMPORTS ---
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { toast } from "sonner"; // Toast bildirimi için
+import { toast } from "sonner";
+import {Id} from "@/convex/_generated/dataModel"; // Toast bildirimi için
 
 const INITIAL_FORM_DATA: ProjectFormData = {
     title: "",
@@ -39,7 +40,11 @@ const INITIAL_FORM_DATA: ProjectFormData = {
     positions: []
 };
 
-export const CreateProjectDialog = ({ children }: LayoutProps) => {
+interface CreateProjectDialogProps extends LayoutProps{
+    userId: Id<"users">
+}
+
+export const CreateProjectDialog = ({ children, userId }: CreateProjectDialogProps) => {
     // --- STATE ---
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState<ProjectFormData>(INITIAL_FORM_DATA);
@@ -119,7 +124,8 @@ export const CreateProjectDialog = ({ children }: LayoutProps) => {
                     department: p.department,
                     count: p.count,
                     skills: p.skills
-                }))
+                })),
+                userId: userId
             });
 
             toast.success("Proje başarıyla oluşturuldu! 🎉");

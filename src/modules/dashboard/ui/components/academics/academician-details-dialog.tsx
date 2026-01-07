@@ -28,13 +28,15 @@ import {
 import { Academician } from "@/modules/dashboard/types";
 // İletişim Dialog'unu ekledik
 import { AcademicianContactDialog } from "./academician-contact-dialog";
+import {Id} from "@/convex/_generated/dataModel";
 
 interface AcademicianDetailsDialogProps {
     academician: Academician;
     children: ReactNode;
+    userId: Id<"users">;
 }
 
-export const AcademicianDetailsDialog = ({ academician, children }: AcademicianDetailsDialogProps) => {
+export const AcademicianDetailsDialog = ({ academician, children, userId }: AcademicianDetailsDialogProps) => {
 
     // Veritabanından gelen bölüm ismini kullanıyoruz
     const deptLabel = academician.department || "Bölüm Belirtilmemiş";
@@ -163,7 +165,7 @@ export const AcademicianDetailsDialog = ({ academician, children }: AcademicianD
                     </Button>
 
                     {/* İletişim Dialog'unu Tetikleme */}
-                    <AcademicianContactDialog academician={academician}>
+                    <AcademicianContactDialog academician={academician} userId={userId} >
                         <Button disabled={!academician.isAvailableForMentorship}>
                             <Mail className="w-4 h-4 mr-2" />
                             {academician.isAvailableForMentorship ? "İletişime Geç" : "Meşgul"}

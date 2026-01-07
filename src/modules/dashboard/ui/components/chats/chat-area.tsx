@@ -56,9 +56,10 @@ interface ChatAreaProps {
     chatId: Id<"conversations">;
     chatData: ChatHeaderData;
     onMobileMenuOpen: () => void;
+    userId: Id<"users">;
 }
 
-export const ChatArea = ({ chatId, chatData, onMobileMenuOpen }: ChatAreaProps) => {
+export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAreaProps) => {
     const [inputValue, setInputValue] = useState("");
     const [detailMessage, setDetailMessage] = useState<Message | null>(null);
 
@@ -77,7 +78,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen }: ChatAreaProps) 
 
     // Mutations & Queries
     const sendMessage = useMutation(api.chats.sendMessage);
-    const currentUser = useQuery(api.users.viewer);
+    const currentUser = useQuery(api.users.viewer, { userId: userId });
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -105,7 +106,8 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen }: ChatAreaProps) 
         try {
             await sendMessage({
                 conversationId: chatId,
-                content: content
+                content: content,
+                userId: userId
             });
             // Scroll will happen automatically due to useEffect on messages.length
         } catch (error) {

@@ -14,8 +14,12 @@ import { ProjectsAdvancedFilter } from "@/modules/dashboard/ui/components/projec
 // --- CONVEX IMPORTS ---
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+interface ProjectsViewProps {
+    userId: Id<"users">;
+}
 
-export const ProjectsView = () => {
+export const ProjectsView = ({userId}: ProjectsViewProps) => {
     // --- STATE ---
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
@@ -27,7 +31,7 @@ export const ProjectsView = () => {
 
     // --- DATA FETCHING ---
     // Backend'den hem sahibi olunan hem de üye olunan projeleri çeker
-    const myProjects = useQuery(api.projects.getMyProjects);
+    const myProjects = useQuery(api.projects.getMyProjects, { userId: userId });
 
     // Kullanıcının kendi ID'sini çekmek (ProjectCard içinde yetki kontrolü için gerekebilir)
     // Şimdilik basitçe projeyi listelemeye odaklanıyoruz.
@@ -87,7 +91,7 @@ export const ProjectsView = () => {
                 </div>
 
                 {/* SAĞ ÜST: YENİ PROJE BUTONU */}
-                <CreateProjectDialog>
+                <CreateProjectDialog userId={userId}>
                     <Button className="shrink-0 gap-2">
                         <Plus className="w-4 h-4"/> Yeni Proje Oluştur
                     </Button>
@@ -129,6 +133,7 @@ export const ProjectsView = () => {
                         <ProjectCard
                             key={project.id}
                             project={project}
+                            userId={userId}
                         />
                     ))
                 )}

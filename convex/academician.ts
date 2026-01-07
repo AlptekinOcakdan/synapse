@@ -101,16 +101,11 @@ export const applyForMentorship = mutation({
     args: {
         projectId: v.id("projects"),
         message: v.string(),
+        userId: v.id("users")
     },
     handler: async (ctx, args) => {
-        // 1. Kimlik Kontrolü
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("Giriş yapmalısınız.");
 
-        const academician = await ctx.db
-            .query("users")
-            .withIndex("by_email", (q) => q.eq("email", identity.email!))
-            .first();
+        const academician = await ctx.db.get(args.userId);
 
         if (!academician || academician.role !== "academician") {
             throw new Error("Sadece akademisyenler mentörlük teklifi yapabilir.");

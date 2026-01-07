@@ -34,9 +34,10 @@ import { Id } from "@/convex/_generated/dataModel";
 
 interface AcademicianContactDialogProps extends LayoutProps {
     academician: Academician;
+    userId: Id<"users">;
 }
 
-export const AcademicianContactDialog = ({ academician, children }: AcademicianContactDialogProps) => {
+export const AcademicianContactDialog = ({ academician, children, userId }: AcademicianContactDialogProps) => {
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -46,11 +47,11 @@ export const AcademicianContactDialog = ({ academician, children }: AcademicianC
     const [selectedProjectId, setSelectedProjectId] = useState<string>("none");
 
     // 1. Kullanıcının Kendi Projelerini Çek
-    const myProjects = useQuery(api.projects.getMyProjects);
+    const myProjects = useQuery(api.projects.getMyProjects, { userId });
 
     // 2. Mevcut Kullanıcıyı Çek (Gönderen ID'si için gerekli)
     // NOT: Senin projende user'ı çeken fonksiyonun adı farklı olabilir (örn: api.users.getMe)
-    const currentUser = useQuery(api.users.getAuthUser);
+    const currentUser = useQuery(api.users.getAuthUser, { userId });
 
     // 3. Mesajlaşma Mutasyonu (Mail değil, Mesaj Başlatma)
     const createThread = useMutation(api.messages.createThreadAndSendMessage);

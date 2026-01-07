@@ -8,11 +8,15 @@ import { Separator } from "@/components/ui/separator";
 // --- CONVEX IMPORTS ---
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+interface AcademyViewProps {
+    userId: Id<"users">;
+}
 
-export const AcademyView = () => {
+export const AcademyView = ({userId}: AcademyViewProps) => {
 
     // Veriyi Backend'den çek (Zaten sıralanmış ve gruplanmış geliyor)
-    const data = useQuery(api.academy.getAcademyEvents);
+    const data = useQuery(api.academy.getAcademyEvents, { userId });
 
     // Loading State
     if (data === undefined) {
@@ -58,7 +62,7 @@ export const AcademyView = () => {
                     {planned.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {planned.map((event) => (
-                                <AcademyEventCard key={event.id} event={event} />
+                                <AcademyEventCard key={event.id} event={event} userId={userId} />
                             ))}
                         </div>
                     ) : (
@@ -73,7 +77,7 @@ export const AcademyView = () => {
                     {completed.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {completed.map((event) => (
-                                <AcademyEventCard key={event.id} event={event} />
+                                <AcademyEventCard key={event.id} event={event} userId={userId} />
                             ))}
                         </div>
                     ) : (

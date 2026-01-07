@@ -1,27 +1,15 @@
 import { v } from "convex/values";
-import { query, mutation, QueryCtx, MutationCtx } from "./_generated/server";
-import { Doc } from "./_generated/dataModel";
+import { query, mutation } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 
 // --- HELPERS ---
-
-// Helper to get the current user with strict typing
-async function getCurrentUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    return await ctx.db
-        .query("users")
-        .withIndex("by_email", (q) => q.eq("email", identity.email!))
-        .first();
-}
-
 // --- QUERIES ---
 
 // 1. List Conversations (Sorted Newest -> Oldest)
 export const listConversations = query({
-    args: {},
-    handler: async (ctx) => {
-        const currentUser = await getCurrentUser(ctx);
+    args: {userId: v.id("users")},
+    handler: async (ctx,args) => {
+        const currentUser = await ctx.db.get(args.userId);
         if (!currentUser) return [];
 
         // Fetch all conversations.
@@ -131,9 +119,9 @@ export const getMessages = query({
 
 // 3. Get Single Chat Details (Header)
 export const getChat = query({
-    args: { conversationId: v.id("conversations") },
+    args: { conversationId: v.id("conversations"), userId: v.id("users") },
     handler: async (ctx, args) => {
-        const currentUser = await getCurrentUser(ctx);
+        const currentUser = await ctx.db.get(args.userId);
         if (!currentUser) return null;
 
         const conv = await ctx.db.get(args.conversationId);
@@ -182,9 +170,10 @@ export const sendMessage = mutation({
     args: {
         conversationId: v.id("conversations"),
         content: v.string(),
+        userId: v.id("users")
     },
     handler: async (ctx, args) => {
-        const currentUser = await getCurrentUser(ctx);
+        const currentUser = await ctx.db.get(args.userId);
         if (!currentUser) throw new Error("Giriş yapmalısınız.");
 
         // Insert message

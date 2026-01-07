@@ -1,5 +1,5 @@
 import {v} from "convex/values";
-import {mutation, MutationCtx, query, QueryCtx} from "./_generated/server";
+import {mutation, query,} from "./_generated/server";
 import {paginationOptsValidator} from "convex/server";
 import {Academician, UserProfile} from "@/modules/dashboard/types";
 import {Doc} from "@/convex/_generated/dataModel";
@@ -151,15 +151,10 @@ export const getDepartments = query({
 });
 
 export const viewer = query({
-    args: {},
-    handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return null;
+    args: {userId: v.id("users")},
+    handler: async (ctx,args) => {
 
-        return await ctx.db
-            .query("users")
-            .withIndex("by_email", (q) => q.eq("email", identity.email!))
-            .first();
+        return await ctx.db.get(args.userId);
     },
 });
 
@@ -231,7 +226,6 @@ export const getViewerProfile = query({
     // ARTIK CONVEX KİMLİĞİ BİLMEDİĞİ İÇİN ID'Yİ BİZ GÖNDERİYORUZ
     args: { userId: v.id("users") },
     handler: async (ctx, args) => {
-        // ctx.auth.getUserIdentity() ARTIK YOK!
 
         const user = await ctx.db.get(args.userId);
 
@@ -339,7 +333,7 @@ export const updateOverview = mutation({
         if (!user) throw new Error("Kullanıcı bulunamadı.");
 
         // 2. Güncelleme Objesi Hazırla
-        const updates: any = {};
+        const updates: Partial<Doc<"users">> = {};
 
         // Eğer bio gönderildiyse güncelleme listesine ekle
         if (args.bio !== undefined) updates.bio = args.bio;
@@ -394,15 +388,10 @@ export const getBasicUser = query({
 });
 
 export const getAuthUser = query({
-    args: {},
-    handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return null;
+    args: {userId: v.id("users")},
+    handler: async (ctx, args) => {
 
-        const user = await ctx.db
-            .query("users")
-            .withIndex("by_email", (q) => q.eq("email", identity.email!))
-            .first();
+        const user = await ctx.db.get(args.userId);
 
         if (!user) return null;
 

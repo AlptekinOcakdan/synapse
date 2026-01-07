@@ -11,16 +11,17 @@ import { Project } from "../../../types";
 // --- CONVEX IMPORTS ---
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel";
 
 interface ProjectCardProps {
     project: Project;
-    // ARTIK currentUserId PROP'UNA GEREK YOK
+    userId: Id<"users">
 }
 
-export const ProjectCard = ({ project }: ProjectCardProps) => {
+export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
 
     // 1. Oturum açmış kullanıcıyı çek
-    const currentUser = useQuery(api.users.viewer);
+    const currentUser = useQuery(api.users.viewer, { userId: userId });
 
     // 2. Sahiplik Kontrolü
     // currentUser yüklenene kadar (undefined) false döner.

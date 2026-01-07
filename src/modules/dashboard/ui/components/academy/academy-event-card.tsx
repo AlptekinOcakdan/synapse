@@ -40,9 +40,10 @@ interface AcademyEventProps {
         }[];
         isSubscribed: boolean; // Backend'den gelen ek alan
     };
+    userId: Id<"users">;
 }
 
-export const AcademyEventCard = ({ event }: AcademyEventProps) => {
+export const AcademyEventCard = ({ event, userId }: AcademyEventProps) => {
 
     // Takip Etme İşlemi
     const toggleSub = useMutation(api.academy.toggleSubscription);
@@ -51,7 +52,7 @@ export const AcademyEventCard = ({ event }: AcademyEventProps) => {
     const handleSubscribe = async () => {
         setIsLoading(true);
         try {
-            const isNowSubscribed = await toggleSub({ eventId: event.id });
+            const isNowSubscribed = await toggleSub({ eventId: event.id , userId });
             if (isNowSubscribed) {
                 toast.success("Etkinlik takibe alındı, bildirim alacaksınız.");
             } else {

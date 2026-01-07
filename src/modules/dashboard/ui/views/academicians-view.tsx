@@ -11,8 +11,13 @@ import { AcademicianCard } from "../components/academics/academician-card";
 // --- CONVEX IMPORTS ---
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel";
 
-export const AcademiciansView = () => {
+interface AcademiciansViewProps {
+    userId: Id<"users">;
+}
+
+export const AcademiciansView = ({userId}: AcademiciansViewProps) => {
     // --- STATE ---
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
@@ -86,7 +91,7 @@ export const AcademiciansView = () => {
             <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-6">
                 {academicians.length > 0 ? (
                     academicians.map((academician) => (
-                        <AcademicianCard key={academician.id} academician={academician} />
+                        <AcademicianCard key={academician.id} academician={academician} userId={userId} />
                     ))
                 ) : (
                     <div className="col-span-full text-center py-12 text-muted-foreground">

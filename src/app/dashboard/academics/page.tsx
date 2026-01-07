@@ -1,9 +1,18 @@
 import {AcademiciansView} from "@/modules/dashboard/ui/views/academicians-view";
+import {getSession} from "@/lib/session";
+import {redirect} from "next/navigation";
+import {Id} from "@/convex/_generated/dataModel";
 
-const Page = () => {
+const Page = async () => {
+    const session = await getSession();
+
+    // 2. Oturum yoksa Login'e at
+    if (!session || !session.userId) {
+        redirect("/");
+    }
     return (
         <>
-            <AcademiciansView />
+            <AcademiciansView userId={session.userId as Id<"users">} />
         </>
     );
 };

@@ -9,12 +9,14 @@ import { Project } from "../../../types";
 import { ApplyProjectDialog } from "./apply-project-dialog";
 // useRouter ve usePathname, useSearchParams ekleyin
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import {Id} from "@/convex/_generated/dataModel";
 
 interface ProjectCardProps {
     project: Project;
+    userId: Id<"users">;
 }
 
-export const ProjectCard = ({ project }: ProjectCardProps) => {
+export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -69,7 +71,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
                         </Button>
 
                         {/* Başvuru Modalı aynı kalabilir veya onu da URL'e taşıyabilirsiniz */}
-                        <ApplyProjectDialog project={project}>
+                        <ApplyProjectDialog project={project} userId={userId}>
                             <Button className="w-fit">
                                 Başvur <ArrowRight className="w-4 h-4 ml-2 hidden sm:inline-block" />
                             </Button>

@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Users, Mail, GraduationCap, CheckCircle2, XCircle, User } from "lucide-react";
 import { Academician } from "@/modules/dashboard/types"; // Tip tanımı
 import { AcademicianDetailsDialog } from "./academician-details-dialog";
-import { AcademicianContactDialog } from "./academician-contact-dialog"; // Yol aynı klasördeyse kısaltılabilir
+import { AcademicianContactDialog } from "./academician-contact-dialog";
+import {Id} from "@/convex/_generated/dataModel"; // Yol aynı klasördeyse kısaltılabilir
 
 interface AcademicianCardProps {
     academician: Academician;
+    userId: Id<"users">;
 }
 
-export const AcademicianCard = ({ academician }: AcademicianCardProps) => {
+export const AcademicianCard = ({ academician, userId }: AcademicianCardProps) => {
 
     // Veritabanında artık tam isim tutulduğu için mapping'e gerek yok
     // Örn: "Bilgisayar Mühendisliği" direkt DB'den gelir.
@@ -114,7 +116,7 @@ export const AcademicianCard = ({ academician }: AcademicianCardProps) => {
             <CardFooter className="p-4 bg-muted/30 border-t flex flex-col gap-2 mt-auto">
 
                 {/* 1. İLETİŞİME GEÇ (Contact Dialog) */}
-                <AcademicianContactDialog academician={academician}>
+                <AcademicianContactDialog academician={academician} userId={userId}>
                     <Button
                         size="sm"
                         className="w-full h-8 text-xs rounded-md shadow-sm"
@@ -127,7 +129,7 @@ export const AcademicianCard = ({ academician }: AcademicianCardProps) => {
                 </AcademicianContactDialog>
 
                 {/* 2. PROFİLİ GÖR (Details Dialog) */}
-                <AcademicianDetailsDialog academician={academician}>
+                <AcademicianDetailsDialog academician={academician} userId={userId}>
                     <Button size="sm" variant="outline" className="w-full h-8 text-xs bg-background hover:bg-background/80">
                         <User className="w-3.5 h-3.5 mr-2" /> Profili Gör
                     </Button>

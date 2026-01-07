@@ -25,9 +25,10 @@ import {Id} from "@/convex/_generated/dataModel"; // Toast bildirimi
 
 interface ApplyProjectDialogProps extends LayoutProps {
     project: Project;
+    userId: Id<"users">;
 }
 
-export const ApplyProjectDialog = ({ project, children }: ApplyProjectDialogProps) => {
+export const ApplyProjectDialog = ({ project, children, userId }: ApplyProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [motivation, setMotivation] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,6 +48,7 @@ export const ApplyProjectDialog = ({ project, children }: ApplyProjectDialogProp
                 // Frontend'deki string ID'yi Convex ID tipine çeviriyoruz
                 projectId: project.id as Id<"projects">,
                 motivation: motivation,
+                userId: userId
             });
 
             // Başarılı olursa

@@ -17,7 +17,11 @@ import { Id } from "@/convex/_generated/dataModel";
 
 const ITEMS_PER_PAGE = 6; // İlk açılışta ve her yüklemede kaç tane gelsin
 
-export const DashboardView = () => {
+interface DashboardViewProps {
+    userId: Id<"users">;
+}
+
+export const DashboardView = ({userId}:DashboardViewProps) => {
     // --- URL STATE ---
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -152,7 +156,7 @@ export const DashboardView = () => {
                     </div>
                 ) : (
                     filteredProjects.map((project) => (
-                        <ProjectCard key={project.id} project={project} />
+                        <ProjectCard key={project.id} project={project} userId={userId} />
                     ))
                 )}
             </div>

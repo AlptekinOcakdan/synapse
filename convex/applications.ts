@@ -5,19 +5,11 @@ export const applyToProject = mutation({
     args: {
         projectId: v.id("projects"),
         motivation: v.string(),
+        userId: v.id("users")
     },
     handler: async (ctx, args) => {
-        // 1. Kullanıcı Giriş Kontrolü
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-            throw new Error("Başvuru yapmak için giriş yapmalısınız.");
-        }
-
         // Kullanıcıyı veritabanında bul (Email üzerinden)
-        const user = await ctx.db
-            .query("users")
-            .withIndex("by_email", (q) => q.eq("email", identity.email!))
-            .first();
+        const user = await ctx.db.get(args.userId);
 
         if (!user) throw new Error("Kullanıcı profili bulunamadı.");
 

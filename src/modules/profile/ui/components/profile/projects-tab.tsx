@@ -34,6 +34,7 @@ export const ProjectsTab = ({ user }: { user: UserProfile }) => {
                     <ProjectCard
                         key={project.id}
                         project={project }
+                        userId={user.id}
                     />
                 ))
             ) : (

@@ -19,7 +19,11 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
-export const ChatsView = () => {
+interface ChatsViewProps {
+    userId: Id<"users">;
+}
+
+export const ChatsView = ({userId}: ChatsViewProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -30,14 +34,11 @@ export const ChatsView = () => {
     const currentChatId = searchParams.get("chatId") as Id<"conversations"> | null;
 
     // 1. Tüm Sohbetleri Çek (Sidebar İçin)
-    const chats = useQuery(api.chats.listConversations);
+    const chats = useQuery(api.chats.listConversations, { userId: userId });
 
     // 2. Seçili Sohbetin Detayını Çek (ChatArea Header İçin)
     // Eğer ID yoksa "skip" et.
-    const selectedChat = useQuery(
-        api.chats.getChat,
-        currentChatId ? { conversationId: currentChatId } : "skip"
-    );
+    const selectedChat = useQuery(api.chats.getChat, currentChatId ? { conversationId: currentChatId, userId: userId } : "skip",);
 
     const handleSelectChat = (chatId: string) => {
         const params = new URLSearchParams(searchParams);
@@ -91,6 +92,7 @@ export const ChatsView = () => {
                         chatData={selectedChat} // Convex'ten gelen header verisi
                         chatId={currentChatId}  // Mesajları çekmek için ID
                         onMobileMenuOpen={() => setIsMobileMenuOpen(true)}
+                        userId={userId}
                     />
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center bg-muted/10">
