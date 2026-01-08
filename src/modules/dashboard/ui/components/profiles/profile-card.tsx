@@ -73,7 +73,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
 
                         {/* Sayı Değeri */}
                         <span className="text-3xl font-black tracking-tight text-foreground z-10 mb-0.5">
-                            {profile.projectCount}
+                            {profile.completedProjectCount}
                         </span>
 
                         {/* Açıklayıcı Metin (Düzeltildi) */}
@@ -95,7 +95,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
 
                         {/* Sayı Değeri */}
                         <span className="text-3xl font-black tracking-tight text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] z-10 mb-0.5">
-                            {profile.top3Count}
+                            {profile.activeProjectCount}
                         </span>
 
                         {/* Açıklayıcı Metin (Düzeltildi) */}

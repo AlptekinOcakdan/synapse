@@ -2,7 +2,7 @@ import {v} from "convex/values";
 import {mutation, query,} from "./_generated/server";
 import {paginationOptsValidator} from "convex/server";
 import {Academician, UserProfile} from "@/modules/dashboard/types";
-import {Doc} from "@/convex/_generated/dataModel";
+import {Doc, Id} from "@/convex/_generated/dataModel";
 
 export const getProfiles = query({
     args: {
@@ -66,11 +66,29 @@ export const getProfiles = query({
                 const memberships = await ctx.db
                     .query("projectMembers")
                     .withIndex("by_user", q => q.eq("userId", user._id))
-                    .collect();
+                    .collect(); // Doc<"projectMembers">[]
 
-                const projectCount = memberships.length;
-                // Şimdilik aktif proje mantığı basit tutuldu
-                const top3Count = Math.floor(projectCount / 2);
+                // Proje ID'lerini topla (üyeliklerden)
+                const projectIds = new Set<Id<"projects">>(memberships.map(m => m.projectId));
+
+                // Sahip olunan projeleri de ekle
+                const ownedProjects = await ctx.db
+                    .query("projects")
+                    .withIndex("by_owner", q => q.eq("ownerId", user._id))
+                    .collect(); // Doc<"projects">[]
+
+                ownedProjects.forEach(p => projectIds.add(p._id));
+
+                // Projeleri getir (benzersiz ID'ler) ve null filtrele
+                const fetched = await Promise.all(
+                    Array.from(projectIds).map(id => ctx.db.get(id))
+                ); // (Doc<"projects"> | null)[]
+
+                const projects = fetched.filter((p): p is Doc<"projects"> => p !== null);
+
+                // Durumlara göre say
+                const completedProjectCount = projects.filter(p => p.status === "completed").length;
+                const activeProjectCount = projects.filter(p => p.status === "ongoing" || p.status === "recruiting").length;
 
                 // --- OBJE OLUŞTURMA (Strict Typing) ---
                 return {
@@ -87,8 +105,10 @@ export const getProfiles = query({
                     bio: user.bio || "",
                     skills: user.skills || [],
                     isAvailable: user.isAvailable ?? false,
-                    projectCount: projectCount,
-                    top3Count: top3Count,
+
+                    // Yeni istatistik alanları
+                    completedProjectCount: completedProjectCount,
+                    activeProjectCount: activeProjectCount,
 
                     // Nested Objeler (Typesafe Mapping)
                     socialLinks: user.socialLinks ? {
@@ -235,10 +255,28 @@ export const getViewerProfile = query({
         const memberships = await ctx.db
             .query("projectMembers")
             .withIndex("by_user", (q) => q.eq("userId", user._id))
-            .collect();
+            .collect(); // Doc<"projectMembers">[]
 
-        const projectCount = memberships.length;
-        const top3Count = 0; // Bu mantık daha sonra eklenecek
+        // Proje ID'lerini topla (üyeliklerden)
+        const projectIds = new Set<Id<"projects">>(memberships.map(m => m.projectId));
+
+        // Sahip olunan projeleri de ekle
+        const ownedProjects = await ctx.db
+            .query("projects")
+            .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
+            .collect(); // Doc<"projects">[]
+
+        ownedProjects.forEach(p => projectIds.add(p._id));
+
+        // Projeleri getir ve tip güvenli şekilde filtrele
+        const fetched = await Promise.all(
+            Array.from(projectIds).map(id => ctx.db.get(id))
+        ); // (Doc<"projects"> | null)[]
+
+        const projects = fetched.filter((p): p is Doc<"projects"> => p !== null);
+
+        const completedProjectCount = projects.filter(p => p.status === "completed").length;
+        const activeProjectCount = projects.filter(p => p.status === "ongoing" || p.status === "recruiting").length;
 
         return {
             id: user._id,
@@ -246,7 +284,7 @@ export const getViewerProfile = query({
             avatar: user.avatar || "",
             title: user.title || "Ünvan Belirtilmemiş",
             department: user.department || "",
-            city: user.city, // EKLENDİ
+            city: user.city,
             bio: user.bio || "",
             skills: user.skills || [],
             socialLinks: {
@@ -260,10 +298,13 @@ export const getViewerProfile = query({
             isAvailable: user.isAvailable ?? false,
             email: user.email,
             role: user.role,
-            projectCount: projectCount,
-            top3Count: top3Count,
+
+            // Yeni alanlar
+            completedProjectCount: completedProjectCount,
+            activeProjectCount: activeProjectCount,
+
             certificates: user.certificates || [],
-        } as UserProfile; // Frontend tipiyle uyumluluğu garantile
+        } as UserProfile;
     },
 });
 

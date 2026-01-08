@@ -29,8 +29,8 @@ export interface UserProfile extends SimpleUser {
     bio: string;
     socialLinks?: SocialLinks;
     skills: string[];
-    projectCount: number;
-    top3Count: number;
+    completedProjectCount: number;
+    activeProjectCount: number;
     isAvailable: boolean;
     experiences: Experience[];
     competitions: Competition[];
@@ -77,21 +77,21 @@ export interface ProjectFormData {
 }
 
 export interface ChatUser {
-    id: string;
+    id: Id<"users">;
     name: string;
     avatar: string;
     status: "online" | "offline";
 }
 
 export interface Message {
-    id: string;
-    senderId: number;
+    id: Id<"messages">;
+    senderId: Id<"users">;
     content: string;
     timestamp: string;
 }
 
 export interface ChatSession {
-    id: string;
+    id: Id<"conversations">;
     type: "direct" | "group";
     name: string;
     avatar?: string;

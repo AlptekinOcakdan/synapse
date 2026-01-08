@@ -22,14 +22,14 @@ const StatsCards = ({ user }: { user: UserProfile }) => (
             <div className="mb-2 p-2 rounded-full bg-background/50 border border-border/50 shadow-sm z-10">
                 <Briefcase className="w-4 h-4 text-muted-foreground" />
             </div>
-            <span className="text-3xl font-black tracking-tight text-foreground z-10 mb-0.5">{user.projectCount}</span>
+            <span className="text-3xl font-black tracking-tight text-foreground z-10 mb-0.5">{user.completedProjectCount}</span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 z-10">Tamamlanan Proje</span>
         </div>
         <div className="group relative overflow-hidden rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col items-center justify-center text-center hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all duration-300">
             <div className="mb-2 p-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 shadow-sm z-10">
                 <Trophy className="w-4 h-4 text-indigo-400" />
             </div>
-            <span className="text-3xl font-black tracking-tight text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] z-10 mb-0.5">{user.top3Count}</span>
+            <span className="text-3xl font-black tracking-tight text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] z-10 mb-0.5">{user.activeProjectCount}</span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400/80 z-10">Aktif Proje</span>
         </div>
     </div>
