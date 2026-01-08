@@ -30,7 +30,7 @@ export const ProjectDetailsDialog = ({
                                          open,
                                          onOpenChange
                                      }: ProjectDetailsDialogProps) => {
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
 
     const getDeptLabel = (val: string) => {
         return (departments || []).find(d => d.value === val)?.label || val;

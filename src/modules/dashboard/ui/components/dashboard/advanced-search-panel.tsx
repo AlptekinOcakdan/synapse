@@ -42,7 +42,7 @@ export const AdvancedSearchPanel = ({
                                         skills,
                                         setSkills,
                                     }: AdvancedSearchPanelProps) => {
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
     const [skillInput, setSkillInput] = useState("");
     const [openDepartment, setOpenDepartment] = useState(false);
 

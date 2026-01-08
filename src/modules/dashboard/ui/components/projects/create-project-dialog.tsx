@@ -53,7 +53,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const createProject = useMutation(api.projects.createProject);
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
 
     const [tempDept, setTempDept] = useState<string>("");
     const [tempCount, setTempCount] = useState<string>("1");
@@ -260,8 +260,8 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                                 <SelectValue placeholder="Bölüm seç..." />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {(departments || []).map((dept) => (
-                                                    <SelectItem key={dept.value} value={dept.value}>
+                                                {(departments || []).map((dept, index) => (
+                                                    <SelectItem key={index} value={dept.value}>
                                                         {dept.label}
                                                     </SelectItem>
                                                 ))}

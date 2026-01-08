@@ -37,7 +37,7 @@ interface ProfileDetailsDialogProps extends LayoutProps {
 export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialogProps) => {
     // 2. Router hook'unu tanımlıyoruz
     const router = useRouter();
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
     const userProjects = useQuery(
         api.projects.getProjectsByUser,
         profile.id ? { userId: profile.id } : "skip"

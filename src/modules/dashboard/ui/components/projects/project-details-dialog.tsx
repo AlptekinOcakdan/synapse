@@ -35,7 +35,7 @@ interface ProjectDetailsDialogProps extends LayoutProps {
 }
 
 export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialogProps) => {
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
 
     // Bölüm label'ını bulmak için yardımcı fonksiyon
     const getDeptLabel = (val: string) => {

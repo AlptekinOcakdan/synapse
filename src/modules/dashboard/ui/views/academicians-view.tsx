@@ -30,7 +30,7 @@ export const AcademiciansView = ({userId}: AcademiciansViewProps) => {
     });
 
     // 2. Bölümleri Çek (Dinamik Liste)
-    const departmentsData = useQuery(api.users.getDepartments);
+    const departmentsData = useQuery(api.departments.get);
     const departments = departmentsData || [];
 
     // --- LOADING STATE ---

@@ -148,28 +148,6 @@ export const getProfiles = query({
     },
 });
 
-export const getDepartments = query({
-    args: {},
-    handler: async (ctx) => {
-        // 1. Fetch all users (or just necessary fields to save bandwidth)
-        const users = await ctx.db.query("users").collect();
-
-        // 2. Extract unique departments using a Set
-        const uniqueDepartments = new Set<string>();
-        users.forEach((u) => {
-            if (u.department) {
-                uniqueDepartments.add(u.department);
-            }
-        });
-
-        // 3. Format for the frontend { value, label }
-        // We use the department name as the value too, to ensure database matching works easily
-        return Array.from(uniqueDepartments).sort().map((dept) => ({
-            value: dept,
-            label: dept
-        }));
-    },
-});
 
 export const viewer = query({
     args: {userId: v.id("users")},

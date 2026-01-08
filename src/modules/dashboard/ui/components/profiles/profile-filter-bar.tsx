@@ -47,7 +47,7 @@ export const ProfileFilterBar = ({
     const [skillInput, setSkillInput] = useState("");
 
     // --- FETCH DATA FROM DB ---
-    const departmentsData = useQuery(api.users.getDepartments);
+    const departmentsData = useQuery(api.departments.get);
 
     // Fallback while loading or if empty
     const departments = departmentsData || [];

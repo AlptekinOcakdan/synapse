@@ -54,7 +54,7 @@ export const ProjectEditDialog = ({ project, children, userId }: ProjectEditDial
     const updateProject = useMutation(api.projects.updateProject);
     const removeMember = useMutation(api.projectMembers.removeMember);
     const updateMemberRole = useMutation(api.projectMembers.updateMemberRole);
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
 
     const handleRemoveParticipant = async (memberId: Id<"users">) => {
         try {
@@ -323,7 +323,7 @@ export const ProjectEditDialog = ({ project, children, userId }: ProjectEditDial
                                             {project.owner.id !== user.id && (
                                                 <>
                                                     <Select defaultValue={user.role || "Üye"} onValueChange={(newRole) => handleRoleChange(user.id, newRole)}>
-                                                        <SelectTrigger className="w-[120px] h-8 text-xs bg-background">
+                                                        <SelectTrigger className="w-30 h-8 text-xs bg-background">
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>

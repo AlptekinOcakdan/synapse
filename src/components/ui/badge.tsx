@@ -23,6 +23,8 @@ const badgeVariants = cva(
             "bg-secondary border-orange-400/50 text-orange-500 dark:border-orange-400/30 dark:text-orange-400",
           indigo:
             "bg-secondary border-indigo-400/50 text-indigo-500 dark:border-indigo-400/30 dark:text-indigo-400",
+        turquiseLight:
+            "bg-blue-100/50 border-blue-200 text-blue-600 dark:bg-blue-900/50 dark:border-blue-500 dark:text-blue-300",
 
       },
     },

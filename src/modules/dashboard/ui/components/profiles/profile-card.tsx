@@ -16,7 +16,7 @@ interface ProfileCardProps {
 }
 
 export const ProfileCard = ({ profile }: ProfileCardProps) => {
-    const departments = useQuery(api.users.getDepartments);
+    const departments = useQuery(api.departments.get);
 
     // İsimden baş harfleri alma
     const getInitials = (name: string) => {
@@ -115,7 +115,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                         {profile.skills.slice(0, 5).map((skill) => (
-                            <Badge key={skill} variant="secondary" className="px-2 py-0.5 text-xs font-normal">
+                            <Badge key={skill} variant="turquiseLight" className="px-2 py-0.5 text-xs font-normal text-bl">
                                 {skill}
                             </Badge>
                         ))}
