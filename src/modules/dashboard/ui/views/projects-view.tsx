@@ -17,9 +17,10 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 interface ProjectsViewProps {
     userId: Id<"users">;
+    isAdvisor?:boolean;
 }
 
-export const ProjectsView = ({userId}: ProjectsViewProps) => {
+export const ProjectsView = ({userId, isAdvisor}: ProjectsViewProps) => {
     // --- STATE ---
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
@@ -91,7 +92,7 @@ export const ProjectsView = ({userId}: ProjectsViewProps) => {
                 </div>
 
                 {/* SAĞ ÜST: YENİ PROJE BUTONU */}
-                <CreateProjectDialog userId={userId}>
+                <CreateProjectDialog userId={userId} isAdvisor={isAdvisor}>
                     <Button className="shrink-0 gap-2">
                         <Plus className="w-4 h-4"/> Yeni Proje Oluştur
                     </Button>

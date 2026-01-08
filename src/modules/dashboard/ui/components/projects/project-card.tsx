@@ -36,8 +36,27 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
         ? project.participants.some(p => p.id === String(currentUser._id))
         : false;
 
+    // Yeni: owner ile advisor aynı mı?
+    const isOwnerAlsoAdvisor = !!project.advisor && project.owner.id === project.advisor.id;
+
+
+    // Koşula göre kullanılacak sınıflar (normal: indigo/varsayılan, çakışma: rose/bordo)
+    const cardBorderClass = isOwnerAlsoAdvisor ? "border-l-4 border-l-rose-700" : "hover:border-primary/50";
+    const statusBadgeClass = isOwnerAlsoAdvisor
+        ? "text-rose-700 border-rose-200 bg-rose-500/10 text-xs font-normal"
+        : "text-xs font-normal";
+    const ownerBadgeClass = isOwnerAlsoAdvisor
+        ? "text-rose-900 bg-rose-50 px-2 py-0.5 rounded-full truncate max-w-37.5"
+        : "text-xs bg-muted px-2 py-0.5 rounded-full truncate max-w-37.5";
+    const actionBtnPrimaryClass = isOwnerAlsoAdvisor
+        ? "bg-rose-600 hover:bg-rose-700 text-white"
+        : "";
+    const editBtnClass = isOwnerAlsoAdvisor
+        ? "border-rose-200 text-rose-700"
+        : "";
+
     return (
-        <Card className="hover:border-primary/50 transition-colors group w-full max-w-full overflow-hidden">
+        <Card className={`${cardBorderClass} transition-colors group w-full max-w-full overflow-hidden`}>
             <CardContent className="p-0">
                 <div className="flex flex-col lg:flex-row">
 
@@ -45,7 +64,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                     <ProjectDetailsDialog project={project}>
                         <div className="flex-1 p-4 sm:p-6 cursor-pointer hover:bg-muted/5 transition-colors space-y-3 min-w-0 text-left">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                                <Badge variant={project.status === "completed" ? "default" : "secondary"} className="text-xs font-normal">
+                                <Badge variant={project.status === "completed" ? "default" : "secondary"} className={statusBadgeClass}>
                                     {project.status === "completed" ? "Tamamlandı" : "Devam Ediyor"}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground truncate">
@@ -72,7 +91,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                                 </span>
                                 {/* Sahibi ben değilsem ismini göster */}
                                 {!isOwner && (
-                                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full truncate max-w-37.5">
+                                    <span className={ownerBadgeClass}>
                                         Sahibi: {project.owner.name}
                                     </span>
                                 )}
@@ -84,7 +103,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                     <div className="flex flex-row items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 shrink-0 px-4">
 
                         {/* Sohbet Butonu */}
-                        <Button variant="secondary" className="flex-1 w-full lg:w-auto text-xs sm:text-sm h-9">
+                        <Button variant="secondary" className={`flex-1 w-full lg:w-auto text-xs sm:text-sm h-9 ${actionBtnPrimaryClass}`}>
                             <MessageSquare className="w-4 h-4 mr-2" />
                             Sohbet
                         </Button>
@@ -92,7 +111,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                         {/* Düzenle Butonu - SADECE SAHİBİ GÖRÜR */}
                         {isOwner && (
                             <ProjectEditDialog project={project}>
-                                <Button variant="outline" className="flex-1 w-full lg:w-auto text-xs sm:text-sm h-9">
+                                <Button variant="outline" className={`flex-1 w-full lg:w-auto text-xs sm:text-sm h-9 ${editBtnClass}`}>
                                     <Edit className="w-4 h-4 mr-2" />
                                     Düzenle
                                 </Button>

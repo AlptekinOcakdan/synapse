@@ -41,10 +41,12 @@ const INITIAL_FORM_DATA: ProjectFormData = {
 };
 
 interface CreateProjectDialogProps extends LayoutProps{
-    userId: Id<"users">
+    userId: Id<"users">,
+    // Eğer true ise oluşturulan projede danışman olarak da bu userId kullanılacak
+    isAdvisor?: boolean
 }
 
-export const CreateProjectDialog = ({ children, userId }: CreateProjectDialogProps) => {
+export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProjectDialogProps) => {
     // --- STATE ---
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState<ProjectFormData>(INITIAL_FORM_DATA);
@@ -125,7 +127,9 @@ export const CreateProjectDialog = ({ children, userId }: CreateProjectDialogPro
                     count: p.count,
                     skills: p.skills
                 })),
-                userId: userId
+                userId: userId,
+                // isAdvisor true ise advisorId olarak da aynı userId'i gönder
+                advisorId: isAdvisor ? userId : undefined
             });
 
             toast.success("Proje başarıyla oluşturuldu! 🎉");

@@ -13,6 +13,7 @@ export const AcademicianNavigationBar = () => {
 
     const navLinks = [
         { name: "Projeler", href: "/academician" },
+        { name: "Projelerim", href: "/academician/my-projects" },
         { name: "Sorular", href: "/academician/questions" },
     ];
     return (

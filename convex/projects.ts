@@ -266,10 +266,23 @@ export const createProject = mutation({
                 skills: v.array(v.string()), // Pozisyon özelindeki yetenekler
             })
         ),
+        // Yeni opsiyonel argüman: proje için danışman ID'si
+        advisorId: v.optional(v.id("users")),
     },
     handler: async (ctx, args) => {
         const user = await ctx.db.get(args.userId);
         if (!user) throw new Error("Kullanıcı bulunamadı.");
+
+        // Eğer advisorId verilmişse, gerçekten var olup olmadığını kontrol et.
+        // Geçerli değilse advisorId'yi yok sayacağız.
+        // Tip uyumu için Id<"users"> veya undefined olacak şekilde tanımla
+        let advisorIdToSet: Id<"users"> | undefined = undefined;
+        if (args.advisorId) {
+            const advUser = await ctx.db.get(args.advisorId);
+            if (advUser) {
+                advisorIdToSet = args.advisorId;
+            }
+        }
 
         // 2. Arama Alanlarını (Search Fields) Otomatik Oluştur
         // Tüm pozisyonlardaki yetenekleri ve departmanları tek bir listede topluyoruz
@@ -287,7 +300,7 @@ export const createProject = mutation({
             summary: args.summary,
             date: new Date().toISOString(),
             ownerId: user._id,
-            advisorId: undefined, // Başlangıçta danışman yok
+            advisorId: advisorIdToSet, // Opsiyonel olarak advisorId eklenebilir (doğru tipte)
             status: args.status,
             platform: "Web/Mobile", // Varsayılan veya formdan eklenebilir
             competition: args.competition || undefined,
