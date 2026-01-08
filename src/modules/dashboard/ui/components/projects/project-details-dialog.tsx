@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Project } from "../../../types";
-import { LayoutProps } from "@/lib/utils";
+import { LayoutProps, formatDate } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
@@ -130,7 +130,7 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium">Başlangıç Tarihi</p>
-                                        <p className="text-sm text-muted-foreground">{project.date}</p>
+                                        <p className="text-sm text-muted-foreground">{formatDate(project.date)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
@@ -208,7 +208,7 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                                                 {pos.skills.length > 0 && (
                                                     <div className="flex flex-wrap gap-1.5 pl-0 sm:pl-10">
                                                         {pos.skills.map((skill) => (
-                                                            <Badge key={skill} variant="secondary" className="text-xs font-normal">
+                                                            <Badge key={skill} variant="turquoise" className="text-xs font-normal">
                                                                 {skill}
                                                             </Badge>
                                                         ))}

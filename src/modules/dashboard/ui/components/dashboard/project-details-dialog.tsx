@@ -16,6 +16,7 @@ import { Project } from "../../../types"; // Yolunuzu kontrol edin
 import {ReactNode} from "react"; // Yolunuzu kontrol edin
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import {formatDate} from "@/lib/utils";
 
 interface ProjectDetailsDialogProps {
     project: Project;
@@ -98,7 +99,7 @@ export const ProjectDetailsDialog = ({
                                 <Calendar className="w-5 h-5 text-primary mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium">Tarih</p>
-                                    <p className="text-sm text-muted-foreground">{project.date}</p>
+                                    <p className="text-sm text-muted-foreground">{formatDate(project.date)}</p>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +129,7 @@ export const ProjectDetailsDialog = ({
 
                                         <div className="flex flex-wrap gap-1.5 pl-6">
                                             {pos.skills.map((skill) => (
-                                                <Badge key={skill} variant="secondary" className="text-[10px] px-2 py-0">
+                                                <Badge key={skill} variant="turquoise" className="text-[10px] px-2 py-0">
                                                     {skill}
                                                 </Badge>
                                             ))}
