@@ -99,6 +99,7 @@ export const getProfiles = query({
                     department: user.department || "",
                     title: user.title || "",
                     city: user.city || null,
+                    role: user.role,
 
                     // UserProfile Alanları
                     email: user.email,

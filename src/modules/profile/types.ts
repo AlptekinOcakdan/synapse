@@ -9,7 +9,7 @@ export interface MailMessage {
 }
 
 export interface MailThread {
-    id: Id<"mailThreads">; // String yerine Convex ID kullanmak daha güvenli
+    id: Id<"mailThreads">;
     academician: {
         id: Id<"users">;
         name: string;

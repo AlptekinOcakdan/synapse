@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, KeyboardEvent } from "react";
-import { Plus, Trash2, Users, GraduationCap, Target, Save, X, Award, Loader2 } from "lucide-react"; // Loader2 eklendi
+import { Plus, Trash2, Users, GraduationCap, Target, Save, X, Award, Loader2 } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -23,48 +23,43 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { ProjectFormData } from "../../../types";
+import { ProjectFormData, ProjectStatus } from "../../../types";
 import { LayoutProps } from "@/lib/utils";
 
-// --- CONVEX & TOAST IMPORTS ---
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import {Id} from "@/convex/_generated/dataModel"; // Toast bildirimi için
+import {Id} from "@/convex/_generated/dataModel";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const INITIAL_FORM_DATA: ProjectFormData = {
     title: "",
     competition: "",
     summary: "",
     status: "recruiting",
-    positions: []
+    positions: [],
+    needsAdvisor: true,
+    platform: ""
 };
 
 interface CreateProjectDialogProps extends LayoutProps{
     userId: Id<"users">,
-    // Eğer true ise oluşturulan projede danışman olarak da bu userId kullanılacak
     isAdvisor?: boolean
 }
 
 export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProjectDialogProps) => {
-    // --- STATE ---
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState<ProjectFormData>(INITIAL_FORM_DATA);
-    const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // CONVEX MUTATION & QUERY
     const createProject = useMutation(api.projects.createProject);
     const departments = useQuery(api.users.getDepartments);
 
-    // Geçici Pozisyon Ekleme State'leri
     const [tempDept, setTempDept] = useState<string>("");
     const [tempCount, setTempCount] = useState<string>("1");
 
-    // Geçici Yetenek State'leri
     const [tempSkillInput, setTempSkillInput] = useState("");
     const [tempSkills, setTempSkills] = useState<string[]>([]);
-
-    // --- HANDLERS ---
 
     const handleAddTempSkill = (e?: KeyboardEvent) => {
         if (e && e.key !== "Enter") return;
@@ -105,9 +100,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
         }));
     };
 
-    // --- SUBMIT HANDLER ---
     const handleSubmit = async () => {
-        // Basit Validasyon
         if (!formData.title || !formData.summary) {
             toast.error("Lütfen zorunlu alanları doldurun.");
             return;
@@ -119,8 +112,8 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
             await createProject({
                 title: formData.title,
                 summary: formData.summary,
-                competition: formData.competition || "", // Boş ise boş string gönder
-                status: "recruiting", // Yeni proje her zaman alıma açık başlar
+                competition: formData.competition || "",
+                status: formData.status,
                 positions: formData.positions.map(p => ({
                     id: p.id,
                     department: p.department,
@@ -128,13 +121,13 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                     skills: p.skills
                 })),
                 userId: userId,
-                // isAdvisor true ise advisorId olarak da aynı userId'i gönder
-                advisorId: isAdvisor ? userId : undefined
+                advisorId: isAdvisor ? userId : undefined,
+                needsAdvisor: formData.needsAdvisor,
+                platform: formData.platform
             });
 
             toast.success("Proje başarıyla oluşturuldu! 🎉");
 
-            // Formu sıfırla ve kapat
             setFormData(INITIAL_FORM_DATA);
             setOpen(false);
 
@@ -151,6 +144,13 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
         return (departments || []).find(d => d.value === val)?.label || val;
     };
 
+    const statusOptions: { value: ProjectStatus, label: string }[] = [
+        { value: "recruiting", label: "Ekip Kuruluyor" },
+        { value: "ongoing", label: "Devam Ediyor" },
+        { value: "completed", label: "Tamamlandı" },
+        { value: "cancelled", label: "İptal Edildi" },
+    ];
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
@@ -166,7 +166,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                 <ScrollArea className="h-[calc(85dvh-10rem)] w-full">
                     <div className="p-6 space-y-6">
 
-                        {/* 1. TEMEL BİLGİLER */}
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label className="flex items-center gap-2">
@@ -193,10 +192,23 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="h-8 md:h-6" />
-                                    <p className="text-xs text-muted-foreground mt-3">
-                                        * Henüz belli değilse boş bırakabilirsin.
-                                    </p>
+                                    <Label>Proje Durumu</Label>
+                                    <Select
+                                        value={formData.status}
+                                        onValueChange={(value: ProjectStatus) => setFormData({...formData, status: value})}
+                                        disabled={isSubmitting}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Durum seç..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {statusOptions.map(option => (
+                                                <SelectItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
 
@@ -210,13 +222,26 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                     disabled={isSubmitting}
                                 />
                             </div>
+
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="needsAdvisor"
+                                    checked={formData.needsAdvisor}
+                                    onCheckedChange={(checked) => setFormData({...formData, needsAdvisor: !!checked})}
+                                    disabled={isSubmitting}
+                                />
+                                <label
+                                    htmlFor="needsAdvisor"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    Proje için akademik danışman mentörlüğü gerekiyor.
+                                </label>
+                            </div>
                         </div>
 
                         <div className="h-px bg-border" />
 
-                        {/* 2. EKİP İHTİYACI (POZİSYONLAR) */}
                         <div className="space-y-4">
-                            {/* ... Pozisyon Ekleme Arayüzü (Değişiklik yok, sadece disabled prop'u eklenebilir) ... */}
                             <div>
                                 <Label className="text-base font-semibold flex items-center gap-2">
                                     <Users className="w-4 h-4 text-primary" /> Aranan Ekip Arkadaşları
@@ -226,7 +251,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                 </p>
                             </div>
 
-                            {/* POZİSYON EKLEME KARTI */}
                             <div className="flex flex-col gap-4 bg-muted/30 p-4 rounded-lg border border-dashed">
                                 <div className="flex flex-col sm:flex-row gap-3">
                                     <div className="space-y-2 w-full sm:flex-1">
@@ -257,7 +281,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                     </div>
                                 </div>
 
-                                {/* Yetenekler Input Kısmı */}
                                 <div className="space-y-2">
                                     <Label className="text-xs font-semibold flex items-center gap-1">
                                         <Award className="w-3 h-3 text-primary" /> Beklenen Yetenekler
@@ -294,7 +317,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                 </Button>
                             </div>
 
-                            {/* Eklenen Pozisyonlar */}
                             <div className="space-y-3">
                                 {formData.positions.length > 0 ? (
                                     formData.positions.map((pos) => (
@@ -332,7 +354,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                     </div>
                 </ScrollArea>
 
-                {/* FOOTER */}
                 <div className="p-4 border-t bg-background shrink-0 flex justify-end gap-2 rounded-b-lg">
                     <Button variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
                         İptal

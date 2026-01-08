@@ -75,8 +75,9 @@ export const getAdvisorSeekingProjects = query({
                         name: `${owner.firstName} ${owner.lastName}`,
                         avatar: owner.avatar || "",
                         department: owner.department || "",
-                        title: owner.title || "Öğrenci",
+                        title: owner.title || "",
                         city: owner.city,
+                        role: memberRelations.find(m => m.userId === owner._id)?.role || "Takım Lideri",
                     },
 
                     platform: p.platform || "Genel",

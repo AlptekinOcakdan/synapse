@@ -5,7 +5,7 @@ export interface StudentParticipant {
     name: string;
     avatar: string;
     department: string;
-    grade: string; // Örn: "4. Sınıf"
+    grade: string;
 }
 
 export interface AcademicianMailThread {
@@ -22,7 +22,7 @@ export interface AcademicianMailThread {
     relatedProjectId?: Id<"projects">;
     lastMessageDate: string;
     isUnread: boolean;
-    messages: { // Sidebar önizlemesi için
+    messages: {
         id: Id<"mailMessages">;
         senderId: string;
         content: string;

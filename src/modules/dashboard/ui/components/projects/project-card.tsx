@@ -110,7 +110,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
 
                         {/* Düzenle Butonu - SADECE SAHİBİ GÖRÜR */}
                         {isOwner && (
-                            <ProjectEditDialog project={project}>
+                            <ProjectEditDialog project={project} userId={userId}>
                                 <Button variant="outline" className={`flex-1 w-full lg:w-auto text-xs sm:text-sm h-9 ${editBtnClass}`}>
                                     <Edit className="w-4 h-4 mr-2" />
                                     Düzenle

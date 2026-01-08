@@ -15,6 +15,7 @@ export interface SimpleUser {
     department: string;
     title: string;
     city: string | null;
+    role: string;
 }
 
 export interface SocialLinks {
@@ -74,6 +75,7 @@ export interface ProjectFormData {
         count: number;
         skills: string[];
     }[];
+    needsAdvisor: boolean;
 }
 
 export interface ChatUser {
@@ -123,19 +125,19 @@ export interface Participant {
     id: string;
     name: string;
     avatar?: string;
-    role: string; // Örn: Eğitmen, Konuk
+    role: string;
 }
 
 export interface AcademyEvent {
     id: string;
     title: string;
     description: string;
-    date: string; // ISO String
-    duration: string; // "45 dk", "1 saat" vb.
+    date: string;
+    duration: string;
     status: AcademyEventStatus;
     platform: "YouTube" | "Zoom" | "Google Meet";
-    url: string; // Yayın linki
-    thumbnail: string; // Kapak görseli
+    url: string;
+    thumbnail: string;
     participants: Participant[];
     tags: string[];
 }

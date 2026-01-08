@@ -1,7 +1,7 @@
 // modules/dashboard/components/dashboard/project-card.tsx
 "use client";
 
-import { ArrowRight, Trophy, Users } from "lucide-react";
+import {ArrowRight,  Users, UserSearch} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,24 +30,34 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
     };
 
     return (
-        <Card className="hover:border-primary/50 transition-colors group">
+        <Card className="transition-colors group border-l-4 border-l-indigo-500 hover:shadow-md">
             <CardContent className="p-4 sm:p-6 w-full">
                 <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-between items-start lg:items-center">
 
                     {/* ... Sol taraf (İçerik) aynı kalıyor ... */}
                     <div className="space-y-3 w-full">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <Badge variant="outline" className="text-xs font-normal group-hover:border-primary/30 transition-colors">
-                                {project.platform}
+                            <Badge variant="indigo" className="text-xs font-normal group-hover:border-primary/30 transition-colors">
+                                {project.competition}
                             </Badge>
-                            <span className="text-xs text-muted-foreground truncate">
-                                • {project.competition}
-                            </span>
                         </div>
 
                         <h3 className="text-lg sm:text-xl font-bold pr-0 lg:pr-4 w-full">
                             {project.title}
                         </h3>
+
+                        {project.positions && project.positions.flatMap(p => p.skills).length > 0 && (
+                            <div className="relative w-full overflow-hidden h-6">
+                                <div className="absolute inset-0 flex flex-nowrap gap-2 items-center">
+                                    {project.positions.flatMap(p => p.skills).map((skill, index) => (
+                                        <Badge key={index} variant="turquoise" className="text-xs font-normal whitespace-nowrap">
+                                            {skill}
+                                        </Badge>
+                                    ))}
+                                </div>
+                                <div className="absolute inset-y-0 right-0 w-16 bg-linear-to-l from-card to-transparent" />
+                            </div>
+                        )}
 
                         <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-3 sm:gap-4">
                             <span className="flex items-center gap-1.5">
@@ -55,7 +65,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                                 <span className="truncate">{project.owner.name}</span>
                             </span>
                             <span className="flex items-center gap-1.5 text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full text-xs">
-                                <Trophy className="w-3.5 h-3.5" />
+                                <UserSearch className="w-3.5 h-3.5" />
                                 Aranan: {project.participantsNeeded}
                             </span>
                         </div>
