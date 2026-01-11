@@ -193,3 +193,39 @@ export const sendMessage = mutation({
         });
     },
 });
+
+// 5. Get or Create Direct Conversation
+export const getOrCreateConversation = mutation({
+    args: {
+        userId: v.id("users"),
+        otherUserId: v.id("users"),
+    },
+    handler: async (ctx, args) => {
+        if (args.userId === args.otherUserId) {
+            throw new Error("Kendinle sohbet başlatamazsın.");
+        }
+
+        // 1. Check for an existing direct conversation
+        const conversations = await ctx.db
+            .query("conversations")
+            .collect();
+
+        const existingConversation = conversations.find(conv =>
+            conv.type === "direct" &&
+            conv.participantIds.includes(args.userId) &&
+            conv.participantIds.includes(args.otherUserId)
+        );
+
+        if (existingConversation) {
+            return existingConversation._id;
+        }
+
+        // 2. If not found, create a new one
+        return ctx.db.insert("conversations", {
+            type: "direct",
+            participantIds: [args.userId, args.otherUserId],
+            lastMessageTime: Date.now(), // Initialize with current time for sorting
+        });
+    }
+});
+

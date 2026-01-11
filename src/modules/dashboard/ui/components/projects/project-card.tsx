@@ -6,16 +6,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProjectEditDialog } from "./project-edit-dialog";
 import { ProjectDetailsDialog } from "./project-details-dialog";
-import { Project } from "../../../types";
-
-// --- CONVEX IMPORTS ---
-import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import {Id} from "@/convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
+import Link from "next/link";
+import {useQuery} from "convex/react";
+import {Project} from "@/modules/dashboard/types";
 
-interface ProjectCardProps {
-    project: Project;
-    userId: Id<"users">
+interface ProjectCardProps{
+    project: Project,
+    userId: Id<"users">,
 }
 
 export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
@@ -48,15 +47,11 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
     const ownerBadgeClass = isOwnerAlsoAdvisor
         ? "text-rose-900 bg-rose-50 px-2 py-0.5 rounded-full truncate max-w-37.5"
         : "text-xs bg-muted px-2 py-0.5 rounded-full truncate max-w-37.5";
-    const actionBtnPrimaryClass = isOwnerAlsoAdvisor
-        ? "bg-rose-600 hover:bg-rose-700 text-white"
-        : "";
-    const editBtnClass = isOwnerAlsoAdvisor
-        ? "border-rose-200 text-rose-700"
-        : "";
+    const actionBtnPrimaryClass = "";
+    const editBtnClass = "";
 
     return (
-        <Card className={`${cardBorderClass} transition-colors group w-full max-w-full overflow-hidden`}>
+        <Card className={`group transition-all duration-300 overflow-hidden ${cardBorderClass}`}>
             <CardContent className="p-0">
                 <div className="flex flex-col lg:flex-row">
 
@@ -117,6 +112,14 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                                 </Button>
                             </ProjectEditDialog>
                         )}
+
+                        <div className="flex items-center gap-2">
+                                <Button asChild variant="outline" size="sm" className={editBtnClass}>
+                                    <Link href={`/dashboard/my-projects/${project.id}/applications`}>
+                                        Başvurular
+                                    </Link>
+                                </Button>
+                        </div>
                     </div>
                 </div>
             </CardContent>

@@ -32,7 +32,7 @@ export const DashboardView = ({userId}:DashboardViewProps) => {
     // usePaginatedQuery bize 'results' (şu ana kadar yüklenenler), 'status' ve 'loadMore' verir.
     const { results, status, loadMore } = usePaginatedQuery(
         api.projects.getProjects,
-        {}, // Argümanlar (varsa)
+        { userId }, // Aktif kullanıcının projelerini liste dışı bırakmak için
         { initialNumItems: ITEMS_PER_PAGE } // Başlangıç sayısı
     );
 

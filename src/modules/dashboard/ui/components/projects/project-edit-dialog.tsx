@@ -58,7 +58,7 @@ export const ProjectEditDialog = ({ project, children, userId }: ProjectEditDial
 
     const handleRemoveParticipant = async (memberId: Id<"users">) => {
         try {
-            await removeMember({ projectId: project.id, memberId });
+            await removeMember({ projectId: project.id, memberId, userId });
             setParticipants(participants.filter(p => p.id !== memberId));
             toast.success("Üye projeden çıkarıldı.");
         } catch (error) {
@@ -69,7 +69,7 @@ export const ProjectEditDialog = ({ project, children, userId }: ProjectEditDial
 
     const handleRoleChange = async (memberId: Id<"users">, newRole: string) => {
         try {
-            await updateMemberRole({ projectId: project.id, memberId, newRole });
+            await updateMemberRole({ projectId: project.id, memberId, newRole, userId });
             setParticipants(prev => prev.map(p => p.id === memberId ? { ...p, role: newRole } : p));
             toast.success("Üyenin rolü güncellendi.");
         } catch (error) {

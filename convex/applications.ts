@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const applyToProject = mutation({
     args: {
@@ -51,5 +51,42 @@ export const applyToProject = mutation({
         }
 
         return { success: true };
+    },
+});
+
+// 1. Get Applications for a Project
+export const getApplicationsForProject = query({
+    args: {
+        projectId: v.id("projects"),
+    },
+    handler: async (ctx, args) => {
+        const applications = await ctx.db
+            .query("applications")
+            .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+            .collect();
+
+        const withUsers = await Promise.all(
+            applications.map(async (app) => {
+                const user = await ctx.db.get(app.userId);
+                if (!user) return null;
+                return {
+                    ...app,
+                    user,
+                };
+            })
+        );
+
+        return withUsers.filter((x): x is NonNullable<typeof x> => x !== null);
+    },
+});
+
+// 2. Reject Application
+export const rejectApplication = mutation({
+    args: {
+        applicationId: v.id("applications"),
+    },
+    handler: async (ctx, args) => {
+        // TODO: Add auth check to ensure only project owner can reject
+        await ctx.db.patch(args.applicationId, { status: "rejected" });
     },
 });

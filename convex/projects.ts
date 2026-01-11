@@ -17,20 +17,100 @@ const DELETED_USER: SimpleUser = {
 };
 
 export const getProjects = query({
-    args: { paginationOpts: paginationOptsValidator },
+    args: {
+        paginationOpts: paginationOptsValidator,
+        userId: v.optional(v.id("users")),
+    },
     handler: async (ctx, args) => {
         const result = await ctx.db
             .query("projects")
             .order("desc")
             .paginate(args.paginationOpts);
 
+        // Aktif kullanıcının projelerini (sahibi olduğu veya üyesi olduğu) liste dışı bırak.
+        // Not: paginate sonrası filtre olduğu için sayfa boyu küçülebilir; UI tarafı zaten loadMore ile ilerliyor.
+        const currentUserId = args.userId;
+
+        const filteredPage = currentUserId
+            ? await (async () => {
+                const out: Doc<"projects">[] = [];
+                for (const p of result.page) {
+                    if (p.ownerId === currentUserId) continue;
+                    const membership = await ctx.db
+                        .query("projectMembers")
+                        .withIndex("by_project_user", (q) => q.eq("projectId", p._id).eq("userId", currentUserId))
+                        .unique();
+                    if (membership) continue;
+                    out.push(p);
+                }
+                return out;
+            })()
+            : result.page;
+
         const pageWithDetails = await Promise.all(
-            result.page.map(async (p) => {
+            filteredPage.map(async (p) => {
                 const owner = await ctx.db.get(p.ownerId);
-                const ownerMember = await ctx.db
+
+                const memberRelations = await ctx.db
                     .query("projectMembers")
-                    .withIndex("by_project_user", q => q.eq("projectId", p._id).eq("userId", p.ownerId))
-                    .unique();
+                    .withIndex("by_project", (q) => q.eq("projectId", p._id))
+                    .collect();
+
+                const ownerMember = memberRelations.find(m => m.userId === p.ownerId);
+
+                const participants = await Promise.all(
+                    memberRelations.map(async (rel) => {
+                        const u = await ctx.db.get(rel.userId);
+                        if (!u) return DELETED_USER;
+                        return {
+                            id: u._id,
+                            name: `${u.firstName} ${u.lastName}`,
+                            avatar: u.avatar || "",
+                            department: u.department || "",
+                            title: u.title || "",
+                            city: u.city,
+                            role: rel.role || "Üye",
+                        } as SimpleUser;
+                    })
+                );
+
+                // Advisor: öncelik project.advisorId, yoksa projedeki ilk akademisyen üye.
+                let advisorUserId: Id<"users"> | undefined = p.advisorId;
+                if (!advisorUserId) {
+                    for (const rel of memberRelations) {
+                        const u = await ctx.db.get(rel.userId);
+                        if (u?.role === "academician") {
+                            advisorUserId = u._id;
+                            break;
+                        }
+                    }
+                }
+
+                let advisorData = undefined;
+                if (advisorUserId) {
+                    const advUser = await ctx.db.get(advisorUserId);
+                    if (advUser) {
+                        const mentoredCount = (await ctx.db
+                            .query("projects")
+                            .withIndex("by_advisor", (q) => q.eq("advisorId", advisorUserId))
+                            .collect()).length;
+
+                        advisorData = {
+                            id: advUser._id,
+                            name: `${advUser.firstName} ${advUser.lastName}`,
+                            title: advUser.title || "Akademisyen",
+                            department: advUser.department || "",
+                            avatar: advUser.avatar || "",
+                            email: advUser.email || "",
+                            office: advUser.academicData?.office,
+                            researchInterests: advUser.academicData?.researchInterests || [],
+                            publicationsCount: advUser.academicData?.publicationsCount || 0,
+                            citationCount: advUser.academicData?.citationCount || 0,
+                            mentoredProjects: mentoredCount,
+                            isAvailableForMentorship: advUser.academicData?.isAvailableForMentorship || false
+                        };
+                    }
+                }
 
                 return {
                     id: p._id,
@@ -43,8 +123,8 @@ export const getProjects = query({
                     participantsNeeded: p.participantsNeeded,
                     needsAdvisor: p.needsAdvisor,
                     positions: p.positions,
-                    participants: [] as SimpleUser[],
-                    advisor: undefined,
+                    participants,
+                    advisor: advisorData,
                     owner: owner ? {
                         id: p.ownerId,
                         name: `${owner.firstName} ${owner.lastName}`,
@@ -60,6 +140,7 @@ export const getProjects = query({
 
         return {
             ...result,
+            // filtered page’i dönüyoruz
             page: pageWithDetails
         };
     },
@@ -184,10 +265,68 @@ export const getMyProjects = query({
             uniqueProjects.map(async (p: Doc<"projects">) => {
 
                 const owner: Doc<"users"> | null = await ctx.db.get(p.ownerId);
-                const ownerMember = await ctx.db
+
+                const memberRelations = await ctx.db
                     .query("projectMembers")
-                    .withIndex("by_project_user", q => q.eq("projectId", p._id).eq("userId", p.ownerId))
-                    .unique();
+                    .withIndex("by_project", (q) => q.eq("projectId", p._id))
+                    .collect();
+
+                const ownerMember = memberRelations.find(m => m.userId === p.ownerId);
+
+                const participants = await Promise.all(
+                    memberRelations.map(async (rel) => {
+                        const u = await ctx.db.get(rel.userId);
+                        if (!u) return DELETED_USER;
+                        return {
+                            id: u._id,
+                            name: `${u.firstName} ${u.lastName}`,
+                            avatar: u.avatar || "",
+                            department: u.department || "",
+                            title: u.title || "",
+                            city: u.city,
+                            role: rel.role || "Üye",
+                        } as SimpleUser;
+                    })
+                );
+
+                // Advisor: öncelik project.advisorId, yoksa projedeki ilk akademisyen üye.
+                let advisorUserId: Id<"users"> | undefined = p.advisorId;
+                if (!advisorUserId) {
+                    const academicianRel = await (async () => {
+                        for (const rel of memberRelations) {
+                            const u = await ctx.db.get(rel.userId);
+                            if (u?.role === "academician") return { rel, u };
+                        }
+                        return null;
+                    })();
+                    advisorUserId = academicianRel?.u?._id;
+                }
+
+                let advisorData = undefined;
+                if (advisorUserId) {
+                    const advUser = await ctx.db.get(advisorUserId);
+                    if (advUser) {
+                        const mentoredCount = (await ctx.db
+                            .query("projects")
+                            .withIndex("by_advisor", (q) => q.eq("advisorId", advisorUserId))
+                            .collect()).length;
+
+                        advisorData = {
+                            id: advUser._id,
+                            name: `${advUser.firstName} ${advUser.lastName}`,
+                            title: advUser.title || "Akademisyen",
+                            department: advUser.department || "",
+                            avatar: advUser.avatar || "",
+                            email: advUser.email || "",
+                            office: advUser.academicData?.office,
+                            researchInterests: advUser.academicData?.researchInterests || [],
+                            publicationsCount: advUser.academicData?.publicationsCount || 0,
+                            citationCount: advUser.academicData?.citationCount || 0,
+                            mentoredProjects: mentoredCount,
+                            isAvailableForMentorship: advUser.academicData?.isAvailableForMentorship || false
+                        };
+                    }
+                }
 
                 return {
                     id: p._id,
@@ -200,10 +339,10 @@ export const getMyProjects = query({
                     participantsNeeded: p.participantsNeeded,
                     needsAdvisor: p.needsAdvisor,
                     positions: p.positions,
-                    participants: [],
-                    advisor: undefined,
+                    participants,
+                    advisor: advisorData,
                     owner: owner ? {
-                        id: p.ownerId,
+                        id: owner._id,
                         name: `${owner.firstName} ${owner.lastName}`,
                         avatar: owner.avatar || "",
                         department: owner.department || "",
@@ -341,7 +480,8 @@ export const updateProject = mutation({
             throw new Error("Yetkilendirme hatası: Bu projeyi sadece sahibi düzenleyebilir.");
         }
 
-        const { ...updates } = args;
+        // `userId` ve `projectId` tablo alanı değil; patch'e gönderilmemeli.
+        const { userId: _userId, projectId: _projectId, ...updates } = args;
 
         // Pozisyonlar güncelleniyorsa, ilgili arama alanlarını da güncelle
         if (updates.positions) {
@@ -448,7 +588,7 @@ export const getProjectsByUser = query({
                     participantsNeeded: project.participantsNeeded,
 
                     owner: {
-                        id: owner._id,
+                        id: project.ownerId,
                         name: `${owner.firstName} ${owner.lastName}`,
                         avatar: owner.avatar || "",
                         department: owner.department || "",
@@ -471,3 +611,4 @@ export const getProjectsByUser = query({
             .sort((a, b) => new Date(b!.date).getTime() - new Date(a!.date).getTime());
     },
 });
+

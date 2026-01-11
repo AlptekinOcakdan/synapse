@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Menu, Loader2 } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useSession } from "@/providers/session-provider";
 import { Button } from "@/components/ui/button";
 import {
     Sheet,
@@ -12,43 +16,54 @@ import {
 } from "@/components/ui/sheet";
 import { ChatSidebar } from "@/modules/dashboard/ui/components/chats/chat-sidebar";
 import { ChatArea } from "@/modules/dashboard/ui/components/chats/chat-area";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-
-// --- CONVEX ---
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
-interface ChatsViewProps {
-    userId: Id<"users">;
-}
-
-export const ChatsView = ({userId}: ChatsViewProps) => {
-    const router = useRouter();
-    const pathname = usePathname();
+export const ChatsView = () => {
+    const { userId, isAuthenticated } = useSession();
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [selectedChatId, setSelectedChatId] = useState<Id<"conversations"> | null>(null);
 
     // URL'den Chat ID'yi al
     const currentChatId = searchParams.get("chatId") as Id<"conversations"> | null;
 
     // 1. Tüm Sohbetleri Çek (Sidebar İçin)
-    const chats = useQuery(api.chats.listConversations, { userId: userId });
+    const conversations = useQuery(
+        api.chats.listConversations,
+        isAuthenticated ? { userId: userId! } : "skip"
+    );
 
     // 2. Seçili Sohbetin Detayını Çek (ChatArea Header İçin)
     // Eğer ID yoksa "skip" et.
-    const selectedChat = useQuery(api.chats.getChat, currentChatId ? { conversationId: currentChatId, userId: userId } : "skip",);
+    const selectedChat = useQuery(api.chats.getChat, currentChatId ? { conversationId: currentChatId, userId: userId as Id<"users"> } : "skip",);
 
-    const handleSelectChat = (chatId: string) => {
-        const params = new URLSearchParams(searchParams);
-        params.set("chatId", chatId);
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    useEffect(() => {
+        const chatIdFromUrl = searchParams.get("chatId");
+        if (chatIdFromUrl) {
+            const chatExists = conversations?.some(c => c.id === chatIdFromUrl);
+            if (chatExists) {
+                setSelectedChatId(chatIdFromUrl as Id<"conversations">);
+            } else {
+                // URL'deki sohbet listede yoksa URL'yi temizle
+                router.replace("/dashboard/chats", { scroll: false });
+            }
+        } else if (conversations && conversations.length > 0 && !selectedChatId) {
+            // URL'de ID yoksa ve bir sohbet seçilmemişse ilk sohbeti seç
+            setSelectedChatId(conversations[0].id);
+        }
+    }, [searchParams, conversations, router, selectedChatId]);
+
+    const handleSelectChat = (chatId: Id<"conversations">) => {
+        setSelectedChatId(chatId);
+        // URL'yi güncelle ama sayfayı yeniden yükleme
+        router.push(`/dashboard/chats?chatId=${chatId}`, { scroll: false });
         setIsMobileMenuOpen(false);
     };
 
     // Loading State
-    if (chats === undefined) {
+    if (conversations === undefined) {
         return (
             <div className="h-[calc(100dvh-5rem)] w-full flex items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -61,7 +76,7 @@ export const ChatsView = ({userId}: ChatsViewProps) => {
             {/* DESKTOP SIDEBAR */}
             <div className="hidden md:block w-80 lg:w-96 shrink-0 h-full">
                 <ChatSidebar
-                    chats={chats || []} // Convex verisi
+                    chats={conversations || []} // Convex verisi
                     selectedChatId={currentChatId}
                     onSelectChat={(chat) => handleSelectChat(chat.id)}
                 />
@@ -78,7 +93,7 @@ export const ChatsView = ({userId}: ChatsViewProps) => {
                                 <SheetDescription>Sohbet geçmişi</SheetDescription>
                             </SheetHeader>
                             <ChatSidebar
-                                chats={chats || []}
+                                chats={conversations || []}
                                 selectedChatId={currentChatId}
                                 onSelectChat={(chat) => handleSelectChat(chat.id)}
                             />
@@ -92,7 +107,7 @@ export const ChatsView = ({userId}: ChatsViewProps) => {
                         chatData={selectedChat} // Convex'ten gelen header verisi
                         chatId={currentChatId}  // Mesajları çekmek için ID
                         onMobileMenuOpen={() => setIsMobileMenuOpen(true)}
-                        userId={userId}
+                        userId={userId as Id<"users">}
                     />
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center bg-muted/10">

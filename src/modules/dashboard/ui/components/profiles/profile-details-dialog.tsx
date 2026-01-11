@@ -25,23 +25,26 @@ import { UserProfile } from "../../../types";
 import { Competition, Experience } from "@/modules/auth/types";
 import { LayoutProps } from "@/lib/utils";
 import { ProjectStatusBadge } from "@/modules/dashboard/ui/components/profiles/project-status-badge";
-// 1. useRouter'ı import ediyoruz
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useSession } from "@/providers/session-provider";
+import { Id } from "@/convex/_generated/dataModel";
+import { toast } from "sonner";
 
 interface ProfileDetailsDialogProps extends LayoutProps {
     profile: UserProfile;
 }
 
 export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialogProps) => {
-    // 2. Router hook'unu tanımlıyoruz
     const router = useRouter();
     const departments = useQuery(api.departments.get);
     const userProjects = useQuery(
         api.projects.getProjectsByUser,
         profile.id ? { userId: profile.id } : "skip"
     );
+    const { userId } = useSession();
+    const createOrGetConversation = useMutation(api.chats.getOrCreateConversation);
 
     const getDeptLabel = (val: string) => {
         return (departments || []).find(d => d.value === val)?.label || val;
@@ -53,10 +56,30 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     };
 
-    // 3. Proje görüntüleme fonksiyonu
+    const handleContact = async () => {
+        if (!userId || !profile.id) {
+            toast.error("Sohbet başlatılamadı. Lütfen giriş yaptığınızdan emin olun.");
+            return;
+        }
+
+        if (userId === profile.id) {
+            toast.info("Kendinizle sohbet başlatamazsınız.");
+            return;
+        }
+
+        try {
+            const conversationId = await createOrGetConversation({
+                userId: userId as Id<"users">,
+                otherUserId: profile.id as Id<"users">,
+            });
+            router.push(`/dashboard/chats?chatId=${conversationId}`);
+        } catch (error) {
+            console.error("Sohbet oluşturulurken hata:", error);
+            toast.error("Sohbet başlatılırken bir hata oluştu.");
+        }
+    };
+
     const handleViewProject = (projectId: string) => {
-        // Kullanıcıyı dashboard'a, proje ID'si ile birlikte yönlendiriyoruz.
-        // Bu işlem, DashboardView'daki useEffect/useMemo mantığını tetikleyip proje modalını açacaktır.
         router.push(`/dashboard?projectId=${projectId}`);
     };
 
@@ -71,7 +94,6 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
             </DialogTrigger>
 
             <DialogContent className="max-w-3xl max-h-[90dvh] p-0 overflow-hidden flex flex-col gap-0">
-                {/* ... Header ve Avatar kısıımları aynı ... */}
                 <div className="relative bg-linear-to-r from-primary/10 via-primary/5 to-background p-6 pb-8">
                     <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                         <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
@@ -100,7 +122,7 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                                 </div>
                             </div>
                             <div className="hidden md:block">
-                                <Button>
+                                <Button onClick={handleContact}>
                                     İletişime Geç <ExternalLink className="w-4 h-4 ml-2" />
                                 </Button>
                             </div>
@@ -116,7 +138,6 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                 <ScrollArea className="h-[calc(90dvh-20rem)] px-6">
                     <div className="space-y-8 py-6">
 
-                        {/* ... Hakkında, Deneyimler, Başarılar kısımları aynı ... */}
                         <section className="space-y-3">
                             <h3 className="font-semibold text-lg flex items-center gap-2">
                                 <Quote className="w-5 h-5 text-primary" /> Hakkında
@@ -238,7 +259,6 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                                                             {new Date(project.date).toLocaleDateString('tr-TR')}
                                                         </div>
 
-                                                        {/* 4. Butona onClick ekliyoruz */}
                                                         <Button
                                                             variant="link"
                                                             size="sm"
@@ -260,7 +280,7 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                 </ScrollArea>
 
                 <div className="p-4 border-t md:hidden bg-background">
-                    <Button className="w-full">İletişime Geç</Button>
+                    <Button className="w-full" onClick={handleContact}>İletişime Geç</Button>
                 </div>
             </DialogContent>
         </Dialog>
