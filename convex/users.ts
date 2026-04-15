@@ -9,7 +9,7 @@ export const getProfiles = query({
         paginationOpts: paginationOptsValidator,
         searchQuery: v.string(),
         departments: v.array(v.string()),
-        skills: v.array(v.string()),
+        competencies: v.array(v.string()),
     },
     handler: async (ctx, args) => {
         let results;
@@ -54,9 +54,9 @@ export const getProfiles = query({
                 }
 
                 // C) Yetenek Filtresi
-                if (args.skills.length > 0) {
-                    const userSkills = (user.skills || []).map(s => s.toLowerCase());
-                    const hasSkill = args.skills.some(searchSkill =>
+                if (args.competencies.length > 0) {
+                    const userSkills = (user.competencies ?? user.skills ?? []).map(s => s.toLowerCase());
+                    const hasSkill = args.competencies.some(searchSkill =>
                         userSkills.some(us => us.includes(searchSkill.toLowerCase()))
                     );
                     if (!hasSkill) return null;
@@ -104,7 +104,7 @@ export const getProfiles = query({
                     // UserProfile Alanları
                     email: user.email,
                     bio: user.bio || "",
-                    skills: user.skills || [],
+                    competencies: user.competencies ?? user.skills ?? [],
                     isAvailable: user.isAvailable ?? false,
 
                     // Yeni istatistik alanları
@@ -263,9 +263,12 @@ export const getViewerProfile = query({
             avatar: user.avatar || "",
             title: user.title || "Ünvan Belirtilmemiş",
             department: user.department || "",
+            university: user.university || "",
             city: user.city,
             bio: user.bio || "",
-            skills: user.skills || [],
+            competencies: user.competencies ?? user.skills ?? [],
+            improvementAreas: user.improvementAreas || [],
+            isCompanyVisible: user.isCompanyVisible ?? false,
             socialLinks: {
                 github: user.socialLinks?.github,
                 linkedin: user.socialLinks?.linkedin,
@@ -294,7 +297,10 @@ export const updateProfile = mutation({
         title: v.string(),
         bio: v.string(),
         avatar: v.optional(v.string()),
-        skills: v.array(v.string()),
+        university: v.optional(v.string()),
+        competencies: v.array(v.string()),
+        improvementAreas: v.optional(v.array(v.string())),
+        isCompanyVisible: v.optional(v.boolean()),
         socialLinks: v.object({
             github: v.optional(v.string()),
             linkedin: v.optional(v.string()),
@@ -324,7 +330,10 @@ export const updateProfile = mutation({
             lastName: lastName || user.lastName,
             title: args.title,
             bio: args.bio,
-            skills: args.skills,
+            university: args.university,
+            competencies: args.competencies,
+            improvementAreas: args.improvementAreas,
+            isCompanyVisible: args.isCompanyVisible,
             avatar: args.avatar || user.avatar,
             socialLinks: args.socialLinks
         });

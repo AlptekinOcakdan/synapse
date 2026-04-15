@@ -13,6 +13,7 @@ import type * as academics from "../academics.js";
 import type * as academy from "../academy.js";
 import type * as applications from "../applications.js";
 import type * as auth from "../auth.js";
+import type * as badges from "../badges.js";
 import type * as chats from "../chats.js";
 import type * as departments from "../departments.js";
 import type * as emails from "../emails.js";
@@ -20,6 +21,7 @@ import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as projectMembers from "../projectMembers.js";
 import type * as projects from "../projects.js";
+import type * as reports from "../reports.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
@@ -35,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   academy: typeof academy;
   applications: typeof applications;
   auth: typeof auth;
+  badges: typeof badges;
   chats: typeof chats;
   departments: typeof departments;
   emails: typeof emails;
@@ -42,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   projectMembers: typeof projectMembers;
   projects: typeof projects;
+  reports: typeof reports;
   seed: typeof seed;
   users: typeof users;
 }>;

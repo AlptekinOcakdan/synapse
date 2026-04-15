@@ -69,8 +69,7 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                 content: content
             });
             // Not: Backend zaten bu işlemden sonra otomatik olarak e-posta bildirimi tetikleyecek.
-        } catch (error) {
-            console.error("Mesaj gönderilemedi:", error);
+        } catch {
             setInputValue(content); // Hata durumunda mesajı geri yükle
         }
     };
@@ -83,8 +82,8 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                 senderId: currentUserId,
                 content: `📎 Dosya Gönderildi: ${file.name}`
             });
-        } catch (error) {
-            console.error("Dosya yükleme hatası:", error);
+        } catch {
+            // Hata sessizce yutuldu
         }
     };
 
@@ -100,8 +99,7 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    // Backend'den gelen veriyi değişkene ata
-    const student = mailThread.academician; // Not: İsimlendirme 'academician' kalsa da içerik 'karşı taraf'tır.
+    const counterpart = mailThread.academician;
 
     if (!messages) {
         return (
@@ -143,11 +141,11 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                             {/* KULLANICI BİLGİSİ (Öğrenci veya diğer taraf) */}
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <User className="w-4 h-4" />
-                                <span className="font-medium text-foreground/80">{student.name}</span>
+                                <span className="font-medium text-foreground/80">{counterpart.name}</span>
                                 <span className="text-xs opacity-50">•</span>
-                                <span className="text-xs">{student.title || "Öğrenci"}</span>
+                                <span className="text-xs">{counterpart.title || "Öğrenci"}</span>
                                 <span className="text-xs opacity-50">•</span>
-                                <span className="text-xs">{student.department}</span>
+                                <span className="text-xs">{counterpart.department}</span>
                             </div>
                         </div>
                     </div>
@@ -190,13 +188,13 @@ export const AcademicianMailArea = ({ mailThread, currentUserId, onMobileMenuOpe
                                                 {isMe ? (
                                                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">BN</AvatarFallback>
                                                 ) : (
-                                                    <AvatarImage src={student.avatar} />
+                                                    <AvatarImage src={counterpart.avatar} />
                                                 )}
-                                                {!isMe && <AvatarFallback>{student.name.substring(0, 2)}</AvatarFallback>}
+                                                {!isMe && <AvatarFallback>{counterpart.name.substring(0, 2)}</AvatarFallback>}
                                             </Avatar>
                                             <div className="flex flex-col">
                                                 <span className="text-xs font-semibold">
-                                                    {isMe ? "Siz" : student.name}
+                                                    {isMe ? "Siz" : counterpart.name}
                                                 </span>
                                             </div>
                                         </div>

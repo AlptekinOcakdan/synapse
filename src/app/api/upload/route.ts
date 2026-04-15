@@ -35,8 +35,7 @@ export async function POST(req: Request) {
             uploadUrl: signedUrl,
             fileUrl: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uniqueFilename}`,
         });
-    } catch (error) {
-        console.error("S3 Upload Error:", error);
+    } catch {
         return NextResponse.json({ error: "Upload failed" }, { status: 500 });
     }
 }

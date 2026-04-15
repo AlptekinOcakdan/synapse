@@ -43,8 +43,6 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
             toast.success("Doğrulama kodu gönderildi!");
             setStep("OTP");
         } catch (error) {
-            console.error(error);
-            // Hatayı kullanıcıya göster
             toast.error(error instanceof Error ? error.message : "Bir hata oluştu.");
         } finally {
             setIsLoading(false);
@@ -63,9 +61,7 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
             toast.success("Giriş başarılı! Yönlendiriliyorsunuz...");
             await loginAction({ userId: result.userId, role: result.role });
 
-        } catch (error) {
-            // Sadece verifySignIn'dan gelen hataları yakala
-            console.error(error);
+        } catch {
             toast.error("Kod hatalı veya süresi dolmuş.");
             setOtp("");
             setIsLoading(false);

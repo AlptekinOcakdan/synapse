@@ -110,8 +110,8 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                 userId: userId
             });
             // Scroll will happen automatically due to useEffect on messages.length
-        } catch (error) {
-            console.error("Error sending message:", error);
+        } catch {
+            // Hata sessizce yutuldu
         }
     };
 
@@ -154,8 +154,8 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                         <h3 className="font-semibold text-sm">{chatData.name}</h3>
                         <p className="text-xs text-muted-foreground">
                             {chatData.type === "group"
-                                ? `${chatData.participants.length} member`
-                                : "Online"}
+                                ? `${chatData.participants.length} uye`
+                                : "Cevrimici"}
                         </p>
                     </div>
                 </div>
@@ -175,7 +175,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                                 onClick={() => loadMore(20)}
                                 className="text-xs text-muted-foreground"
                             >
-                                <ArrowUp className="w-3 h-3 mr-2" /> Load Previous Messages
+                                <ArrowUp className="w-3 h-3 mr-2" /> Onceki Mesajlari Yukle
                             </Button>
                         </div>
                     )}
@@ -188,7 +188,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
 
                     {messages.length === 0 && status !== "LoadingFirstPage" ? (
                         <div className="text-center text-muted-foreground text-sm mt-10">
-                            No messages yet. Send a wave! 👋
+                            Henuz mesaj yok. Bir merhaba gonderin!
                         </div>
                     ) : (
                         messages.map((msg) => {
@@ -237,7 +237,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                                     </ContextMenuTrigger>
                                     <ContextMenuContent>
                                         <ContextMenuItem onClick={() => setDetailMessage(msg)}>
-                                            <Info className="w-4 h-4 mr-2" /> Details
+                                            <Info className="w-4 h-4 mr-2" /> Detaylar
                                         </ContextMenuItem>
                                     </ContextMenuContent>
                                 </ContextMenu>
@@ -254,7 +254,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                 <div className="flex items-end gap-2 bg-muted/30 p-2 rounded-xl border focus-within:ring-1 focus-within:ring-ring transition-all">
                     <Textarea
                         ref={textareaRef}
-                        placeholder="Write a message..."
+                        placeholder="Bir mesaj yazin..."
                         className="flex-1 w-full min-h-6 max-h-32 border-none shadow-none focus-visible:ring-0 resize-none bg-transparent px-2 py-1.5 wrap-break-word whitespace-pre-wrap"
                         rows={1}
                         value={inputValue}
@@ -276,8 +276,8 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
             <Dialog open={!!detailMessage} onOpenChange={(open) => !open && setDetailMessage(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Message Details</DialogTitle>
-                        <DialogDescription>Message metadata.</DialogDescription>
+                        <DialogTitle>Mesaj Detaylari</DialogTitle>
+                        <DialogDescription>Mesaj bilgileri.</DialogDescription>
                     </DialogHeader>
                     {detailMessage && (
                         <div className="space-y-4 py-2">
@@ -287,13 +287,13 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                                     <AvatarFallback>{detailMessage.senderName.substring(0,2)}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="text-sm font-medium">Sender</p>
+                                    <p className="text-sm font-medium">Gonderen</p>
                                     <p className="text-sm text-muted-foreground">{detailMessage.senderName}</p>
                                 </div>
                             </div>
 
                             <div className="space-y-1">
-                                <p className="text-xs font-semibold text-muted-foreground">CONTENT</p>
+                                <p className="text-xs font-semibold text-muted-foreground">ICERIK</p>
                                 <div className="p-3 border rounded-md text-sm bg-background">
                                     {detailMessage.content}
                                 </div>

@@ -70,25 +70,22 @@ export const MailArea = ({ mailThread, currentUserId, onMobileMenuOpen }: MailAr
                 senderId: currentUserId,
                 content: content
             });
-        } catch (error) {
-            console.error("Mesaj gönderilemedi:", error);
-            // Hata olursa inputu geri doldurabilir veya toast gösterebilirsiniz
+        } catch {
+            // Hata sessizce yutuldu
         }
     };
 
     const handleFileUpload = async (file: File) => {
         // Not: Gerçek dosya yükleme (AWS S3 vb.) entegrasyonu buraya gelecek.
         // Şimdilik dosya ismini mesaj olarak gönderiyoruz.
-        console.log("Dosya seçildi:", file.name);
-
         try {
             await sendMessage({
                 threadId: mailThread.id as Id<"mailThreads">,
                 senderId: currentUserId,
                 content: `📎 Dosya Gönderildi: ${file.name}`
             });
-        } catch (error) {
-            console.error("Dosya mesajı gönderilemedi:", error);
+        } catch {
+            // Hata sessizce yutuldu
         }
     };
 
@@ -99,7 +96,6 @@ export const MailArea = ({ mailThread, currentUserId, onMobileMenuOpen }: MailAr
     // İlgili Projeye Gitme Mantığı
     const handleOpenProject = () => {
         if (!mailThread.relatedProjectId) {
-            console.log("Mailde ilişkili proje ID'si yok.");
             return;
         }
 

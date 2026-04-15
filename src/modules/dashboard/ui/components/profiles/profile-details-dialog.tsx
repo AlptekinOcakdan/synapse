@@ -73,8 +73,7 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                 otherUserId: profile.id as Id<"users">,
             });
             router.push(`/dashboard/chats?chatId=${conversationId}`);
-        } catch (error) {
-            console.error("Sohbet oluşturulurken hata:", error);
+        } catch {
             toast.error("Sohbet başlatılırken bir hata oluştu.");
         }
     };
@@ -205,7 +204,7 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
                                 <Award className="w-5 h-5 text-primary" /> Uzmanlık Alanları
                             </h3>
                             <div className="flex flex-wrap gap-2">
-                                {profile.skills.map((skill) => (
+                                {profile.competencies.map((skill) => (
                                     <Badge key={skill} variant="secondary" className="px-3 py-1 text-sm font-normal">
                                         {skill}
                                     </Badge>

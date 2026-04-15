@@ -38,6 +38,7 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
     const [editableUser, setEditableUser] = useState(user);
     const [skillInput, setSkillInput] = useState("");
+    const [improvementInput, setImprovementInput] = useState("");
     const [isSaving, setIsSaving] = useState(false);
 
     // Mutation
@@ -47,8 +48,8 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
     const handleAddSkill = () => {
         if (skillInput.trim()) {
             const newSkill = skillInput.trim();
-            if (!editableUser.skills.includes(newSkill)) {
-                setEditableUser({ ...editableUser, skills: [...editableUser.skills, newSkill] });
+            if (!editableUser.competencies.includes(newSkill)) {
+                setEditableUser({ ...editableUser, competencies: [...editableUser.competencies, newSkill] });
             }
             setSkillInput("");
         }
@@ -64,7 +65,33 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
     const removeSkill = (skillToRemove: string) => {
         setEditableUser({
             ...editableUser,
-            skills: editableUser.skills.filter((skill) => skill !== skillToRemove),
+            competencies: editableUser.competencies.filter((skill) => skill !== skillToRemove),
+        });
+    };
+
+    // Improvement Area Ekleme
+    const handleAddImprovement = () => {
+        const trimmed = improvementInput.trim();
+        if (trimmed && !(editableUser.improvementAreas || []).includes(trimmed)) {
+            setEditableUser({
+                ...editableUser,
+                improvementAreas: [...(editableUser.improvementAreas || []), trimmed],
+            });
+        }
+        setImprovementInput("");
+    };
+
+    const addImprovementOnEnter = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleAddImprovement();
+        }
+    };
+
+    const removeImprovement = (areaToRemove: string) => {
+        setEditableUser({
+            ...editableUser,
+            improvementAreas: (editableUser.improvementAreas || []).filter((a) => a !== areaToRemove),
         });
     };
 
@@ -73,15 +100,15 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
         setIsSaving(true);
         try {
             await updateProfile({
-                // DÜZELTME BURADA: userId'yi ekliyoruz
-                // user.id string geliyor olabilir, Convex ID tipine cast ediyoruz
                 userId: user.id as Id<"users">,
-
                 name: editableUser.name,
                 title: editableUser.title,
                 bio: editableUser.bio,
                 avatar: editableUser.avatar,
-                skills: editableUser.skills,
+                university: editableUser.university || "",
+                competencies: editableUser.competencies,
+                improvementAreas: editableUser.improvementAreas || [],
+                isCompanyVisible: editableUser.isCompanyVisible ?? false,
                 socialLinks: {
                     github: editableUser.socialLinks?.github || "",
                     linkedin: editableUser.socialLinks?.linkedin || "",
@@ -92,8 +119,6 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
             toast.success("Profil başarıyla güncellendi!");
             setOpen(false);
         } catch (error) {
-            console.error(error);
-            // Hata mesajını kullanıcıya göster
             const msg = error instanceof Error ? error.message : "Hata oluştu";
             toast.error(msg);
         } finally {
@@ -150,6 +175,16 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
                                     id="title"
                                     value={editableUser.title}
                                     onChange={(e) => setEditableUser({...editableUser, title: e.target.value})}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="university" className="text-right">Üniversite</Label>
+                                <Input
+                                    id="university"
+                                    placeholder="ör. İstanbul Teknik Üniversitesi"
+                                    value={editableUser.university || ""}
+                                    onChange={(e) => setEditableUser({...editableUser, university: e.target.value})}
                                     className="col-span-3"
                                 />
                             </div>
@@ -224,15 +259,15 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
                                 </div>
                             </div>
 
-                            {/* Yetenekler */}
+                            {/* Yetkinlikler */}
                             <div className="grid grid-cols-4 items-start gap-4">
-                                <Label htmlFor="skills" className="text-right pt-2">
-                                    Yetenekler
+                                <Label htmlFor="competencies" className="text-right pt-2">
+                                    Yetkinlikler
                                 </Label>
                                 <div className="col-span-3 bg-secondary/20 p-3 rounded-md border border-input min-h-20 focus-within:ring-1 focus-within:ring-ring transition-all">
                                     <div className="flex flex-wrap gap-2 mb-2">
                                         <AnimatePresence>
-                                            {editableUser.skills.map((skill) => (
+                                            {editableUser.competencies.map((skill) => (
                                                 <motion.div key={skill} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
                                                     <Badge variant="secondary" className="pl-2 pr-1 py-1 gap-1 hover:bg-secondary/80 pointer-events-auto">
                                                         {skill}
@@ -247,7 +282,7 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
                                     <div className="flex items-center gap-2">
                                         <Input
                                             className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-auto flex-1"
-                                            placeholder="Yetenek ekle..."
+                                            placeholder="ör. PHP, Canva, Adobe Photoshop..."
                                             value={skillInput}
                                             onChange={(e) => setSkillInput(e.target.value)}
                                             onKeyDown={addSkillOnEnter}
@@ -263,6 +298,73 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
                                             <Plus className="w-4 h-4" />
                                         </Button>
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Gelişim Alanları */}
+                            <div className="grid grid-cols-4 items-start gap-4">
+                                <Label className="text-right pt-2">Gelişim Alanları</Label>
+                                <div className="col-span-3 bg-secondary/20 p-3 rounded-md border border-input min-h-20 focus-within:ring-1 focus-within:ring-ring transition-all">
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        <AnimatePresence>
+                                            {(editableUser.improvementAreas || []).map((area) => (
+                                                <motion.div key={area} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
+                                                    <Badge variant="outline" className="pl-2 pr-1 py-1 gap-1 border-primary/30 text-muted-foreground hover:bg-secondary/60 pointer-events-auto">
+                                                        {area}
+                                                        <div className="ml-1 cursor-pointer" onClick={() => removeImprovement(area)}>
+                                                            <X className="w-3 h-3 hover:text-destructive transition-colors" />
+                                                        </div>
+                                                    </Badge>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-auto flex-1"
+                                            placeholder="ör. Sunum becerileri, Proje yönetimi..."
+                                            value={improvementInput}
+                                            onChange={(e) => setImprovementInput(e.target.value)}
+                                            onKeyDown={addImprovementOnEnter}
+                                        />
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-8 px-3 rounded-md"
+                                            onClick={handleAddImprovement}
+                                            disabled={!improvementInput.trim()}
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Visible to Companies */}
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label className="text-right">Şirkete Görünürlük</Label>
+                                <div className="col-span-3 flex items-center gap-3 p-3 rounded-md border border-input bg-secondary/20">
+                                    <button
+                                        type="button"
+                                        role="switch"
+                                        aria-checked={editableUser.isCompanyVisible ?? false}
+                                        onClick={() => setEditableUser({ ...editableUser, isCompanyVisible: !(editableUser.isCompanyVisible ?? false) })}
+                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                                            (editableUser.isCompanyVisible ?? false) ? "bg-primary" : "bg-secondary"
+                                        }`}
+                                    >
+                                        <span
+                                            className={`pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform ${
+                                                (editableUser.isCompanyVisible ?? false) ? "translate-x-4" : "translate-x-0"
+                                            }`}
+                                        />
+                                    </button>
+                                    <span className="text-sm text-muted-foreground">
+                                        {(editableUser.isCompanyVisible ?? false)
+                                            ? "Profiliniz şirketlere görünür"
+                                            : "Profiliniz şirketlerden gizli"}
+                                    </span>
                                 </div>
                             </div>
                         </div>

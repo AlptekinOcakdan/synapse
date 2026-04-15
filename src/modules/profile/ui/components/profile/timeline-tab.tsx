@@ -86,8 +86,7 @@ export const TimelineTab = ({ user }: { user: UserProfile }) => {
 
             toast.success("Deneyimler başarıyla güncellendi.");
             setIsEditing(false);
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Kaydetme sırasında bir hata oluştu.");
         } finally {
             setIsSaving(false);

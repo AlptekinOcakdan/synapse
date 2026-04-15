@@ -84,9 +84,19 @@ export const getApplicationsForProject = query({
 export const rejectApplication = mutation({
     args: {
         applicationId: v.id("applications"),
+        userId: v.id("users"),
     },
     handler: async (ctx, args) => {
-        // TODO: Add auth check to ensure only project owner can reject
+        const application = await ctx.db.get(args.applicationId);
+        if (!application) throw new Error("Başvuru bulunamadı.");
+
+        const project = await ctx.db.get(application.projectId);
+        if (!project) throw new Error("Proje bulunamadı.");
+
+        if (project.ownerId !== args.userId) {
+            throw new Error("Yetkilendirme hatası: Sadece proje sahibi başvuruları reddedebilir.");
+        }
+
         await ctx.db.patch(args.applicationId, { status: "rejected" });
     },
 });

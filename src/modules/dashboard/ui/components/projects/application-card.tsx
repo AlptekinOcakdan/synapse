@@ -46,7 +46,7 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
         email: applicant.email,
         bio: applicant.bio,
         socialLinks: applicant.socialLinks,
-        skills: applicant.skills,
+        competencies: applicant.competencies ?? [],
         isAvailable: applicant.isAvailable,
         // Şemada olmayan ama Interface'de zorunlu olan alanlara varsayılan değer atıyoruz:
         completedProjectCount: 0,
@@ -76,7 +76,7 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
     };
 
     const handleReject = async () => {
-        toast.promise(rejectApplication({ applicationId: application._id }), {
+        toast.promise(rejectApplication({ applicationId: application._id, userId: userId as Id<"users"> }), {
             loading: "Başvuru reddediliyor...",
             success: "Başvuru reddedildi.",
             error: "Reddetme sırasında bir hata oluştu.",
@@ -119,7 +119,7 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
                         </h4>
                         <p className="text-sm text-muted-foreground">{applicant.title}</p>
                         <div className="flex flex-wrap gap-2 mt-2">
-                            {applicant.skills?.slice(0, 3).map((skill: string) => (
+                            {applicant.competencies?.slice(0, 3).map((skill: string) => (
                                 <Badge key={skill} variant="secondary">
                                     {skill}
                                 </Badge>

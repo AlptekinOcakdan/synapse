@@ -49,10 +49,10 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                         <h3 className="text-lg sm:text-xl font-bold pr-0 lg:pr-4 w-full">
                             {project.title}
                         </h3>
-                        {project.positions && project.positions.flatMap(p => p.skills).length > 0 && (
+                        {project.positions && project.positions.flatMap(p => p.competencies).length > 0 && (
                             <div className="relative w-full overflow-hidden h-6">
                                 <div className="absolute inset-0 flex flex-nowrap gap-2 items-center">
-                                    {project.positions.flatMap(p => p.skills).map((skill, index) => (
+                                    {project.positions.flatMap(p => p.competencies).map((skill, index) => (
                                         <Badge key={index} variant="turquoise" className="text-xs font-normal whitespace-nowrap">
                                             {skill}
                                         </Badge>

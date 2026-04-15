@@ -56,10 +56,11 @@ export const PhotoUploadDialog = ({ open, onOpenChange, onSend }: PhotoUploadDia
 
                         {selectedFile && previewUrl ? (
                             <>
+                                {/* Preview icin blob URL kullanildigi icin next/image uygun degil */}
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={previewUrl}
-                                    alt="Preview"
+                                    alt="Onizleme"
                                     className="w-full h-full object-contain max-h-75"
                                 />
                                 <Button

@@ -31,7 +31,9 @@ export const SignUpView = () => {
         otp: "",
         department: "",
         city: null,
-        skills: [],
+        competencies: [],
+        improvementAreas: [],
+        isCompanyVisible: false,
         bio: "",
         experiences: [],
         competitions: [],
@@ -65,9 +67,8 @@ export const SignUpView = () => {
             });
             toast.success("Kod doğrulandı!");
             setStep("CV_BUILDER");
-        } catch (error) {
+        } catch {
             toast.error("Hatalı kod, lütfen tekrar deneyin.");
-            console.error(error);
         } finally {
             setIsLoading(false);
         }
@@ -83,8 +84,7 @@ export const SignUpView = () => {
             });
             toast.success("Aramıza hoş geldin! 🎉");
             router.push("/dashboard");
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Kayıt oluşturulurken bir hata oluştu.");
         } finally {
             setIsLoading(false);

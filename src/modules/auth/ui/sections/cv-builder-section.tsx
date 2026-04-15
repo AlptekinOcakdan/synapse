@@ -2,7 +2,7 @@
 
 import { useState, KeyboardEvent } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
-import { Award, Briefcase, Check, ChevronsUpDown, GraduationCap, Loader2, Plus, Trash2, Trophy, Upload, User, X, GripVertical } from "lucide-react";
+import { Award, Briefcase, Building2, Check, ChevronsUpDown, GraduationCap, Loader2, Plus, Trash2, TrendingUp, Trophy, Upload, User, X, GripVertical } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +41,7 @@ interface CVBuilderSectionProps {
 export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBuilderSectionProps) => {
     // --- Local States ---
     const [skillInput, setSkillInput] = useState("");
+    const [improvementInput, setImprovementInput] = useState("");
     const [openDepartment, setOpenDepartment] = useState(false);
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
@@ -64,14 +65,14 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
     const addSkill = (e: KeyboardEvent) => {
         if (e.key === "Enter" && skillInput.trim()) {
             e.preventDefault();
-            if (!data.skills.includes(skillInput.trim())) {
-                updateData({ ...data, skills: [...data.skills, skillInput.trim()] });
+            if (!data.competencies.includes(skillInput.trim())) {
+                updateData({ ...data, competencies: [...data.competencies, skillInput.trim()] });
             }
             setSkillInput("");
         }
     };
     const removeSkill = (skill: string) => {
-        updateData({ ...data, skills: data.skills.filter((s) => s !== skill) });
+        updateData({ ...data, competencies: data.competencies.filter((s) => s !== skill) });
     };
 
     // DEĞİŞİKLİK 4: Deneyim Ekleme Mantığı Güncellendi
@@ -240,13 +241,13 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
                     </div>
                 </div>
 
-                {/* 2. Yetenekler (Aynı) */}
+                {/* 2. Yetkinlikler */}
                 <div className="space-y-2">
-                    <Label className="flex items-center gap-2"><Award className="w-4 h-4 text-primary" /> Yetenekler</Label>
+                    <Label className="flex items-center gap-2"><Award className="w-4 h-4 text-primary" /> Yetkinlikler</Label>
                     <div className="bg-secondary/20 p-3 rounded-md border border-input min-h-20 focus-within:ring-1 focus-within:ring-ring transition-all">
                         <div className="flex flex-wrap gap-2 mb-2">
                             <AnimatePresence>
-                                {data.skills.map((skill) => (
+                                {data.competencies.map((skill) => (
                                     <motion.div key={skill} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
                                         <Badge variant="secondary" className="pl-2 pr-1 py-1 gap-1 hover:bg-secondary/80 pointer-events-auto">
                                             {skill}
@@ -256,7 +257,70 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
                                 ))}
                             </AnimatePresence>
                         </div>
-                        <Input className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-auto" placeholder="Yetenek yaz ve Enter'a bas..." value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={addSkill} />
+                        <Input className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-auto" placeholder="ör. PHP, Canva, Adobe Photoshop..." value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={addSkill} />
+                    </div>
+                </div>
+
+                {/* 2.5. Gelişim Alanları */}
+                <div className="space-y-2">
+                    <Label className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" /> Gelişim Alanları</Label>
+                    <p className="text-xs text-muted-foreground">Geliştirmek istediğin becerileri veya alanları ekle.</p>
+                    <div className="bg-secondary/20 p-3 rounded-md border border-input min-h-16 focus-within:ring-1 focus-within:ring-ring transition-all">
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            <AnimatePresence>
+                                {(data.improvementAreas || []).map((area) => (
+                                    <motion.div key={area} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
+                                        <Badge variant="outline" className="pl-2 pr-1 py-1 gap-1 border-primary/30 text-muted-foreground hover:bg-secondary/60 pointer-events-auto">
+                                            {area}
+                                            <div className="ml-1 cursor-pointer"><X className="w-3 h-3 hover:text-destructive transition-colors relative z-10" onClick={(e) => { e.stopPropagation(); updateData({ ...data, improvementAreas: (data.improvementAreas || []).filter(a => a !== area) }); }} /></div>
+                                        </Badge>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                        <Input
+                            className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-auto"
+                            placeholder="ör. Sunum becerileri, Proje yönetimi..."
+                            value={improvementInput}
+                            onChange={(e) => setImprovementInput(e.target.value)}
+                            onKeyDown={(e: KeyboardEvent) => {
+                                if (e.key === "Enter" && improvementInput.trim()) {
+                                    e.preventDefault();
+                                    const val = improvementInput.trim();
+                                    if (!(data.improvementAreas || []).includes(val)) {
+                                        updateData({ ...data, improvementAreas: [...(data.improvementAreas || []), val] });
+                                    }
+                                    setImprovementInput("");
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* 2.7. Şirkete Görünürlük */}
+                <div className="space-y-2">
+                    <Label className="flex items-center gap-2"><Building2 className="w-4 h-4 text-primary" /> Şirkete Görünürlük</Label>
+                    <div className="flex items-center gap-3 p-3 rounded-md border border-input bg-secondary/20">
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={data.isCompanyVisible ?? false}
+                            onClick={() => updateData({ ...data, isCompanyVisible: !(data.isCompanyVisible ?? false) })}
+                            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                                (data.isCompanyVisible ?? false) ? "bg-primary" : "bg-secondary"
+                            }`}
+                        >
+                            <span
+                                className={`pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform ${
+                                    (data.isCompanyVisible ?? false) ? "translate-x-4" : "translate-x-0"
+                                }`}
+                            />
+                        </button>
+                        <span className="text-sm text-muted-foreground">
+                            {(data.isCompanyVisible ?? false)
+                                ? "Profiliniz şirketlere görünür"
+                                : "Profiliniz şirketlerden gizli"}
+                        </span>
                     </div>
                 </div>
 

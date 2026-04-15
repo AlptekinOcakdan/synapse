@@ -93,8 +93,7 @@ export const ProfilePhotoDialog = ({ isOpen, onClose, onSave, currentImage }: Pr
 
             toast.success("Fotoğraf kırpıldı. Kaydetmeyi unutmayın.");
 
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Fotoğraf kırpılırken bir hata oluştu.");
         } finally {
             setIsProcessingCrop(false);
@@ -127,8 +126,7 @@ export const ProfilePhotoDialog = ({ isOpen, onClose, onSave, currentImage }: Pr
                 onSave(preview);
                 closeDialog();
             }
-        } catch (error) {
-            console.error("Profil fotoğrafı kaydedilemedi:", error);
+        } catch {
             toast.error("Kaydetme işlemi başarısız.");
         }
     };

@@ -8,22 +8,24 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Id } from "@/convex/_generated/dataModel";
 
 // Tip Tanımlaması (Convex Dönüşüne Uygun)
 interface ChatItem {
-    id: string;
+    id: Id<"conversations">;
     type: "direct" | "group";
     name: string;
     avatar?: string;
     lastMessage: string;
-    lastMessageTime: string;
+    lastMessageTime: number;
+    lastMessageTimeFormatted: string;
     unreadCount: number;
 }
 
 interface ChatSidebarProps {
-    chats: any[]; // veya ChatItem[]
+    chats: ChatItem[];
     selectedChatId: string | null;
-    onSelectChat: (chat: any) => void;
+    onSelectChat: (chat: ChatItem) => void;
 }
 
 export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebarProps) => {
@@ -52,7 +54,7 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
             <div className="flex-1 overflow-hidden">
                 <div className="flex justify-between items-center mb-0.5">
                     <span className="font-medium truncate text-sm">{chat.name}</span>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{chat.lastMessageTime}</span>
+                    <span className="text-[10px] text-muted-foreground shrink-0">{chat.lastMessageTimeFormatted}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <p className="text-xs text-muted-foreground truncate max-w-35 min-h-[1rem]">
@@ -94,7 +96,7 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
                 <TabsContent value="direct" className="flex-1 min-h-0 m-0">
                     <ScrollArea className="h-full px-2 py-2">
                         <div className="space-y-1">
-                            {filterChats("direct").map((chat: any) => (
+                            {filterChats("direct").map((chat) => (
                                 <ChatListItem key={chat.id} chat={chat} />
                             ))}
                             {filterChats("direct").length === 0 && (
@@ -107,7 +109,7 @@ export const ChatSidebar = ({ chats, selectedChatId, onSelectChat }: ChatSidebar
                 <TabsContent value="group" className="flex-1 min-h-0 m-0">
                     <ScrollArea className="h-full px-2 py-2">
                         <div className="space-y-1">
-                            {filterChats("group").map((chat: any) => (
+                            {filterChats("group").map((chat) => (
                                 <ChatListItem key={chat.id} chat={chat} />
                             ))}
                         </div>

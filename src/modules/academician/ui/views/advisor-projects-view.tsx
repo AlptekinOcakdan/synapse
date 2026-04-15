@@ -55,8 +55,7 @@ export const AdvisorProjectsView = ({userId}: AdvisorProjectsViewProps) => {
             toast.success("Danışmanlık talebiniz iletildi.");
             setSelectedProject(null);
             setMessage("");
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Bir hata oluştu.");
         } finally {
             setIsSubmitting(false);

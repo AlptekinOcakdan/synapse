@@ -46,12 +46,9 @@ export const AcademicianContactDialog = ({ academician, children, userId }: Acad
     const [message, setMessage] = useState("");
     const [selectedProjectId, setSelectedProjectId] = useState<string>("none");
 
-    // 1. Kullanıcının Kendi Projelerini Çek
-    const myProjects = useQuery(api.projects.getMyProjects, { userId });
-
-    // 2. Mevcut Kullanıcıyı Çek (Gönderen ID'si için gerekli)
-    // NOT: Senin projende user'ı çeken fonksiyonun adı farklı olabilir (örn: api.users.getMe)
-    const currentUser = useQuery(api.users.getAuthUser, { userId });
+    // Dialog acik oldugunda sorgula, kapali iken skip
+    const myProjects = useQuery(api.projects.getMyProjects, open ? { userId } : "skip");
+    const currentUser = useQuery(api.users.getAuthUser, open ? { userId } : "skip");
 
     // 3. Mesajlaşma Mutasyonu (Mail değil, Mesaj Başlatma)
     const createThread = useMutation(api.messages.createThreadAndSendMessage);
@@ -90,8 +87,7 @@ export const AcademicianContactDialog = ({ academician, children, userId }: Acad
             setMessage("");
             setSelectedProjectId("none");
 
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Mesaj gönderilirken bir hata oluştu.");
         } finally {
             setIsLoading(false);

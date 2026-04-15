@@ -8,8 +8,9 @@ import { ProfileCard } from "../components/profiles/profile-card";
 import { ProfileFilterBar } from "../components/profiles/profile-filter-bar";
 
 // --- CONVEX IMPORTS ---
-import { usePaginatedQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Department } from "@/modules/dashboard/types";
 
 const ITEMS_PER_PAGE = 8; // Sayfa başına profil sayısı
 
@@ -19,13 +20,16 @@ export const ProfilesView = () => {
     const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
+    // --- DEPARTMENTS (tek kez cek, ProfileCard'lara ilet) ---
+    const departments = useQuery(api.departments.get);
+
     // --- CONVEX QUERY ---
     const { results, status, loadMore } = usePaginatedQuery(
         api.users.getProfiles,
         {
             searchQuery: searchQuery,
             departments: selectedDepartments,
-            skills: selectedSkills,
+            competencies: selectedSkills,
         },
         { initialNumItems: ITEMS_PER_PAGE }
     );
@@ -69,7 +73,7 @@ export const ProfilesView = () => {
                     <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-6">
                         {profiles.length > 0 ? (
                             profiles.map((profile) => (
-                                <ProfileCard key={profile.id} profile={profile} />
+                                <ProfileCard key={profile.id} profile={profile} departments={departments} />
                             ))
                         ) : (
                             // SONUÇ BULUNAMADI EKRANI

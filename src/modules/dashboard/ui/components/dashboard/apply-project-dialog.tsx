@@ -57,8 +57,6 @@ export const ApplyProjectDialog = ({ project, children, userId }: ApplyProjectDi
             setMotivation("");
 
         } catch (error) {
-            console.error("Başvuru hatası:", error);
-            // Backend'den gelen hatayı (örn: "Zaten başvurdunuz") kullanıcıya göster
             const errorMessage = error instanceof Error ? error.message : "Başvuru sırasında bir hata oluştu.";
             toast.error(errorMessage);
         } finally {

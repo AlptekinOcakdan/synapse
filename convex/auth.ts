@@ -107,7 +107,9 @@ export const completeStudentSignUp = mutation({
         otp: v.string(),
         department: v.string(),
         bio: v.string(),
-        skills: v.array(v.string()),
+        competencies: v.array(v.string()),
+        improvementAreas: v.optional(v.array(v.string())),
+        isCompanyVisible: v.optional(v.boolean()),
 
         // Buraya artık Base64 değil, S3'den dönen URL gelecek (örn: https://bucket.s3.../image.jpg)
         profileImage: v.optional(v.string()),
@@ -162,7 +164,9 @@ export const completeStudentSignUp = mutation({
             bio: args.bio,
             title: "Lisans Öğrencisi",
             role: "student",
-            skills: args.skills,
+            competencies: args.competencies,
+            improvementAreas: args.improvementAreas ?? [],
+            isCompanyVisible: args.isCompanyVisible ?? false,
             experiences: args.experiences,
             competitions: args.competitions,
             certificates: args.certificates,

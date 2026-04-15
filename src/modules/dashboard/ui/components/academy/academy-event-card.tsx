@@ -58,8 +58,7 @@ export const AcademyEventCard = ({ event, userId }: AcademyEventProps) => {
             } else {
                 toast.info("Etkinlik takibi bırakıldı.");
             }
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("İşlem başarısız. Giriş yaptığınızdan emin olun.");
         } finally {
             setIsLoading(false);

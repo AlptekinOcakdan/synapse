@@ -82,7 +82,7 @@ export const DashboardView = ({userId}:DashboardViewProps) => {
             let matchesSkills = true;
             if (skills.length > 0) {
                 matchesSkills = p.positions.some((pos) => {
-                    const positionSkills = pos.skills.map(s => s.toLowerCase());
+                    const positionSkills = pos.competencies.map(s => s.toLowerCase());
                     return skills.some(searchSkill => positionSkills.includes(searchSkill.toLowerCase()));
                 });
             }

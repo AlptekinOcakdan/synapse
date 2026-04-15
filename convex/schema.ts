@@ -15,7 +15,11 @@ export default defineSchema({
         city: v.union(v.string(), v.null()),
         role: v.union(v.literal("student"), v.literal("academician"), v.literal("admin")),
 
-        skills: v.array(v.string()),
+        university: v.optional(v.string()),
+        skills: v.optional(v.array(v.string())),
+        competencies: v.optional(v.array(v.string())),
+        improvementAreas: v.optional(v.array(v.string())),
+        isCompanyVisible: v.optional(v.boolean()),
         socialLinks: v.object({
             github: v.optional(v.string()),
             linkedin: v.optional(v.string()),
@@ -89,7 +93,8 @@ export default defineSchema({
                 department: v.string(),
                 count: v.number(),
                 filled: v.number(),
-                skills: v.array(v.string()),
+                skills: v.optional(v.array(v.string())),
+                competencies: v.optional(v.array(v.string())),
                 description: v.optional(v.string())
             })
         ),
@@ -127,7 +132,12 @@ export default defineSchema({
 
     notifications: defineTable({
         userId: v.id("users"),
-        type: v.string(),
+        type: v.union(
+            v.literal("application_received"),
+            v.literal("mentorship_offer"),
+            v.literal("badge_awarded"),
+            v.literal("application_approved")
+        ),
         title: v.string(),
         message: v.string(),
         relatedLink: v.string(),
@@ -207,5 +217,15 @@ export default defineSchema({
 
     departments: defineTable({
         label: v.string(),
+    }),
+
+    badges: defineTable({
+        issuerId: v.id("users"),
+        recipientId: v.id("users"),
+        title: v.string(),
+        description: v.string(),
+        issuedAt: v.string(),
     })
+        .index("by_recipient", ["recipientId"])
+        .index("by_issuer", ["issuerId"]),
 });

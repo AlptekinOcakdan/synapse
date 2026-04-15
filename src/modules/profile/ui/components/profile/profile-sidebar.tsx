@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Github, Linkedin, Mail, MapPin, Edit2, Twitter, Link as LinkIcon } from "lucide-react";
+import { Github, Linkedin, Mail, MapPin, Edit2, Twitter, Link as LinkIcon, TrendingUp } from "lucide-react";
 import {UserProfile} from "@/modules/dashboard/types";
 import {ProfileEditModal} from "@/modules/profile/ui/components/profile/profile-edit-modal";
 
@@ -92,19 +92,37 @@ export const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
 
                 <Separator />
 
-                {/* Yetenekler */}
+                {/* Yetkinlikler */}
                 <div className="w-full text-left space-y-3">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                        Yetenekler
-                    </h3>
+                    <h3 className="text-sm font-semibold">Yetkinlikler</h3>
                     <div className="flex flex-wrap gap-1.5">
-                        {user.skills.map((skill) => (
+                        {user.competencies.map((skill) => (
                             <Badge key={skill} variant="secondary" className="text-[10px] px-2 py-0.5 font-normal">
                                 {skill}
                             </Badge>
                         ))}
                     </div>
                 </div>
+
+                {/* Gelişim Alanları */}
+                {user.improvementAreas && user.improvementAreas.length > 0 && (
+                    <>
+                        <Separator />
+                        <div className="w-full text-left space-y-3">
+                            <h3 className="text-sm font-semibold flex items-center gap-2">
+                                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                                Gelişim Alanları
+                            </h3>
+                            <div className="flex flex-wrap gap-1.5">
+                                {user.improvementAreas.map((area) => (
+                                    <Badge key={area} variant="outline" className="text-[10px] px-2 py-0.5 font-normal text-muted-foreground border-primary/30">
+                                        {area}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
 
             </CardContent>
         </Card>

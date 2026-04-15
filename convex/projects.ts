@@ -122,7 +122,10 @@ export const getProjects = query({
                     competition: p.competition || "",
                     participantsNeeded: p.participantsNeeded,
                     needsAdvisor: p.needsAdvisor,
-                    positions: p.positions,
+                    positions: p.positions.map((pos) => ({
+                        ...pos,
+                        competencies: pos.competencies ?? pos.skills ?? [],
+                    })),
                     participants,
                     advisor: advisorData,
                     owner: owner ? {
@@ -338,7 +341,10 @@ export const getMyProjects = query({
                     competition: p.competition || "",
                     participantsNeeded: p.participantsNeeded,
                     needsAdvisor: p.needsAdvisor,
-                    positions: p.positions,
+                    positions: p.positions.map((pos) => ({
+                        ...pos,
+                        competencies: pos.competencies ?? pos.skills ?? [],
+                    })),
                     participants,
                     advisor: advisorData,
                     owner: owner ? {
@@ -385,7 +391,7 @@ export const createProject = mutation({
                 id: v.string(),
                 department: v.string(),
                 count: v.number(),
-                skills: v.array(v.string()),
+                competencies: v.array(v.string()),
             })
         ),
         advisorId: v.optional(v.id("users")),
@@ -409,7 +415,7 @@ export const createProject = mutation({
 
         args.positions.forEach((pos) => {
             allDepartments.add(pos.department);
-            pos.skills.forEach((skill) => allSkills.add(skill));
+            (pos.competencies ?? []).forEach((skill) => allSkills.add(skill));
         });
 
         const projectId = await ctx.db.insert("projects", {
@@ -460,7 +466,7 @@ export const updateProject = mutation({
                 department: v.string(),
                 count: v.number(),
                 filled: v.number(),
-                skills: v.array(v.string()),
+                competencies: v.array(v.string()),
                 description: v.optional(v.string())
             })
         )),
@@ -491,7 +497,7 @@ export const updateProject = mutation({
 
             updates.positions.forEach((pos) => {
                 allDepartments.add(pos.department);
-                pos.skills.forEach((skill) => allSkills.add(skill));
+                (pos.competencies ?? []).forEach((skill) => allSkills.add(skill));
                 totalNeeded += pos.count;
             });
 

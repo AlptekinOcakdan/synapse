@@ -6,17 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {UserProfile } from "../../../types";
+import {UserProfile, Department } from "../../../types";
 import {ProfileDetailsDialog} from "@/modules/dashboard/ui/components/profiles/profile-details-dialog";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 interface ProfileCardProps {
     profile: UserProfile;
+    departments?: Department[];
 }
 
-export const ProfileCard = ({ profile }: ProfileCardProps) => {
-    const departments = useQuery(api.departments.get);
+export const ProfileCard = ({ profile, departments }: ProfileCardProps) => {
 
     // İsimden baş harfleri alma
     const getInitials = (name: string) => {
@@ -114,14 +112,14 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
                         Uzmanlık Alanları
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                        {profile.skills.slice(0, 5).map((skill) => (
+                        {profile.competencies.slice(0, 5).map((skill) => (
                             <Badge key={skill} variant="turquiseLight" className="px-2 py-0.5 text-xs font-normal text-bl">
                                 {skill}
                             </Badge>
                         ))}
-                        {profile.skills.length > 5 && (
+                        {profile.competencies.length > 5 && (
                             <Badge variant="outline" className="px-2 py-0.5 text-xs text-muted-foreground bg-background">
-                                +{profile.skills.length - 5}
+                                +{profile.competencies.length - 5}
                             </Badge>
                         )}
                     </div>

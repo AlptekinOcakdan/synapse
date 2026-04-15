@@ -26,15 +26,19 @@ import {
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Project } from "../../../types";
-import { LayoutProps, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-interface ProjectDetailsDialogProps extends LayoutProps {
+interface ProjectDetailsDialogProps {
     project: Project;
+    children?: ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialogProps) => {
+export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: ProjectDetailsDialogProps) => {
     const departments = useQuery(api.departments.get);
 
     // Bölüm label'ını bulmak için yardımcı fonksiyon
@@ -50,10 +54,10 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            {children && <DialogTrigger asChild>
                 {children}
-            </DialogTrigger>
+            </DialogTrigger>}
 
             <DialogContent className="max-w-3xl max-h-[85dvh] h-auto flex flex-col p-0 gap-0 font-sans overflow-hidden">
 
@@ -205,9 +209,9 @@ export const ProjectDetailsDialog = ({ project, children }: ProjectDetailsDialog
                                                 )}
 
                                                 {/* Yetenekler */}
-                                                {pos.skills.length > 0 && (
+                                                {(pos.competencies ?? pos.skills ?? []).length > 0 && (
                                                     <div className="flex flex-wrap gap-1.5 pl-0 sm:pl-10">
-                                                        {pos.skills.map((skill) => (
+                                                        {(pos.competencies ?? pos.skills ?? []).map((skill) => (
                                                             <Badge key={skill} variant="turquoise" className="text-xs font-normal">
                                                                 {skill}
                                                             </Badge>

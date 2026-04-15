@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, KeyboardEvent } from "react";
+import { useState } from "react";
+import { useTagInput } from "@/lib/hooks/use-tag-input";
 import { Plus, Trash2, Users, GraduationCap, Target, Save, X, Award, Loader2 } from "lucide-react";
 import {
     Dialog,
@@ -58,22 +59,14 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
     const [tempDept, setTempDept] = useState<string>("");
     const [tempCount, setTempCount] = useState<string>("1");
 
-    const [tempSkillInput, setTempSkillInput] = useState("");
-    const [tempSkills, setTempSkills] = useState<string[]>([]);
-
-    const handleAddTempSkill = (e?: KeyboardEvent) => {
-        if (e && e.key !== "Enter") return;
-        e?.preventDefault();
-        const trimmed = tempSkillInput.trim();
-        if (trimmed && !tempSkills.includes(trimmed)) {
-            setTempSkills([...tempSkills, trimmed]);
-            setTempSkillInput("");
-        }
-    };
-
-    const handleRemoveTempSkill = (skill: string) => {
-        setTempSkills(tempSkills.filter(s => s !== skill));
-    };
+    const {
+        tags: tempSkills,
+        setTags: setTempSkills,
+        inputValue: tempSkillInput,
+        setInputValue: setTempSkillInput,
+        addTag: handleAddTempSkill,
+        removeTag: handleRemoveTempSkill,
+    } = useTagInput();
 
     const handleAddPosition = () => {
         if (!tempDept || !tempCount) return;
@@ -81,7 +74,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
             id: crypto.randomUUID(),
             department: tempDept,
             count: parseInt(tempCount),
-            skills: tempSkills
+            competencies: tempSkills
         };
         setFormData(prev => ({
             ...prev,
@@ -118,7 +111,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                     id: p.id,
                     department: p.department,
                     count: p.count,
-                    skills: p.skills
+                    competencies: p.competencies
                 })),
                 userId: userId,
                 advisorId: isAdvisor ? userId : undefined,
@@ -132,7 +125,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
             setOpen(false);
 
         } catch (error) {
-            console.error(error);
             const errorMessage = error instanceof Error ? error.message : "Bir hata oluştu.";
             toast.error(errorMessage);
         } finally {
@@ -335,9 +327,9 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
                                             </div>
-                                            {pos.skills.length > 0 && (
+                                            {pos.competencies.length > 0 && (
                                                 <div className="flex flex-wrap gap-1.5 pl-9">
-                                                    {pos.skills.map((skill, idx) => (
+                                                    {pos.competencies.map((skill, idx) => (
                                                         <Badge key={idx} variant="outline" className="text-[10px] px-1.5 py-0 h-5 text-muted-foreground bg-secondary/20">{skill}</Badge>
                                                     ))}
                                                 </div>

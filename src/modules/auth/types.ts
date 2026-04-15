@@ -20,7 +20,9 @@ export interface SignUpFormData {
     department: string;
     city: string | null;
     bio: string;
-    skills: string[];
+    competencies: string[];
+    improvementAreas: string[];
+    isCompanyVisible: boolean;
     experiences: Experience[];
     competitions: Competition[];
     certificates: string[];

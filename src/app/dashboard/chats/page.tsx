@@ -3,7 +3,7 @@ import {Suspense} from "react";
 
 const Page =  () => {
     return (
-        <Suspense fallback={<p>Loading chats...</p>}>
+        <Suspense fallback={<p>Sohbetler yukleniyor...</p>}>
             <ChatsView />
         </Suspense>
     );

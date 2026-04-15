@@ -27,9 +27,12 @@ export interface SocialLinks {
 
 export interface UserProfile extends SimpleUser {
     email?: string;
+    university?: string;
     bio: string;
     socialLinks?: SocialLinks;
-    skills: string[];
+    competencies: string[];
+    improvementAreas?: string[];
+    isCompanyVisible?: boolean;
     completedProjectCount: number;
     activeProjectCount: number;
     isAvailable: boolean;
@@ -43,7 +46,8 @@ export interface ProjectPosition {
     department: string;
     count: number;
     filled: number;
-    skills: string[];
+    competencies?: string[];
+    skills?: string[];
     description?: string;
 }
 
@@ -73,7 +77,7 @@ export interface ProjectFormData {
         id: string;
         department: string;
         count: number;
-        skills: string[];
+        competencies: string[];
     }[];
     needsAdvisor: boolean;
 }
@@ -98,7 +102,7 @@ export interface ChatSession {
     name: string;
     avatar?: string;
     lastMessage: string;
-    lastMessageTime: string;
+    lastMessageTime: number;
     unreadCount: number;
     participants: ChatUser[];
     messages: Message[];
@@ -132,7 +136,7 @@ export interface AcademyEvent {
     id: string;
     title: string;
     description: string;
-    date: string;
+    date: number;
     duration: string;
     status: AcademyEventStatus;
     platform: "YouTube" | "Zoom" | "Google Meet";

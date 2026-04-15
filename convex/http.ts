@@ -31,7 +31,7 @@ http.route({
         }
 
         // 4. Doğrulama (Verify) İşlemi
-        let body: any;
+        let body: Record<string, unknown>;
         try {
             const wh = new Webhook(WEBHOOK_SECRET);
             // Eğer imza tutmazsa burası hata fırlatır ve catch bloğuna düşeriz
@@ -39,7 +39,7 @@ http.route({
                 "svix-id": svix_id,
                 "svix-timestamp": svix_timestamp,
                 "svix-signature": svix_signature,
-            });
+            }) as Record<string, unknown>;
         } catch (err) {
             console.error("Webhook imzası doğrulanamadı (Fake Request):", err);
             return new Response("Error: Invalid signature", { status: 400 });
@@ -49,10 +49,10 @@ http.route({
 
         // Resend Payload yapısına göre verileri çek
         // Not: body değişkeni artık güvenli JSON objesidir.
-        const toAddress = body.to?.[0] || body.recipient; // Resend bazen array dönebilir
-        const fromAddress = body.from;
-        const subject = body.subject;
-        const textContent = body.text || body.html;
+        const toAddress = ((body.to as string[]) ?? [])[0] || (body.recipient as string);
+        const fromAddress = body.from as string;
+        const subject = body.subject as string;
+        const textContent = (body.text || body.html) as string;
 
         // 5. Thread ID Ayıklama
         const match = toAddress?.match(/reply\+(.*?)@/);

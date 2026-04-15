@@ -35,9 +35,7 @@ export async function decrypt(session: string | undefined = "") {
             algorithms: ["HS256"],
         });
         return payload;
-    } catch (error) {
-        // Hata logunu sadece geliştirme ortamında görmek istersen:
-        console.error("Session decrypt error:", error);
+    } catch {
         return null;
     }
 }
