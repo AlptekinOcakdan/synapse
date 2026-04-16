@@ -33,8 +33,8 @@ export const useFileUpload = () => {
             if (!uploadRes.ok) throw new Error("S3 yüklemesi başarısız");
 
             return fileUrl; // Dosyanın kalıcı linki
-        } catch {
-            toast.error("Dosya yüklenirken bir hata oluştu.");
+        } catch (error) {
+            toast.error((error as Error).message || "Dosya yüklenirken bir hata oluştu");
             return null;
         } finally {
             setIsUploading(false);
