@@ -264,7 +264,9 @@ export const CVBuilderSection = ({ data, updateData, onSubmit, isLoading }: CVBu
                 {/* 2.5. Gelişim Alanları */}
                 <div className="space-y-2">
                     <Label className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" /> Gelişim Alanları</Label>
-                    <p className="text-xs text-muted-foreground">Geliştirmek istediğin becerileri veya alanları ekle.</p>
+                    <p className="text-xs text-muted-foreground">
+                        Geliştirmek istediğin becerileri veya alanları ekle. Bu bilgiler diğer kullanıcılar tarafından görüntülenmez; yalnızca ileride hazırlanacak kişiselleştirilmiş eğitim önerileri için kullanılacaktır.
+                    </p>
                     <div className="bg-secondary/20 p-3 rounded-md border border-input min-h-16 focus-within:ring-1 focus-within:ring-ring transition-all">
                         <div className="flex flex-wrap gap-2 mb-2">
                             <AnimatePresence>

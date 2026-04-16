@@ -39,7 +39,10 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
     const [editableUser, setEditableUser] = useState(user);
     const [skillInput, setSkillInput] = useState("");
     const [improvementInput, setImprovementInput] = useState("");
+    const [researchInput, setResearchInput] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+
+    const isAcademician = user.role === "academician";
 
     // Mutation
     const updateProfile = useMutation(api.users.updateProfile);
@@ -95,6 +98,32 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
         });
     };
 
+    // Araştırma İlgileri Ekleme
+    const handleAddResearch = () => {
+        const trimmed = researchInput.trim();
+        if (trimmed && !(editableUser.researchInterests || []).includes(trimmed)) {
+            setEditableUser({
+                ...editableUser,
+                researchInterests: [...(editableUser.researchInterests || []), trimmed],
+            });
+        }
+        setResearchInput("");
+    };
+
+    const addResearchOnEnter = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleAddResearch();
+        }
+    };
+
+    const removeResearch = (item: string) => {
+        setEditableUser({
+            ...editableUser,
+            researchInterests: (editableUser.researchInterests || []).filter((r) => r !== item),
+        });
+    };
+
     // Kaydetme Fonksiyonu
     const handleSave = async () => {
         setIsSaving(true);
@@ -114,7 +143,10 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
                     linkedin: editableUser.socialLinks?.linkedin || "",
                     twitter: editableUser.socialLinks?.twitter || "",
                     personalWebsite: editableUser.socialLinks?.personalWebsite || ""
-                }
+                },
+                ...(isAcademician && {
+                    researchInterests: editableUser.researchInterests || [],
+                }),
             });
             toast.success("Profil başarıyla güncellendi!");
             setOpen(false);
@@ -303,7 +335,10 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
 
                             {/* Gelişim Alanları */}
                             <div className="grid grid-cols-4 items-start gap-4">
-                                <Label className="text-right pt-2">Gelişim Alanları</Label>
+                                <div className="text-left pt-2 space-y-1">
+                                    <Label>Gelişim Alanları</Label>
+                                    <p className="text-[10px] text-muted-foreground leading-snug">Diğer kullanıcılar göremez. Yalnızca ileride hazırlanacak eğitim önerileri için kullanılır.</p>
+                                </div>
                                 <div className="col-span-3 bg-secondary/20 p-3 rounded-md border border-input min-h-20 focus-within:ring-1 focus-within:ring-ring transition-all">
                                     <div className="flex flex-wrap gap-2 mb-2">
                                         <AnimatePresence>
@@ -340,6 +375,48 @@ export const ProfileEditModal = ({ children, user }: ProfileEditModalProps) => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Araştırma İlgileri — Yalnızca Akademisyenler */}
+                            {isAcademician && (
+                                <div className="grid grid-cols-4 items-start gap-4">
+                                    <Label className="text-right pt-2">Uzmanlık alanlarım</Label>
+                                    <div className="col-span-3 bg-secondary/20 p-3 rounded-md border border-input min-h-20 focus-within:ring-1 focus-within:ring-ring transition-all">
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            <AnimatePresence>
+                                                {(editableUser.researchInterests || []).map((item) => (
+                                                    <motion.div key={item} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
+                                                        <Badge variant="indigo" className="pl-2 pr-1 py-1 gap-1 hover:opacity-80 pointer-events-auto">
+                                                            {item}
+                                                            <div className="ml-1 cursor-pointer" onClick={() => removeResearch(item)}>
+                                                                <X className="w-3 h-3 hover:text-destructive transition-colors" />
+                                                            </div>
+                                                        </Badge>
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-auto flex-1"
+                                                placeholder="ör. Makine Öğrenmesi, Bilgisayarlı Görü..."
+                                                value={researchInput}
+                                                onChange={(e) => setResearchInput(e.target.value)}
+                                                onKeyDown={addResearchOnEnter}
+                                            />
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-8 px-3 rounded-md"
+                                                onClick={handleAddResearch}
+                                                disabled={!researchInput.trim()}
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Visible to Companies */}
                             <div className="grid grid-cols-4 items-center gap-4">

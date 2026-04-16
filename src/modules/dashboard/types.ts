@@ -39,6 +39,7 @@ export interface UserProfile extends SimpleUser {
     experiences: Experience[];
     competitions: Competition[];
     certificates?: string[];
+    researchInterests?: string[];
 }
 
 export interface ProjectPosition {

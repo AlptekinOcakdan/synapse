@@ -286,6 +286,7 @@ export const getViewerProfile = query({
             activeProjectCount: activeProjectCount,
 
             certificates: user.certificates || [],
+            researchInterests: user.academicData?.researchInterests || [],
         } as UserProfile;
     },
 });
@@ -306,7 +307,8 @@ export const updateProfile = mutation({
             linkedin: v.optional(v.string()),
             twitter: v.optional(v.string()),
             personalWebsite: v.optional(v.string()),
-        })
+        }),
+        researchInterests: v.optional(v.array(v.string())),
     },
     handler: async (ctx, args) => {
         // 1. ctx.auth KULLANILMIYOR (Custom Auth'ta token yok)
@@ -325,7 +327,7 @@ export const updateProfile = mutation({
         const firstName = nameParts.join(" ");
 
         // 4. Güncelleme
-        await ctx.db.patch(user._id, {
+        const updateData: Partial<Doc<"users">> = {
             firstName: firstName || user.firstName,
             lastName: lastName || user.lastName,
             title: args.title,
@@ -335,8 +337,21 @@ export const updateProfile = mutation({
             improvementAreas: args.improvementAreas,
             isCompanyVisible: args.isCompanyVisible,
             avatar: args.avatar || user.avatar,
-            socialLinks: args.socialLinks
-        });
+            socialLinks: args.socialLinks,
+        };
+
+        // Akademisyen rolü için araştırma ilgilerini güncelle
+        if (args.researchInterests !== undefined) {
+            updateData.academicData = {
+                office: user.academicData?.office,
+                researchInterests: args.researchInterests,
+                publicationsCount: user.academicData?.publicationsCount ?? 0,
+                citationCount: user.academicData?.citationCount ?? 0,
+                isAvailableForMentorship: user.academicData?.isAvailableForMentorship ?? false,
+            };
+        }
+
+        await ctx.db.patch(user._id, updateData);
 
         return { success: true };
     },
