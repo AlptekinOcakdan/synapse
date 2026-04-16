@@ -34,7 +34,7 @@ export const useFileUpload = () => {
 
             return fileUrl; // Dosyanın kalıcı linki
         } catch (error) {
-            toast.error((error as Error).message || "Dosya yüklenirken bir hata oluştu");
+            toast.error("Dosya yüklenirken bir hata oluştu");
             return null;
         } finally {
             setIsUploading(false);

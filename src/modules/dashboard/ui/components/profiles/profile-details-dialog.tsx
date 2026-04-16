@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { UserProfile } from "../../../types";
 import { Competition, Experience } from "@/modules/auth/types";
-import { LayoutProps } from "@/lib/utils";
+import React from "react";
 import { ProjectStatusBadge } from "@/modules/dashboard/ui/components/profiles/project-status-badge";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
@@ -32,11 +32,14 @@ import { useSession } from "@/providers/session-provider";
 import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
 
-interface ProfileDetailsDialogProps extends LayoutProps {
+interface ProfileDetailsDialogProps {
     profile: UserProfile;
+    children?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialogProps) => {
+export const ProfileDetailsDialog = ({ profile, children, open, onOpenChange }: ProfileDetailsDialogProps) => {
     const router = useRouter();
     const departments = useQuery(api.departments.get);
     const userProjects = useQuery(
@@ -87,10 +90,12 @@ export const ProfileDetailsDialog = ({ profile, children }: ProfileDetailsDialog
     const competitions: Competition[] = profile.competitions || [];
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            {children && (
+                <DialogTrigger asChild>
+                    {children}
+                </DialogTrigger>
+            )}
 
             <DialogContent className="max-w-3xl max-h-[90dvh] p-0 overflow-hidden flex flex-col gap-0">
                 <div className="relative bg-linear-to-r from-primary/10 via-primary/5 to-background p-6 pb-8">

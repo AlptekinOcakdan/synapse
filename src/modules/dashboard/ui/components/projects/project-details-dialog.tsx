@@ -27,9 +27,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Project } from "../../../types";
 import { formatDate } from "@/lib/utils";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { ProfileDetailsDialog } from "@/modules/dashboard/ui/components/profiles/profile-details-dialog";
 
 interface ProjectDetailsDialogProps {
     project: Project;
@@ -40,6 +42,23 @@ interface ProjectDetailsDialogProps {
 
 export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: ProjectDetailsDialogProps) => {
     const departments = useQuery(api.departments.get);
+    const [selectedUserId, setSelectedUserId] = useState<Id<"users"> | null>(null);
+    const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+
+    const selectedProfile = useQuery(
+        api.users.getViewerProfile,
+        selectedUserId ? { userId: selectedUserId } : "skip"
+    );
+
+    const handleUserClick = (userId: Id<"users">) => {
+        setSelectedUserId(userId);
+        setProfileDialogOpen(true);
+    };
+
+    const handleProfileDialogClose = (isOpen: boolean) => {
+        setProfileDialogOpen(isOpen);
+        if (!isOpen) setSelectedUserId(null);
+    };
 
     // Bölüm label'ını bulmak için yardımcı fonksiyon
     const getDeptLabel = (val: string) => {
@@ -54,6 +73,7 @@ export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: 
     };
 
     return (
+        <>
         <Dialog open={open} onOpenChange={onOpenChange}>
             {children && <DialogTrigger asChild>
                 {children}
@@ -91,7 +111,10 @@ export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: 
                         </div>
 
                         {/* Proje Sahibi (Mini Profil) */}
-                        <div className="flex items-center gap-3 pt-2">
+                        <div
+                            className="flex items-center gap-3 pt-2 cursor-pointer w-fit"
+                            onClick={() => handleUserClick(project.owner.id)}
+                        >
                             <Avatar className="h-10 w-10 border-2 border-background shadow-sm">
                                 <AvatarImage src={project.owner.avatar} />
                                 <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
@@ -99,7 +122,7 @@ export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: 
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                                <span className="text-sm font-semibold leading-none">{project.owner.name}</span>
+                                <span className="text-sm font-semibold leading-none hover:text-primary transition-colors">{project.owner.name}</span>
                                 <span className="text-xs text-muted-foreground mt-1">Proje Yöneticisi</span>
                             </div>
                         </div>
@@ -162,13 +185,17 @@ export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: 
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {project.participants.map((user) => (
-                                            <div key={user.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border">
+                                            <div
+                                                key={user.id}
+                                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border cursor-pointer"
+                                                onClick={() => handleUserClick(user.id)}
+                                            >
                                                 <Avatar className="h-9 w-9">
                                                     <AvatarImage src={user.avatar} />
                                                     <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="overflow-hidden">
-                                                    <p className="text-sm font-medium truncate">{user.name}</p>
+                                                    <p className="text-sm font-medium truncate hover:text-primary transition-colors">{user.name}</p>
                                                     <p className="text-xs text-muted-foreground truncate">{getDeptLabel(user.department)}</p>
                                                 </div>
                                             </div>
@@ -238,5 +265,14 @@ export const ProjectDetailsDialog = ({ project, children, open, onOpenChange }: 
 
             </DialogContent>
         </Dialog>
+
+        {selectedProfile && (
+            <ProfileDetailsDialog
+                profile={selectedProfile}
+                open={profileDialogOpen}
+                onOpenChange={handleProfileDialogClose}
+            />
+        )}
+        </>
     );
 };
