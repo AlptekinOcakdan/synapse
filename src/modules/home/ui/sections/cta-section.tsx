@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const CTASection = () => {
     return (
         <section className="py-20 md:py-32">
@@ -13,9 +15,9 @@ export const CTASection = () => {
                             Hemen profilini oluştur, SYNAPSE&apos;a katıl ve hayalindeki projeyi gerçeğe dönüştürmek için ilk adımı at.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button className="px-8 py-4 bg-white text-violet-900 rounded-full font-bold hover:bg-violet-50 transition-all shadow-xl shadow-violet-900/20">
+                            <Link href="/sign-up" className="px-8 py-4 bg-white text-violet-900 rounded-full font-bold hover:bg-violet-50 transition-all shadow-xl shadow-violet-900/20">
                                 Hemen Kayıt Ol
-                            </button>
+                            </Link>
                             <button className="px-8 py-4 bg-transparent border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-all">
                                 Daha Fazla Bilgi
                             </button>

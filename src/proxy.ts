@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { decrypt } from "@/lib/session";
 
-const protectedRoutes = ["/dashboard", "/profile", "/projects", "/academician"];
+const protectedRoutes = ["/dashboard", "/profile", "/projects", "/academician", "/admin"];
 
 const publicRoutes = ["/sign-in", "/sign-up", "/"];
 
@@ -25,6 +25,12 @@ export default async function proxy(req: NextRequest) {
 
     if (path.startsWith("/academician")) {
         if (session?.role !== "academician" && session?.role !== "admin") {
+            return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+        }
+    }
+
+    if (path.startsWith("/admin")) {
+        if (session?.role !== "admin") {
             return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
         }
     }

@@ -146,7 +146,7 @@ export const SignUpView = () => {
             </div>
 
             <p className="mt-6 text-sm text-muted-foreground">
-                Zaten hesabın var mı? <a href="#" className="text-primary hover:underline">Giriş Yap</a>
+                Zaten hesabın var mı? <a href="/sign-in" className="text-primary hover:underline">Giriş Yap</a>
             </p>
         </div>
     );

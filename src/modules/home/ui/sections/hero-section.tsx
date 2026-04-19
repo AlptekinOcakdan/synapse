@@ -1,5 +1,6 @@
 import {Search} from "lucide-react";
 import {Button} from "@/components/ui/button";
+import Link from "next/link";
 
 export const HeroSection = () => {
     return (
@@ -14,7 +15,7 @@ export const HeroSection = () => {
                             className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </span>
-                    AYBU Öğrencileri İçin Yayında
+                    AÜ Öğrencileri İçin Yayında
                 </div>
 
                 {/* Ana Başlık */}
@@ -44,7 +45,7 @@ export const HeroSection = () => {
                     Dönüştürün.
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-                    Synapse, AYBU öğrencilerinin proje fikirlerini paylaştığı, takım
+                    Synapse, AÜ öğrencilerinin proje fikirlerini paylaştığı, takım
                     arkadaşları bulduğu ve sektörle buluştuğu yeni nesil işbirliği
                     platformudur.
                 </p>
@@ -52,12 +53,17 @@ export const HeroSection = () => {
                     <Button
                         size="lg"
                         className="rounded-full bg-foreground text-background hover:bg-foreground/90 font-bold"
+                        asChild
                     >
-                        <Search className="w-5 h-5 mr-2"/>
-                        Projeleri Keşfet
+                        <Link href="/sign-up">
+                            <Search className="w-5 h-5 mr-2"/>
+                            Projeleri Keşfet
+                        </Link>
                     </Button>
-                    <Button variant="ghost" size="lg" className="rounded-full">
-                        Proje Fikri Ekle
+                    <Button variant="ghost" size="lg" className="rounded-full" asChild>
+                        <Link href="/sign-up">
+                            Proje Fikri Ekle
+                        </Link>
                     </Button>
                 </div>
 

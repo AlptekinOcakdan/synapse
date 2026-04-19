@@ -7,6 +7,7 @@ import Link from "next/link";
 import {Separator} from "@/components/ui/separator";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Menu} from "lucide-react";
+import {AuthButton} from "@/modules/auth/ui/components/auth-button";
 
 export const AcademicianNavigationBar = () => {
     const pathname = usePathname();
@@ -33,9 +34,12 @@ export const AcademicianNavigationBar = () => {
                                     </Link>
                                 </Button>
                             ))}
-                            <Separator orientation="vertical" className="h-6 w-px hidden lg:block"/>
+                                <Separator orientation="vertical" className="h-6 w-px hidden lg:block"/>
+                            <Button variant="outline" size="sm" asChild>
+                                <Link href="/dashboard">Proje Pazarı</Link>
+                            </Button>
                         </div>
-                        {/*<AuthButton/>*/}
+                        <AuthButton/>
                         <div className="md:hidden flex items-center ml-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

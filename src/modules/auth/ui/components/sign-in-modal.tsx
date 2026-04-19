@@ -169,9 +169,15 @@ export const SignInModal = ({ isOpen, onClose }: AuthModalProps) => {
                     )}
                 </div>
 
-                <div className="bg-secondary/30 p-4 text-center border-t border-border">
+                <div className="bg-secondary/30 p-4 text-center border-t border-border space-y-2">
                     <p className="text-xs text-muted-foreground">
                         Synapse&apos;a giriş yaparak <span className="underline cursor-pointer hover:text-foreground">Kullanım Koşulları</span>&apos;nı kabul etmiş olursunuz.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        Hesabın yok mu?{" "}
+                        <a href="/sign-up" className="text-primary hover:underline font-medium">
+                            Kayıt Ol
+                        </a>
                     </p>
                 </div>
             </DialogContent>

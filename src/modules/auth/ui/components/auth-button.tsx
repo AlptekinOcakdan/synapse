@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { LogOut, User, Settings, Loader2, LogIn } from "lucide-react";
+import {LogOut, User, Settings, Loader2, LogIn, LayoutDashboard, GraduationCap, Crown} from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -46,7 +46,7 @@ export const AuthButton = () => {
     // A. Giriş Yapmamışsa (Login Butonu Göster veya Null Dön)
     if (!isAuthenticated) {
         return (
-            <Button variant="default" size="sm" onClick={() => /* Login Modalını Aç */ {}}>
+            <Button variant="default" size="sm" onClick={() => router.push("/sign-in")}>
                 <LogIn className="w-4 h-4 mr-2" /> Giriş Yap
             </Button>
         );
@@ -98,6 +98,22 @@ export const AuthButton = () => {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Sorularım</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard")} className="cursor-pointer">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Proje Pazarı</span>
+                </DropdownMenuItem>
+                {(user.role === "academician" || user.role === "admin") && (
+                    <DropdownMenuItem onClick={() => router.push("/academician")} className="cursor-pointer">
+                        <GraduationCap className="mr-2 h-4 w-4" />
+                        <span>Akademisyen Paneli</span>
+                    </DropdownMenuItem>
+                )}
+                {(user.role === "admin") && (
+                    <DropdownMenuItem onClick={() => router.push("/admin")} className="cursor-pointer">
+                        <Crown className="mr-2 h-4 w-4" />
+                        <span>Admin Paneli</span>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     onClick={handleLogout}

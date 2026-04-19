@@ -1,26 +1,12 @@
-import { LayoutProps } from "@/lib/utils";
-import { SynapseLogo } from "@/components/synapse-logo";
-import { getSession } from "@/lib/session";
-import { redirect } from "next/navigation";
+import {LayoutProps} from "@/lib/utils";
+import {AdminLayout} from "@/modules/admin/ui/layouts/admin-layout";
 
-const AdminLayout = async ({ children }: LayoutProps) => {
-    const session = await getSession();
-
-    if (!session || session.role !== "admin") {
-        redirect("/dashboard");
-    }
-
+const Layout = ({children}: LayoutProps) => {
     return (
-        <div className="min-h-screen bg-background">
-            <header className="h-16 border-b border-border flex items-center px-6">
-                <SynapseLogo />
-                <span className="ml-4 text-sm text-muted-foreground font-medium">Yönetim Paneli</span>
-            </header>
-            <main className="p-6">
-                {children}
-            </main>
-        </div>
+        <AdminLayout>
+            {children}
+        </AdminLayout>
     );
 };
 
-export default AdminLayout;
+export default Layout;
