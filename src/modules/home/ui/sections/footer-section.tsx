@@ -8,7 +8,7 @@ export const Footer = () => {
                 <div className="flex flex-col md:flex-row justify-center gap-12 mb-12">
                     <div className="flex items-center gap-6 mb-4">
                         <div className="h-12 w-auto flex items-center">
-                            <Image src="/ankara-logo.png" width={125} height={125} quality={100} alt="AYBU Logo" className="object-contain" />
+                            <Image src="/aybu-logo.png" width={125} height={125} quality={100} alt="AYBU Logo" className="object-contain" />
                         </div>
                         <Separator
                             orientation="vertical"
