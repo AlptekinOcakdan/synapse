@@ -1,30 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Synapse
 
-## Getting Started
+Akademik proje pazaryeri. Öğrencilerin proje oluşturduğu ve katıldığı, akademisyenlerin danışmanlık yaptığı bir platform.
 
-First, run the development server:
+## Özellikler
+
+- **Proje Yönetimi** — Proje oluşturma, başvurma, kabul/red ve üye yönetimi
+- **Gerçek Zamanlı Sohbet** — Kullanıcılar arası anlık mesajlaşma
+- **Akademisyen Postası** — Öğrenci↔akademisyen arası kalıcı mail sistemi
+- **Academy** — Etkinlik ve duyuru takibi
+- **Rozet Sistemi** — Kullanıcı başarı ve tanınma kayıtları
+- **Profil Sayfaları** — Deneyim, sertifika, yetenek ve proje geçmişi
+- **OTP Kimlik Doğrulama** — E-posta tabanlı tek kullanımlık şifre ile giriş
+
+## Teknoloji Yığını
+
+| Katman | Teknoloji |
+|--------|-----------|
+| Frontend | Next.js 15 (App Router) · React 19 · TypeScript |
+| Backend | Convex (gerçek zamanlı veritabanı, sorgular, mutasyonlar) |
+| Stil | Tailwind CSS v4 · Radix UI |
+| Durum Yönetimi | Zustand · React Query |
+| Dosya Depolama | AWS S3 (presigned URL) |
+| E-posta | Resend / Nodemailer (SMTP) |
+| Oturum | Jose (JWT HS256, 7 günlük) |
+
+## Kurulum
+
+**Gereksinimler:** [Bun](https://bun.sh), [Convex](https://convex.dev) hesabı, AWS S3 bucket
 
 ```bash
+bun install
+bunx convex dev
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Uygulama `http://localhost:3000` adresinde çalışır.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Ortam Değişkenleri
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.local` dosyasına aşağıdaki değişkenleri ekleyin:
 
-## Learn More
+```env
+CONVEX_DEPLOYMENT=
+NEXT_PUBLIC_CONVEX_URL=
+SESSION_SECRET=
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+AWS_REGION=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_BUCKET_NAME=
+RESEND_API_KEY=
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Komutlar
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+bun run dev          # Geliştirme sunucusu (localhost:3000)
+bun run dev:all      # Next.js + ngrok webhook tüneli
+bun run dev:webhook  # Yalnızca ngrok tüneli
+bun run build        # Production build
+bun run start        # Production sunucusu
+bun run lint         # ESLint kontrolü
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Proje Yapısı
 
-## Deploy on Vercel
+```
+src/
+  app/              # Next.js App Router sayfaları
+    (auth)/         # Giriş / kayıt akışları
+    (public)/       # Genel sayfalar (ana sayfa, hakkında)
+    dashboard/      # Öğrenci paneli
+    academician/    # Akademisyen paneli
+    admin/          # Yönetici paneli
+    profile/        # Kullanıcı profil sayfaları
+  modules/          # Özellik modülleri (types + ui/ içerir)
+  components/ui/    # Radix tabanlı paylaşımlı UI bileşenleri
+  providers/        # ConvexClientProvider, SessionProvider
+  lib/              # Yardımcı fonksiyonlar (session, aws, utils)
+  actions/          # Server actions (createSession, deleteSession)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+convex/             # Backend: şema, sorgular, mutasyonlar, webhook'lar
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Kimlik Doğrulama Akışı
+
+1. Kullanıcı e-posta gönderir — Convex 6 haneli OTP üretir ve iletir
+2. OTP doğrulanır — Profil tamamlama adımı
+3. Profil fotoğrafı S3'e presigned URL ile doğrudan yüklenir
+4. Kullanıcı Convex'te oluşturulur; JWT httpOnly cookie olarak saklanır (7 gün)
+5. `useSession()` hook'u ile `userId` / `isAuthenticated` erişimi sağlanır
+6. Giriş sonrası: öğrenciler `/dashboard`, akademisyenler `/academician` yönlendirilir
+
+## Paket Yöneticisi
+
+Bu proje **Bun** kullanır. `npm` veya `yarn` kullanmayın.
