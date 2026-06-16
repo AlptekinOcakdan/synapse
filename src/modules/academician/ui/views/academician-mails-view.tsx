@@ -100,7 +100,7 @@ export const AcademicianMailsView = ({userId}: AcademicianMailsViewProps) => {
             )}
 
             {/* --- DESKTOP SIDEBAR --- */}
-            <div className="hidden md:block w-80 lg:w-96 shrink-0 h-full">
+            <div className="hidden md:block w-64 lg:w-80 xl:w-96 shrink-0 h-full">
                 <AcademicianMailSidebar
                     mails={threads as AcademicianMailThread[]}
                     selectedMailId={selectedMail?.id || null}

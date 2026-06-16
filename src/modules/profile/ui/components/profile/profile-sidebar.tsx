@@ -46,7 +46,7 @@ export const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
 
                 {/* Durum Rozeti */}
                 {user.isAvailable && (
-                    <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-200 py-1 px-4">
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 py-1 px-4">
                         Projeye Açık
                     </Badge>
                 )}

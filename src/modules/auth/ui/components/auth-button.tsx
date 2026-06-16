@@ -18,6 +18,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { logoutAction } from "@/actions/auth";
 import {useSession} from "@/providers/session-provider";
+import { getInitials } from "@/lib/utils";
 
 // Artık Props Yok!
 export const AuthButton = () => {
@@ -28,13 +29,6 @@ export const AuthButton = () => {
 
     // 2. Convex'ten Veriyi Çek (Eğer ID varsa sorgu çalışır, yoksa "skip")
     const user = useQuery(api.users.getBasicUser, userId ? { userId } : "skip");
-
-    const getInitials = (name: string) => {
-        if (!name) return "SY";
-        const parts = name.trim().split(" ");
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    };
 
     const handleLogout = async () => {
         await logoutAction();
@@ -117,7 +111,7 @@ export const AuthButton = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50"
+                    className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
                 >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Çıkış Yap</span>

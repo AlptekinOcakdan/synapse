@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Menu, Loader2 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
@@ -24,7 +24,6 @@ export const ChatsView = () => {
     const router = useRouter();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [selectedChatId, setSelectedChatId] = useState<Id<"conversations"> | null>(null);
 
     // URL'den Chat ID'yi al
     const currentChatId = searchParams.get("chatId") as Id<"conversations"> | null;
@@ -41,23 +40,17 @@ export const ChatsView = () => {
 
     useEffect(() => {
         const chatIdFromUrl = searchParams.get("chatId");
+        if (!conversations) return;
         if (chatIdFromUrl) {
-            const chatExists = conversations?.some(c => c.id === chatIdFromUrl);
-            if (chatExists) {
-                setSelectedChatId(chatIdFromUrl as Id<"conversations">);
-            } else {
-                // URL'deki sohbet listede yoksa URL'yi temizle
+            if (!conversations.some(c => c.id === chatIdFromUrl)) {
                 router.replace("/dashboard/chats", { scroll: false });
             }
-        } else if (conversations && conversations.length > 0 && !selectedChatId) {
-            // URL'de ID yoksa ve bir sohbet seçilmemişse ilk sohbeti seç
-            setSelectedChatId(conversations[0].id);
+        } else if (conversations.length > 0) {
+            router.push(`/dashboard/chats?chatId=${conversations[0].id}`, { scroll: false });
         }
-    }, [searchParams, conversations, router, selectedChatId]);
+    }, [searchParams, conversations, router]);
 
     const handleSelectChat = (chatId: Id<"conversations">) => {
-        setSelectedChatId(chatId);
-        // URL'yi güncelle ama sayfayı yeniden yükleme
         router.push(`/dashboard/chats?chatId=${chatId}`, { scroll: false });
         setIsMobileMenuOpen(false);
     };
@@ -74,7 +67,7 @@ export const ChatsView = () => {
     return (
         <div className="h-[calc(100dvh-5rem)] w-full flex overflow-hidden bg-background">
             {/* DESKTOP SIDEBAR */}
-            <div className="hidden md:block w-80 lg:w-96 shrink-0 h-full">
+            <div className="hidden md:block w-64 lg:w-80 xl:w-96 shrink-0 h-full">
                 <ChatSidebar
                     chats={conversations || []} // Convex verisi
                     selectedChatId={currentChatId}

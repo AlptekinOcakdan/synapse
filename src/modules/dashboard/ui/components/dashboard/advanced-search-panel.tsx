@@ -78,7 +78,7 @@ export const AdvancedSearchPanel = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                 >
-                    <div className="w-full bg-muted/30 border rounded-lg p-4 md:p-6 flex flex-col md:flex-row gap-6 justify-around">
+                    <div className="w-full bg-muted/30 border rounded-lg p-4 md:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-around">
 
                         {/* BÖLÜM SEÇİMİ */}
                         <div className="space-y-2 flex flex-col w-full">
@@ -177,7 +177,7 @@ export const AdvancedSearchPanel = ({
                                 {/* Input ve Ekle Butonu */}
                                 <div className="flex items-center gap-2 w-full">
                                     <Input
-                                        className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-8 placeholder:text-muted-foreground/50 text-sm flex-1 min-w-30"
+                                        className="bg-transparent border-none shadow-none focus-visible:ring-0 px-0 h-8 placeholder:text-muted-foreground/50 text-sm flex-1 min-w-[6rem] sm:min-w-[7.5rem]"
                                         placeholder="Yetenek yaz..."
                                         value={skillInput}
                                         onChange={(e) => setSkillInput(e.target.value)}

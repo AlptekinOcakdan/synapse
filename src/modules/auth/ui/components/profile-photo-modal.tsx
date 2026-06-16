@@ -224,7 +224,7 @@ export const ProfilePhotoDialog = ({ isOpen, onClose, onSave, currentImage }: Pr
                                     <button
                                         onClick={handleRemove}
                                         type="button"
-                                        className="absolute top-0 right-0 bg-destructive text-white p-1.5 rounded-full shadow-md hover:bg-destructive/90 transition-colors z-10"
+                                        className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-1.5 rounded-full shadow-md hover:bg-destructive/90 transition-colors z-10"
                                     >
                                         <X className="w-4 h-4" />
                                     </button>

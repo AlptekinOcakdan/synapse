@@ -73,7 +73,7 @@ export const AdvisorProjectsView = ({userId}: AdvisorProjectsViewProps) => {
     return (
         <div className="space-y-8 max-w-full px-4 py-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">
+                <h1 className="text-3xl font-bold tracking-tight text-primary">
                     Akademik Danışmanlık
                 </h1>
                 <p className="text-muted-foreground mt-2 max-w-3xl">
@@ -126,7 +126,7 @@ export const AdvisorProjectsView = ({userId}: AdvisorProjectsViewProps) => {
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
-                        <div className="bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-lg text-sm text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800">
+                        <div className="bg-primary/10 p-4 rounded-lg text-sm text-primary border border-primary/20">
                             Proje sahibine bildirim gönderilecektir.
                         </div>
 
@@ -146,7 +146,7 @@ export const AdvisorProjectsView = ({userId}: AdvisorProjectsViewProps) => {
                         </Button>
                         <Button
                             onClick={handleConfirmMentorship}
-                            className="bg-indigo-600 hover:bg-indigo-700"
+                            className=""
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

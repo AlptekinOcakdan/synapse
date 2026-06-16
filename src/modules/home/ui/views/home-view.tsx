@@ -8,7 +8,7 @@ import {Footer} from "@/modules/home/ui/sections/footer-section";
 
 export const HomeView = () => {
     return (
-        <div className="min-h-dvh bg-slate-950 text-slate-200 font-sans selection:bg-violet-500/30 selection:text-violet-200 overflow-x-hidden">
+        <div className="min-h-dvh bg-background text-foreground font-sans overflow-x-hidden">
             <BackgroundEffects />
             <HomeNavigationBar />
 

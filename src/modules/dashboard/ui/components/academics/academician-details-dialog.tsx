@@ -26,9 +26,9 @@ import {
     ExternalLink
 } from "lucide-react";
 import { Academician } from "@/modules/dashboard/types";
-// İletişim Dialog'unu ekledik
 import { AcademicianContactDialog } from "./academician-contact-dialog";
 import {Id} from "@/convex/_generated/dataModel";
+import { getInitials } from "@/lib/utils";
 
 interface AcademicianDetailsDialogProps {
     academician: Academician;
@@ -40,12 +40,6 @@ export const AcademicianDetailsDialog = ({ academician, children, userId }: Acad
 
     // Veritabanından gelen bölüm ismini kullanıyoruz
     const deptLabel = academician.department || "Bölüm Belirtilmemiş";
-
-    const getInitials = (name: string) => {
-        const parts = name.split(" ");
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    };
 
     return (
         <Dialog>
@@ -67,7 +61,7 @@ export const AcademicianDetailsDialog = ({ academician, children, userId }: Acad
                 <div className="relative bg-linear-to-r from-primary/20 via-primary/10 to-background h-32 w-full shrink-0">
                     <div className="absolute top-4 right-4">
                         {academician.isAvailableForMentorship ? (
-                            <Badge className="bg-green-500/90 hover:bg-green-600 text-white border-none gap-1.5 py-1.5 px-3">
+                            <Badge className="bg-success/90 hover:bg-success/80 text-success-foreground border-none gap-1.5 py-1.5 px-3">
                                 <CheckCircle2 className="w-3.5 h-3.5" /> Mentörlüğe Açık
                             </Badge>
                         ) : (
@@ -111,12 +105,12 @@ export const AcademicianDetailsDialog = ({ academician, children, userId }: Acad
                                 <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Yayın</span>
                             </div>
                             <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-muted/30 border border-border/50 text-center space-y-1 hover:bg-muted/50 transition-colors">
-                                <Quote className="w-5 h-5 text-indigo-500 mb-1" />
+                                <Quote className="w-5 h-5 text-primary mb-1" />
                                 <span className="text-2xl font-bold">{academician.citationCount}</span>
                                 <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Atıf</span>
                             </div>
                             <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-muted/30 border border-border/50 text-center space-y-1 hover:bg-muted/50 transition-colors">
-                                <Users className="w-5 h-5 text-green-600 mb-1" />
+                                <Users className="w-5 h-5 text-success mb-1" />
                                 <span className="text-2xl font-bold">{academician.mentoredProjects}</span>
                                 <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Proje</span>
                             </div>

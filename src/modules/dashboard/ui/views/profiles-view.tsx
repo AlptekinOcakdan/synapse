@@ -6,11 +6,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ProfileCard } from "../components/profiles/profile-card";
 import { ProfileFilterBar } from "../components/profiles/profile-filter-bar";
+import { EmptyState } from "../components/shared/empty-state";
 
 // --- CONVEX IMPORTS ---
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Department } from "@/modules/dashboard/types";
 
 const ITEMS_PER_PAGE = 8; // Sayfa başına profil sayısı
 
@@ -70,34 +70,26 @@ export const ProfilesView = () => {
             ) : (
                 <>
                     {/* --- GRID LAYOUT --- */}
-                    <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
                         {profiles.length > 0 ? (
                             profiles.map((profile) => (
                                 <ProfileCard key={profile.id} profile={profile} departments={departments} />
                             ))
                         ) : (
-                            // SONUÇ BULUNAMADI EKRANI
-                            <div className="col-span-full py-20 text-center space-y-4 bg-muted/10 rounded-xl border border-dashed">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
-                                    <Search className="w-8 h-8 text-muted-foreground" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-medium">Sonuç Bulunamadı</h3>
-                                    <p className="text-muted-foreground max-w-md mx-auto">
-                                        Aradığınız kriterlere uygun bir profil bulamadık.
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => {
-                                        setSearchQuery("");
-                                        setSelectedDepartments([]);
-                                        setSelectedSkills([]);
-                                    }}
-                                    className="text-primary font-medium hover:underline"
-                                >
-                                    Filtreleri Temizle
-                                </button>
-                            </div>
+                            <EmptyState
+                                className="col-span-full"
+                                icon={<Search className="w-8 h-8 text-muted-foreground" />}
+                                title="Sonuç Bulunamadı"
+                                description="Aradığınız kriterlere uygun bir profil bulamadık."
+                                action={
+                                    <button
+                                        onClick={() => { setSearchQuery(""); setSelectedDepartments([]); setSelectedSkills([]); }}
+                                        className="text-primary font-medium hover:underline"
+                                    >
+                                        Filtreleri Temizle
+                                    </button>
+                                }
+                            />
                         )}
                     </div>
 

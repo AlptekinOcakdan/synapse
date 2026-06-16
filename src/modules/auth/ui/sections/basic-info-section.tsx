@@ -27,7 +27,7 @@ export const BasicInfoSection = ({ data, updateData, onSubmit, isLoading }: Basi
                 <p className="text-muted-foreground">Synapse topluluğuna katılmak için temel bilgilerini gir.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="firstName">Ad</Label>
                     <Input

@@ -65,7 +65,7 @@ export const AcademicianMailSidebar = ({ mails, selectedMailId, onSelectMail }: 
                         {mail.subject}
                     </span>
                     {mail.isUnread && (
-                        <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                        <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
                     )}
                 </div>
 

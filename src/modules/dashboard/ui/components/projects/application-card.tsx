@@ -14,7 +14,8 @@ import { Check, MessageSquare, User, X } from "lucide-react";
 import { ProfileDetailsDialog } from "../profiles/profile-details-dialog";
 // Importları kontrol et (yolun doğru olduğundan emin ol)
 import type {Project, UserProfile} from "@/modules/dashboard/types";
-import { Experience, Competition } from "@/modules/auth/types"; // Bu tiplerin import edildiği yer
+import { Experience, Competition } from "@/modules/auth/types";
+import { getInitials } from "@/lib/utils";
 
 export type ApplicationWithUser = Doc<"applications"> & { user: Doc<"users"> };
 
@@ -96,12 +97,6 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
         }
     };
 
-    const getInitials = (name: string) => {
-        const parts = name.split(" ");
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    };
-
     return (
         <Card>
             <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -147,7 +142,7 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-red-500 hover:text-red-600"
+                                className="text-destructive hover:text-destructive/80"
                                 onClick={handleReject}
                             >
                                 <X className="h-5 w-5" />
@@ -155,7 +150,7 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-green-500 hover:text-green-600"
+                                className="text-success hover:text-success/80"
                                 onClick={handleApprove}
                             >
                                 <Check className="h-5 w-5" />
@@ -164,7 +159,7 @@ export const ApplicationCard = ({ application, project }: ApplicationCardProps) 
                     )}
 
                     {application.status === "accepted" && (
-                        <Badge className="bg-green-500/10 text-green-700">Onaylandı</Badge>
+                        <Badge className="bg-success/10 text-success">Onaylandı</Badge>
                     )}
                     {application.status === "rejected" && (
                         <Badge variant="destructive">Reddedildi</Badge>

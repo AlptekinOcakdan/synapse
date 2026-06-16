@@ -67,7 +67,7 @@ export const ProjectCard = ({ project, userId }: ProjectCardProps) => {
                                 </span>
                                 {/* Eğer katılımcıysa rozet göster */}
                                 {isParticipant && !isOwner && (
-                                    <Badge variant="outline" className="text-xs border-green-500 text-green-600 bg-green-500/10">
+                                    <Badge variant="outline" className="text-xs border-success text-success bg-success/10">
                                         Katılımcısın
                                     </Badge>
                                 )}

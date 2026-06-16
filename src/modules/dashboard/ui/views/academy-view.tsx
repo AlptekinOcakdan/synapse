@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AcademyEventCard } from "../components/academy/academy-event-card";
+import { EmptyState } from "../components/shared/empty-state";
 import { LayoutGrid, ListVideo, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -47,7 +48,7 @@ export const AcademyView = ({userId}: AcademyViewProps) => {
             {/* Tabs */}
             <Tabs defaultValue="planned" className="w-full">
                 <div className="flex items-center justify-between mb-6">
-                    <TabsList className="grid w-full max-w-100 grid-cols-2">
+                    <TabsList className="grid w-full max-w-sm grid-cols-2">
                         <TabsTrigger value="planned" className="gap-2">
                             <LayoutGrid className="w-4 h-4" /> Planlanan Yayınlar
                         </TabsTrigger>
@@ -60,30 +61,26 @@ export const AcademyView = ({userId}: AcademyViewProps) => {
                 {/* --- TAB 1: PLANLANANLAR --- */}
                 <TabsContent value="planned" className="mt-0">
                     {planned.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {planned.map((event) => (
                                 <AcademyEventCard key={event.id} event={event} userId={userId} />
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-20 bg-muted/10 rounded-xl border border-dashed">
-                            <p className="text-muted-foreground">Şu an planlanmış bir yayın bulunmamaktadır.</p>
-                        </div>
+                        <EmptyState title="Şu an planlanmış bir yayın bulunmamaktadır." />
                     )}
                 </TabsContent>
 
                 {/* --- TAB 2: TAMAMLANANLAR --- */}
                 <TabsContent value="completed" className="mt-0">
                     {completed.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {completed.map((event) => (
                                 <AcademyEventCard key={event.id} event={event} userId={userId} />
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-20 bg-muted/10 rounded-xl border border-dashed">
-                            <p className="text-muted-foreground">Henüz tamamlanmış bir yayın bulunmamaktadır.</p>
-                        </div>
+                        <EmptyState title="Henüz tamamlanmış bir yayın bulunmamaktadır." />
                     )}
                 </TabsContent>
             </Tabs>

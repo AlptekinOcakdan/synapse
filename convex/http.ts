@@ -51,7 +51,6 @@ http.route({
         // Not: body değişkeni artık güvenli JSON objesidir.
         const toAddress = ((body.to as string[]) ?? [])[0] || (body.recipient as string);
         const fromAddress = body.from as string;
-        const subject = body.subject as string;
         const textContent = (body.text || body.html) as string;
 
         // 5. Thread ID Ayıklama

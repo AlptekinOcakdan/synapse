@@ -25,7 +25,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { ProjectFormData, ProjectStatus } from "../../../types";
-import { LayoutProps } from "@/lib/utils";
+import { LayoutProps, getDeptLabel } from "@/lib/utils";
 
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -132,10 +132,6 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
         }
     };
 
-    const getDeptLabel = (val: string) => {
-        return (departments || []).find(d => d.value === val)?.label || val;
-    };
-
     const statusOptions: { value: ProjectStatus, label: string }[] = [
         { value: "recruiting", label: "Ekip Kuruluyor" },
         { value: "ongoing", label: "Devam Ediyor" },
@@ -147,7 +143,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
 
-            <DialogContent className="max-w-2xl max-h-[85dvh] h-auto flex flex-col p-0 gap-0 font-sans">
+            <DialogContent className="w-[95vw] sm:max-w-lg md:max-w-2xl max-h-[90dvh] sm:max-h-[85dvh] h-auto flex flex-col p-0 gap-0 font-sans">
                 <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle>Yeni Proje Oluştur</DialogTitle>
                     <DialogDescription>
@@ -290,7 +286,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                         )}
                                         <div className="flex gap-2 items-center">
                                             <Input
-                                                className="border-none shadow-none focus-visible:ring-0 px-0 h-7 text-sm min-w-30"
+                                                className="border-none shadow-none focus-visible:ring-0 px-0 h-7 text-sm min-w-[6rem] sm:min-w-[7.5rem]"
                                                 placeholder="Yetenek yaz ve Enter'a bas..."
                                                 value={tempSkillInput}
                                                 onChange={(e) => setTempSkillInput(e.target.value)}
@@ -319,7 +315,7 @@ export const CreateProjectDialog = ({ children, userId, isAdvisor }: CreateProje
                                                         <GraduationCap className="w-3.5 h-3.5 text-primary" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-semibold">{getDeptLabel(pos.department)}</p>
+                                                        <p className="text-sm font-semibold">{getDeptLabel(pos.department, departments)}</p>
                                                         <p className="text-xs text-muted-foreground font-medium">{pos.count} Kişi Aranıyor</p>
                                                     </div>
                                                 </div>

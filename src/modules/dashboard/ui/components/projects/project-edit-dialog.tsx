@@ -144,7 +144,7 @@ export const ProjectEditDialog = ({ project, children, userId }: ProjectEditDial
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
 
-            <DialogContent className="w-full max-w-2xl max-h-[85dvh] h-auto flex flex-col p-0 gap-0">
+            <DialogContent className="w-[95vw] sm:max-w-lg md:max-w-2xl max-h-[90dvh] sm:max-h-[85dvh] h-auto flex flex-col p-0 gap-0">
                 <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle>Projeyi Düzenle</DialogTitle>
                     <DialogDescription>
@@ -244,7 +244,7 @@ export const ProjectEditDialog = ({ project, children, userId }: ProjectEditDial
                                             </div>
                                         )}
                                         <div className="flex gap-2 items-center">
-                                            <Input className="border-none shadow-none focus-visible:ring-0 px-0 h-7 text-sm min-w-30" placeholder="Yetenek yaz ve Enter'a bas..." value={tempSkillInput} onChange={(e) => setTempSkillInput(e.target.value)} onKeyDown={handleAddTempSkill} disabled={isSubmitting} />
+                                            <Input className="border-none shadow-none focus-visible:ring-0 px-0 h-7 text-sm min-w-[6rem] sm:min-w-[7.5rem]" placeholder="Yetenek yaz ve Enter'a bas..." value={tempSkillInput} onChange={(e) => setTempSkillInput(e.target.value)} onKeyDown={handleAddTempSkill} disabled={isSubmitting} />
                                             <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleAddTempSkill()} disabled={!tempSkillInput.trim() || isSubmitting}>
                                                 <Plus className="w-4 h-4" />
                                             </Button>

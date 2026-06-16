@@ -15,11 +15,11 @@ interface AdvisorProjectCardProps {
 export const AdvisorProjectCard = ({ project, onBecomeAdvisor }: AdvisorProjectCardProps) => {
 
     return (
-        <Card className="flex flex-col h-full border-l-4 border-l-indigo-500 hover:shadow-lg transition-all duration-300">
+        <Card className="flex flex-col h-full border-l-4 border-l-primary hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-2">
                 <div className="flex flex-col justify-between items-start gap-2">
                     <div className="space-y-1">
-                        <Badge variant="outline" className="text-indigo-500 border-indigo-200 bg-indigo-500/10 mb-2">
+                        <Badge variant="outline" className="text-primary border-primary/20 bg-primary/10 mb-2">
                             <School className="w-3 h-3 mr-1" /> Akademik Danışman Aranıyor
                         </Badge>
                         <h3 className="font-bold text-lg leading-tight">{project.title}</h3>
@@ -56,7 +56,7 @@ export const AdvisorProjectCard = ({ project, onBecomeAdvisor }: AdvisorProjectC
 
                 <Button
                     size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                    className="gap-2"
                     onClick={() => onBecomeAdvisor(project)}
                 >
                     <GraduationCap className="w-4 h-4" /> Danışman Ol

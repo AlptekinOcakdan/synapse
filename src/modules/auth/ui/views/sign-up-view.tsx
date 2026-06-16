@@ -99,7 +99,7 @@ export const SignUpView = () => {
             </div>
 
             {/* Ana Kart */}
-            <div className="w-full max-w-4xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden relative">
+            <div className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-4xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden relative">
                 {/* İlerleme Çubuğu (Basit) */}
                 <div className="absolute top-0 left-0 h-1 bg-secondary w-full">
                     <div

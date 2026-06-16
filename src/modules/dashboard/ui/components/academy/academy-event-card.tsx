@@ -96,7 +96,7 @@ export const AcademyEventCard = ({ event, userId }: AcademyEventProps) => {
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
                 <div className="absolute top-3 left-3">
-                    <Badge variant="secondary" className="bg-black/60 text-white backdrop-blur-sm border-white/10">
+                    <Badge variant="secondary" className="bg-background/60 text-foreground backdrop-blur-sm border-foreground/10">
                         {event.platform}
                     </Badge>
                 </div>
@@ -118,8 +118,8 @@ export const AcademyEventCard = ({ event, userId }: AcademyEventProps) => {
                 </div>
 
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    <div className="bg-white/20 backdrop-blur-md p-3 rounded-full">
-                        <PlayCircle className="w-12 h-12 text-white" />
+                    <div className="bg-foreground/20 backdrop-blur-md p-3 rounded-full">
+                        <PlayCircle className="w-12 h-12 text-foreground" />
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@ export const AcademyEventCard = ({ event, userId }: AcademyEventProps) => {
                     ))}
                 </div>
 
-                <ScrollArea className="h-18 w-full pr-3">
+                <ScrollArea className="h-18 w-full [&>[data-radix-scroll-area-viewport]]:pr-3">
                     <p className="text-sm text-muted-foreground leading-relaxed">
                         {event.description}
                     </p>
@@ -212,7 +212,8 @@ export const AcademyEventCard = ({ event, userId }: AcademyEventProps) => {
 
                 {isLive ? (
                     <Button
-                        className="w-full bg-red-600 hover:bg-red-700 text-white gap-2 shadow-md shadow-red-500/20 h-9"
+                        className="w-full gap-2 shadow-md h-9"
+                        variant="destructive"
                         onClick={() => window.open(event.url, "_blank")}
                     >
                         <Radio className="w-4 h-4 animate-pulse" /> Yayına Eriş

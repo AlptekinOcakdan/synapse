@@ -10,6 +10,20 @@ export interface LayoutProps {
   children: ReactNode;
 }
 
+export function getInitials(name: string, fallback = ""): string {
+  if (!name?.trim()) return fallback;
+  const parts = name.trim().split(" ").filter(Boolean);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+export function getDeptLabel(
+  value: string,
+  departments: Array<{ value: string; label: string }> | undefined
+): string {
+  return departments?.find((d) => d.value === value)?.label ?? value;
+}
+
 /**
  * formatDate: Gelen tarih değerini (string | number | Date | null | undefined)
  * kullanıcıya okunabilir Türkçe biçiminde döndürür.

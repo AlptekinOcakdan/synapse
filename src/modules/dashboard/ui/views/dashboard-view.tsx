@@ -5,10 +5,11 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button"; // Buton eklendi
 import { ProjectCard } from "../components/dashboard/project-card";
-import { ProjectsFilterBar } from "../components/dashboard/projects-filter-bar";
+import { ProjectsFilterBar } from "../components/projects/projects-filter-bar";
 import { AdvancedSearchPanel } from "../components/dashboard/advanced-search-panel";
 import { ProjectDetailsDialog } from "@/modules/dashboard/ui/components/dashboard/project-details-dialog";
 import { Loader2, ArrowDown } from "lucide-react";
+import { EmptyState } from "../components/shared/empty-state";
 
 // --- CONVEX IMPORTS ---
 import { usePaginatedQuery, useQuery } from "convex/react";
@@ -133,6 +134,8 @@ export const DashboardView = ({userId}:DashboardViewProps) => {
                     toggleSort={toggleSort}
                     isAdvancedOpen={isAdvancedOpen}
                     toggleAdvanced={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                    searchPlaceholder="Proje adı veya proje sahibi ara..."
+                    filterLabel="Gelişmiş Arama"
                 />
 
                 <AdvancedSearchPanel
@@ -149,11 +152,11 @@ export const DashboardView = ({userId}:DashboardViewProps) => {
             {/* --- LİSTE --- */}
             <div className="space-y-4">
                 {filteredProjects.length === 0 ? (
-                    <div className="text-center py-20 text-muted-foreground">
-                        {status === "Exhausted"
+                    <EmptyState
+                        title={status === "Exhausted"
                             ? "Aradığınız kriterlere uygun proje bulunamadı."
                             : "Projeler yükleniyor..."}
-                    </div>
+                    />
                 ) : (
                     filteredProjects.map((project) => (
                         <ProjectCard key={project.id} project={project} userId={userId} />

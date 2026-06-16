@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { EmptyState } from "../components/shared/empty-state";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 // Pagination bileşenlerini kaldırdık çünkü "Projelerim" listesi genelde kısadır
@@ -124,11 +125,11 @@ export const ProjectsView = ({userId, isAdvisor}: ProjectsViewProps) => {
             {/* --- PROJECTS LIST --- */}
             <div className="space-y-4">
                 {filteredProjects.length === 0 ? (
-                    <div className="text-center py-20 text-muted-foreground border border-dashed rounded-lg bg-muted/10">
-                        {searchQuery || selectedCompetition || statusFilter !== "all"
+                    <EmptyState
+                        title={searchQuery || selectedCompetition || statusFilter !== "all"
                             ? "Arama kriterlerine uygun proje bulunamadı."
                             : "Henüz bir projen yok veya bir projeye katılmadın."}
-                    </div>
+                    />
                 ) : (
                     filteredProjects.map((project) => (
                         <ProjectCard

@@ -31,6 +31,7 @@ import { api } from "@/convex/_generated/api";
 import { useSession } from "@/providers/session-provider";
 import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
+import { getInitials, getDeptLabel } from "@/lib/utils";
 
 interface ProfileDetailsDialogProps {
     profile: UserProfile;
@@ -41,23 +42,12 @@ interface ProfileDetailsDialogProps {
 
 export const ProfileDetailsDialog = ({ profile, children, open, onOpenChange }: ProfileDetailsDialogProps) => {
     const router = useRouter();
-    const departments = useQuery(api.departments.get);
     const userProjects = useQuery(
         api.projects.getProjectsByUser,
         profile.id ? { userId: profile.id } : "skip"
     );
     const { userId } = useSession();
     const createOrGetConversation = useMutation(api.chats.getOrCreateConversation);
-
-    const getDeptLabel = (val: string) => {
-        return (departments || []).find(d => d.value === val)?.label || val;
-    };
-
-    const getInitials = (name: string) => {
-        const parts = name.split(" ");
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    };
 
     const handleContact = async () => {
         if (!userId || !profile.id) {
@@ -112,7 +102,7 @@ export const ProfileDetailsDialog = ({ profile, children, open, onOpenChange }: 
                                 <h2 className="text-2xl font-bold">{profile.name}</h2>
                                 {profile.isAvailable && (
                                     <Badge variant="secondary"
-                                           className="bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-200">
+                                           className="bg-success/10 text-success hover:bg-success/20 border-success/20">
                                         Projeye Açık
                                     </Badge>
                                 )}
@@ -122,7 +112,7 @@ export const ProfileDetailsDialog = ({ profile, children, open, onOpenChange }: 
                             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-1">
                                 <div className="flex items-center gap-1.5">
                                     <GraduationCap className="w-4 h-4" />
-                                    <span>{getDeptLabel(profile.department)}</span>
+                                    <span>{getDeptLabel(profile.department, undefined)}</span>
                                 </div>
                             </div>
                             <div className="hidden md:block">
@@ -139,7 +129,7 @@ export const ProfileDetailsDialog = ({ profile, children, open, onOpenChange }: 
                     <DialogDescription>Kullanıcı detayları</DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="h-[calc(90dvh-20rem)] px-6">
+                <ScrollArea className="h-[calc(90dvh-22rem)] md:h-[calc(90dvh-20rem)] px-6">
                     <div className="space-y-8 py-6">
 
                         <section className="space-y-3">
@@ -237,7 +227,7 @@ export const ProfileDetailsDialog = ({ profile, children, open, onOpenChange }: 
                                                                     {project.title}
                                                                 </h4>
                                                                 {isOwner ? (
-                                                                    <Badge className="bg-indigo-500/10 text-indigo-600 border-indigo-200 hover:bg-indigo-500/20 text-[10px] px-1.5 h-5 gap-1">
+                                                                    <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 text-[10px] px-1.5 h-5 gap-1">
                                                                         <Crown className="w-3 h-3" /> Kurucu
                                                                     </Badge>
                                                                 ) : (

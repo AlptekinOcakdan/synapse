@@ -58,7 +58,7 @@ export const SignInView = () => {
                 <SynapseLogo/>
             </div>
 
-            <div className="w-full max-w-sm bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
+            <div className="w-[92vw] sm:max-w-sm bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
                 <div className="p-6 pb-2 flex flex-col items-center text-center">
                     <h1 className="text-xl font-bold text-foreground mb-1">
                         {step === "EMAIL" ? "Hesabına Giriş Yap" : "Kodu Doğrula"}

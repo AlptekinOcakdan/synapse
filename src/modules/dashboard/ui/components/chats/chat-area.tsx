@@ -199,7 +199,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                                     <ContextMenuTrigger>
                                         <div
                                             className={cn(
-                                                "flex w-full gap-2 md:gap-3 max-w-[85%] md:max-w-[75%]",
+                                                "flex w-full gap-2 md:gap-3 max-w-[85%] md:max-w-[75%] min-w-0",
                                                 isMe ? "ml-auto flex-row-reverse" : "mr-auto flex-row"
                                             )}
                                         >
@@ -222,7 +222,7 @@ export const ChatArea = ({ chatId, chatData, onMobileMenuOpen, userId }: ChatAre
                                                     </span>
                                                 )}
 
-                                                <span className="leading-relaxed whitespace-pre-wrap">
+                                                <span className="leading-relaxed whitespace-pre-wrap break-words">
                                                     {msg.content}
                                                 </span>
 

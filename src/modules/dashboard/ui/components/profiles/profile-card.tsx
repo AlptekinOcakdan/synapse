@@ -1,6 +1,6 @@
 "use client";
 
-import { Trophy, Briefcase, GraduationCap, ArrowRight } from "lucide-react";
+import { GraduationCap, ArrowRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator";
 import {UserProfile, Department } from "../../../types";
 import {ProfileDetailsDialog} from "@/modules/dashboard/ui/components/profiles/profile-details-dialog";
+import { getInitials, getDeptLabel } from "@/lib/utils";
+import { ProjectStatsCards } from "@/modules/dashboard/ui/components/shared/project-stats-cards";
 
 interface ProfileCardProps {
     profile: UserProfile;
@@ -15,17 +17,6 @@ interface ProfileCardProps {
 }
 
 export const ProfileCard = ({ profile, departments }: ProfileCardProps) => {
-
-    // İsimden baş harfleri alma
-    const getInitials = (name: string) => {
-        const parts = name.split(" ");
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    };
-
-    const getDeptLabel = (val: string) => {
-        return (departments || []).find(d => d.value === val)?.label || val;
-    };
 
     return (
         <Card className="hover:border-primary/50 transition-all duration-300 group flex flex-col h-full overflow-hidden w-full">
@@ -40,7 +31,7 @@ export const ProfileCard = ({ profile, departments }: ProfileCardProps) => {
                     </Avatar>
                     {/* Online/Müsaitlik Durumu (Opsiyonel Süsleme) */}
                     {profile.isAvailable && (
-                        <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-background rounded-full" title="Projelere Açık" />
+                        <span className="absolute bottom-0 right-0 w-4 h-4 bg-success border-2 border-background rounded-full" title="Projelere Açık" />
                     )}
                 </div>
 
@@ -53,58 +44,16 @@ export const ProfileCard = ({ profile, departments }: ProfileCardProps) => {
                     </p>
                     <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/80">
                         <GraduationCap className="w-3.5 h-3.5" />
-                        <span className="truncate">{getDeptLabel(profile.department)}</span> {/* Burayı güncelleyin */}
+                        <span className="truncate">{getDeptLabel(profile.department, departments)}</span>
                     </div>
                 </div>
             </CardHeader>
 
             <CardContent className="flex-1 space-y-5 pb-4">
-                {/* --- İSTATİSTİKLER (Grid Yapısı) --- */}
-                <div className="grid grid-cols-2 gap-4">
-                    {/* 1. KART: TAMAMLANAN PROJELER */}
-                    <div className="group relative overflow-hidden rounded-xl border border-border/40 bg-linear-to-br from-muted/50 via-muted/20 to-transparent p-4 flex flex-col items-center justify-center text-center hover:border-border/80 transition-all duration-300">
-
-                        {/* İkon */}
-                        <div className="mb-2 p-2 rounded-full bg-background/50 border border-border/50 shadow-sm group-hover:scale-110 transition-transform duration-300 z-10">
-                            <Briefcase className="w-4 h-4 text-muted-foreground" />
-                        </div>
-
-                        {/* Sayı Değeri */}
-                        <span className="text-3xl font-black tracking-tight text-foreground z-10 mb-0.5">
-                            {profile.completedProjectCount}
-                        </span>
-
-                        {/* Açıklayıcı Metin (Düzeltildi) */}
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 z-10">
-                            Tamamlanan Proje
-                        </span>
-
-                        {/* Arka Plan Dekoru */}
-                        <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full bg-foreground/5 blur-2xl group-hover:bg-foreground/10 transition-colors duration-500" />
-                    </div>
-
-                    {/* 2. KART: AKTİF / DEVAM EDEN PROJELER */}
-                    <div className="group relative overflow-hidden rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 flex flex-col items-center justify-center text-center hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all duration-300">
-
-                        {/* İkon */}
-                        <div className="mb-2 p-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.2)] group-hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] group-hover:scale-110 transition-all duration-300 z-10">
-                            <Trophy className="w-4 h-4 text-indigo-400" />
-                        </div>
-
-                        {/* Sayı Değeri */}
-                        <span className="text-3xl font-black tracking-tight text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] z-10 mb-0.5">
-                            {profile.activeProjectCount}
-                        </span>
-
-                        {/* Açıklayıcı Metin (Düzeltildi) */}
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400/80 z-10">
-                        Aktif Proje
-                        </span>
-
-                        {/* Arka Plan Glow Efekti */}
-                        <div className="absolute bottom-0 left-0 -ml-4 -mb-4 w-24 h-24 rounded-full bg-indigo-500/10 blur-2xl group-hover:bg-indigo-500/20 transition-colors duration-500" />
-                    </div>
-                </div>
+                <ProjectStatsCards
+                    completedCount={profile.completedProjectCount}
+                    activeCount={profile.activeProjectCount}
+                />
 
                 {/* --- YETENEKLER --- */}
                 <div className="space-y-2">

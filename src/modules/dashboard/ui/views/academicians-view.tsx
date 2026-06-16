@@ -7,6 +7,7 @@ import { Search, Filter, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { AcademicianCard } from "../components/academics/academician-card";
+import { EmptyState } from "../components/shared/empty-state";
 
 // --- CONVEX IMPORTS ---
 import { useQuery } from "convex/react";
@@ -88,21 +89,21 @@ export const AcademiciansView = ({userId}: AcademiciansViewProps) => {
             <Separator />
 
             {/* --- GRID LIST --- */}
-            <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(360px,1fr))] gap-6">
                 {academicians.length > 0 ? (
                     academicians.map((academician) => (
                         <AcademicianCard key={academician.id} academician={academician} userId={userId} />
                     ))
                 ) : (
-                    <div className="col-span-full text-center py-12 text-muted-foreground">
-                        <p>Aradığınız kriterlere uygun akademisyen bulunamadı.</p>
-                        <Button
-                            variant="link"
-                            onClick={() => {setSearchQuery(""); setSelectedDepartment("all");}}
-                        >
-                            Filtreleri Temizle
-                        </Button>
-                    </div>
+                    <EmptyState
+                        className="col-span-full"
+                        title="Aradığınız kriterlere uygun akademisyen bulunamadı."
+                        action={
+                            <Button variant="link" onClick={() => { setSearchQuery(""); setSelectedDepartment("all"); }}>
+                                Filtreleri Temizle
+                            </Button>
+                        }
+                    />
                 )}
             </div>
         </div>
