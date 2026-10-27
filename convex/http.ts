@@ -35,11 +35,13 @@ http.route({
         try {
             const wh = new Webhook(WEBHOOK_SECRET);
             // Eğer imza tutmazsa burası hata fırlatır ve catch bloğuna düşeriz
-            body = wh.verify(payloadString, {
+            // svix 2: verify() artık değer döndürmüyor, sadece imza hatasında fırlatıyor; doğrulanmış ham gövdeyi biz parse ediyoruz
+            wh.verify(payloadString, {
                 "svix-id": svix_id,
                 "svix-timestamp": svix_timestamp,
                 "svix-signature": svix_signature,
-            }) as Record<string, unknown>;
+            });
+            body = JSON.parse(payloadString) as Record<string, unknown>;
         } catch (err) {
             console.error("Webhook imzası doğrulanamadı (Fake Request):", err);
             return new Response("Error: Invalid signature", { status: 400 });

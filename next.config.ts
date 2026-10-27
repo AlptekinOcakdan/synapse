@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
         ],
     },
     allowedDevOrigins: ['localhost:3000', 'morally-advanced-escargot.ngrok-free.app', "synapse.ngrok.app"],
+    // `next dev` AGENTS.md üretmesin; proje kuralları CLAUDE.md'de
+    agentRules: false,
 };
 
 export default nextConfig;
